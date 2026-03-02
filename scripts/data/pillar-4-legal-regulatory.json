@@ -1,0 +1,576 @@
+[
+  {
+    "questionNumber": 1,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What is the EU AI Act risk classification for this system (unacceptable, high-risk, limited, minimal)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Classify risk level based on Annex III categories and system functionality.",
+    "type": "RADIO",
+    "options": [
+      "Unacceptable risk (prohibited)",
+      "High risk (strict requirements)",
+      "Limited risk (transparency obligations)",
+      "Minimal risk (no specific obligations)",
+      "Not yet classified"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 2,
+    "subCategory": "EU AI Act Compliance",
+    "text": "Does this system fall under any Annex III high-risk AI category?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Check against all 8 Annex III domains and sub-categories.",
+    "type": "RADIO",
+    "options": [
+      "Yes - fully compliant",
+      "No - gaps identified",
+      "Currently assessing",
+      "Not applicable"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 3,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What conformity assessment procedure is required?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Determine assessment type based on risk classification and domain.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 4,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What technical documentation is required under EU AI Act Article 11?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate documentation checklist from Article 11 requirements."
+  },
+  {
+    "questionNumber": 5,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What quality management system requirements apply (Article 17)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map QMS requirements from Article 17 to current processes.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 6,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What transparency obligations apply (Article 13, Article 52)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify transparency requirements based on system type and user interaction.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 7,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What human oversight requirements apply (Article 14)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map human oversight measures from Article 14 to system design.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 8,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What record-keeping and logging requirements apply (Article 12)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate logging requirements checklist from Article 12."
+  },
+  {
+    "questionNumber": 9,
+    "subCategory": "EU AI Act Compliance",
+    "text": "What post-market monitoring obligations apply (Article 61)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design post-market monitoring plan per Article 61 requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 10,
+    "subCategory": "EU AI Act Compliance",
+    "text": "Is registration in the EU AI database required (Article 60)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Determine registration requirements based on system classification.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 11,
+    "subCategory": "Data Protection & Privacy",
+    "text": "What GDPR lawful basis applies for personal data processing?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess lawful basis options based on data processing activities.",
+    "type": "RADIO",
+    "options": [
+      "Consent",
+      "Legitimate interest",
+      "Contractual necessity",
+      "Legal obligation",
+      "Vital interests",
+      "Public interest",
+      "Multiple bases apply",
+      "Not yet determined"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 12,
+    "subCategory": "Data Protection & Privacy",
+    "text": "Has a Data Protection Impact Assessment (DPIA) been conducted?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Guide through DPIA framework and flag high-risk processing activities.",
+    "type": "RADIO",
+    "options": [
+      "Completed",
+      "In progress",
+      "Required but not started",
+      "Not required",
+      "Under assessment"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 13,
+    "subCategory": "Data Protection & Privacy",
+    "text": "What data subject rights must be supported (access, rectification, erasure, portability)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map applicable data subject rights from GDPR and local regulations."
+  },
+  {
+    "questionNumber": 14,
+    "subCategory": "Data Protection & Privacy",
+    "text": "What cross-border data transfer mechanisms are needed (SCCs, BCRs, adequacy)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Assess transfer mechanisms based on data flows and jurisdictions.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 15,
+    "subCategory": "Data Protection & Privacy",
+    "text": "Is a Data Processing Agreement (DPA) required with third-party providers?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify DPA needs based on data sharing arrangements."
+  },
+  {
+    "questionNumber": 16,
+    "subCategory": "Data Protection & Privacy",
+    "text": "What data retention periods apply to AI training data and inference logs?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Determine retention periods from regulatory requirements and data categories.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 17,
+    "subCategory": "Data Protection & Privacy",
+    "text": "How will the right to explanation for automated decisions be implemented (GDPR Art. 22)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design explanation mechanism meeting Art. 22 requirements."
+  },
+  {
+    "questionNumber": 18,
+    "subCategory": "Data Protection & Privacy",
+    "text": "What privacy-by-design measures are incorporated?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply privacy-by-design checklist to system architecture.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 19,
+    "subCategory": "Data Protection & Privacy",
+    "text": "Is a legitimate interest assessment (LIA) required?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Conduct preliminary LIA based on processing purposes and data sensitivity.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 20,
+    "subCategory": "Data Protection & Privacy",
+    "text": "What children's data protection requirements apply (if any)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Assess applicability of children's data protection regulations.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 21,
+    "subCategory": "Sector-Specific Regulations",
+    "text": "What industry-specific regulations apply (financial services, healthcare, education)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify sector-specific AI regulations from industry classification.",
+    "type": "CHECKBOX",
+    "options": [
+      "Financial services",
+      "Healthcare / Life sciences",
+      "Government / Public sector",
+      "Education",
+      "Telecommunications",
+      "Energy / Utilities",
+      "Manufacturing",
+      "Retail / E-commerce",
+      "Transportation",
+      "Other"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 22,
+    "subCategory": "Sector-Specific Regulations",
+    "text": "Are there professional licensing or certification requirements for AI in this domain?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Research domain-specific certification requirements."
+  },
+  {
+    "questionNumber": 23,
+    "subCategory": "Sector-Specific Regulations",
+    "text": "What consumer protection laws apply to AI-powered products/services?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map applicable consumer protection regulations."
+  },
+  {
+    "questionNumber": 24,
+    "subCategory": "Sector-Specific Regulations",
+    "text": "Are there anti-discrimination laws that constrain AI decision-making?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify anti-discrimination laws relevant to the use case domain."
+  },
+  {
+    "questionNumber": 25,
+    "subCategory": "Sector-Specific Regulations",
+    "text": "What employment law implications exist if AI is used in HR/workforce decisions?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess employment law requirements for AI-assisted workforce decisions.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 26,
+    "subCategory": "Sector-Specific Regulations",
+    "text": "What accessibility regulations apply (ADA, EAA)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map accessibility requirements from applicable regulations."
+  },
+  {
+    "questionNumber": 27,
+    "subCategory": "Intellectual Property & Licensing",
+    "text": "What IP rights apply to AI model outputs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Analyze IP ownership framework for AI-generated content.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 28,
+    "subCategory": "Intellectual Property & Licensing",
+    "text": "Are there copyright concerns with AI training data?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess training data copyright compliance and fair use considerations."
+  },
+  {
+    "questionNumber": 29,
+    "subCategory": "Intellectual Property & Licensing",
+    "text": "What model licensing terms and restrictions apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Review licensing terms for all AI models and components used."
+  },
+  {
+    "questionNumber": 30,
+    "subCategory": "Intellectual Property & Licensing",
+    "text": "How will open-source AI component licensing be managed?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Audit open-source dependencies and licensing compatibility."
+  },
+  {
+    "questionNumber": 31,
+    "subCategory": "Intellectual Property & Licensing",
+    "text": "What trade secret protection measures are needed for proprietary AI components?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend trade secret protection for custom models and training data."
+  },
+  {
+    "questionNumber": 32,
+    "subCategory": "Intellectual Property & Licensing",
+    "text": "Are there patent considerations for the AI approach or algorithms used?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Conduct preliminary patent landscape analysis for the AI techniques used.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 33,
+    "subCategory": "Liability & Insurance",
+    "text": "What liability allocation framework and product liability considerations apply?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires legal analysis of liability allocation.",
+    "type": "RADIO",
+    "options": [
+      "Provider bears liability",
+      "Deployer bears liability",
+      "Shared liability model",
+      "Insurance-backed",
+      "Not yet determined"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 34,
+    "subCategory": "Liability & Insurance",
+    "text": "What product liability regulations apply to AI-powered products?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify applicable product liability frameworks (EU Product Liability Directive).",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 35,
+    "subCategory": "Liability & Insurance",
+    "text": "Is AI-specific insurance needed (errors & omissions, cyber, product liability)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess insurance needs based on risk profile and liability exposure."
+  },
+  {
+    "questionNumber": 36,
+    "subCategory": "Liability & Insurance",
+    "text": "What contractual liability limitations should be included in agreements?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose liability clauses for AI-related contracts.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 37,
+    "subCategory": "Liability & Insurance",
+    "text": "How will liability be apportioned in multi-vendor AI supply chains?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires legal analysis of supply chain liability allocation.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 38,
+    "subCategory": "Contractual & Vendor",
+    "text": "What AI-specific clauses are needed in vendor contracts?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Generate AI contract clause checklist (data usage, model ownership, SLAs)."
+  },
+  {
+    "questionNumber": 39,
+    "subCategory": "Contractual & Vendor",
+    "text": "What SLA commitments are required from AI service providers?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Define SLA requirements based on criticality and usage patterns."
+  },
+  {
+    "questionNumber": 40,
+    "subCategory": "Contractual & Vendor",
+    "text": "What data ownership and processing terms govern vendor relationships?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Review data terms in vendor agreements against requirements."
+  },
+  {
+    "questionNumber": 41,
+    "subCategory": "Contractual & Vendor",
+    "text": "What exit clauses and data portability terms are needed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose vendor lock-in mitigation clauses and data portability terms.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 42,
+    "subCategory": "Contractual & Vendor",
+    "text": "What indemnification terms are needed for AI-related risks?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft indemnification language for AI-specific risk scenarios."
+  },
+  {
+    "questionNumber": 43,
+    "subCategory": "International & Jurisdictional",
+    "text": "In which jurisdictions will this AI system operate?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map deployment jurisdictions from business requirements.",
+    "type": "CHECKBOX",
+    "options": [
+      "European Union",
+      "United States",
+      "United Kingdom",
+      "Canada",
+      "Asia-Pacific (APAC)",
+      "Middle East & Africa",
+      "Latin America",
+      "Global / Multiple regions"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 44,
+    "subCategory": "International & Jurisdictional",
+    "text": "What jurisdiction-specific AI regulations apply (US state laws, China AI regulations, etc.)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research AI regulations for each deployment jurisdiction."
+  },
+  {
+    "questionNumber": 45,
+    "subCategory": "International & Jurisdictional",
+    "text": "How will conflicting regulations across jurisdictions be managed?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires legal analysis of regulatory conflict resolution.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 46,
+    "subCategory": "International & Jurisdictional",
+    "text": "What export control regulations apply to AI technology?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Check AI components against export control lists and restrictions."
+  },
+  {
+    "questionNumber": 47,
+    "subCategory": "International & Jurisdictional",
+    "text": "What sanctions or trade restrictions affect AI vendor selection?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Screen vendors and technologies against sanctions lists.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 48,
+    "subCategory": "Compliance Framework",
+    "text": "What internal compliance policies govern AI deployment?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map to organization's AI policy framework."
+  },
+  {
+    "questionNumber": 49,
+    "subCategory": "Compliance Framework",
+    "text": "What compliance monitoring and reporting requirements exist?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate compliance monitoring checklist from applicable regulations."
+  },
+  {
+    "questionNumber": 50,
+    "subCategory": "Compliance Framework",
+    "text": "What audit trail and evidence requirements apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Define audit trail requirements from regulatory and internal policy frameworks."
+  },
+  {
+    "questionNumber": 51,
+    "subCategory": "Compliance Framework",
+    "text": "What compliance training is required for team members?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify mandatory training from regulatory requirements and role responsibilities.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 52,
+    "subCategory": "Compliance Framework",
+    "text": "What third-party compliance certifications are required or recommended?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map required certifications from regulatory and customer requirements."
+  },
+  {
+    "questionNumber": 53,
+    "subCategory": "Compliance Framework",
+    "text": "How will regulatory changes be tracked and responded to?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose regulatory change monitoring and impact assessment process."
+  },
+  {
+    "questionNumber": 54,
+    "subCategory": "Risk & Impact Assessment",
+    "text": "What risk classification does this system receive under internal frameworks?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Classify using internal risk framework based on impact and likelihood.",
+    "type": "RADIO",
+    "options": [
+      "Critical / Very High",
+      "High",
+      "Medium",
+      "Low",
+      "Not yet assessed"
+    ]
+  },
+  {
+    "questionNumber": 55,
+    "subCategory": "Risk & Impact Assessment",
+    "text": "What is the potential harm severity if the AI system fails?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess harm severity across dimensions (financial, physical, psychological, reputational)."
+  },
+  {
+    "questionNumber": 56,
+    "subCategory": "Risk & Impact Assessment",
+    "text": "What vulnerable populations could be affected by this system?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify vulnerable populations from use case context and deployment domain."
+  },
+  {
+    "questionNumber": 57,
+    "subCategory": "Risk & Impact Assessment",
+    "text": "What fundamental rights impact assessment has been conducted?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Guide through fundamental rights impact assessment framework."
+  },
+  {
+    "questionNumber": 58,
+    "subCategory": "Risk & Impact Assessment",
+    "text": "What risk mitigation measures are in place or planned?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Generate risk mitigation plan from identified risks and best practices."
+  },
+  {
+    "questionNumber": 59,
+    "subCategory": "Documentation & Reporting",
+    "text": "What regulatory filings and ongoing compliance reporting requirements exist?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify required filings from applicable regulations and jurisdiction."
+  },
+  {
+    "questionNumber": 60,
+    "subCategory": "Documentation & Reporting",
+    "text": "What ongoing reporting obligations exist (incident reporting, periodic reviews)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map reporting obligations from regulatory requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 61,
+    "subCategory": "Documentation & Reporting",
+    "text": "What documentation must be maintained for regulatory inspection?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate documentation requirements list from applicable regulations."
+  },
+  {
+    "questionNumber": 62,
+    "subCategory": "Documentation & Reporting",
+    "text": "How will regulatory inquiries and audits be supported?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design audit response process and documentation repository."
+  },
+  {
+    "questionNumber": 63,
+    "subCategory": "Documentation & Reporting",
+    "text": "What model cards or system documentation standards apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply model card framework and documentation standards."
+  },
+  {
+    "questionNumber": 64,
+    "subCategory": "Emerging Regulations",
+    "text": "What anticipated regulatory changes and adaptability measures are planned?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research pending AI legislation in relevant jurisdictions."
+  },
+  {
+    "questionNumber": 65,
+    "subCategory": "Emerging Regulations",
+    "text": "How will the system adapt to evolving regulatory requirements?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design regulatory adaptability into system architecture.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 66,
+    "subCategory": "Emerging Regulations",
+    "text": "What industry standards and best practices should be followed proactively?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Identify relevant industry standards (ISO, IEEE, NIST) for AI systems."
+  },
+  {
+    "questionNumber": 67,
+    "subCategory": "Emerging Regulations",
+    "text": "What regulatory sandbox or testing opportunities are available?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research available regulatory sandboxes in relevant jurisdictions.",
+    "isInactive": true
+  }
+]

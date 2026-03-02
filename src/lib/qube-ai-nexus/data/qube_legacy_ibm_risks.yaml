@@ -1,0 +1,871 @@
+taxonomies:
+- id: qube-legacy-ibm
+  name: QUBE Legacy IBM Risk Atlas
+  description: Legacy IBM AI Risk Atlas imported into QUBE AI Risk Data
+risks:
+- id: qube-ibm-0005
+  name: Introduction of new data bias
+  description: Agents can generate new biased content or reinforce skewed data patterns.
+    These issues spread across downstream systems and create long-term fairness gaps.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Technological risk; Compliance risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0007
+  name: Impact on human agency
+  description: Highly autonomous agents can take over decisions that should remain
+    under human control. This reduces oversight and can create overdependence on automated
+    judgment.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Strategic risk; Operational risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0012
+  name: Attacks on external resources used by the agent
+  description: Agents depend on external APIs, tools and services. If attackers compromise
+    these components, the agent inherits the risk and may behave unpredictably.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Third-party or vendor risk; Operational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0018
+  name: Mitigation and maintenance challenges
+  description: Agent behavior changes as tools, environments or models evolve. Maintaining
+    safe behavior requires constant monitoring and policy updates over time.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Strategic risk; Compliance risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0020
+  name: Reproducibility issues
+  description: Agent behavior can differ between runs due to randomness, tool timing
+    or environmental differences. This complicates debugging, evaluation and incident
+    analysis.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Technological risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0022
+  name: Compliance difficulties
+  description: Autonomous actions may unintentionally violate rules, contracts or
+    regulatory requirements. Ensuring continuous compliance becomes harder as agents
+    evolve.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Legal risk; Operational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0023
+  name: Unrepresentative training distribution
+  description: The dataset doesn't accurately reflect real-world scenarios or user
+    populations. This causes uneven model performance and unreliable predictions in
+    critical contexts.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Technological risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0024
+  name: Training data contamination
+  description: The dataset contains irrelevant, corrupted or low-quality examples,
+    which distort model learning. These impurities often lead to unstable or inconsistent
+    model behavior.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Technological risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0025
+  name: Model overfitting during training
+  description: The model memorizes specific training examples instead of learning
+    generalizable patterns. This results in degraded performance when encountering
+    new or unseen data.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Technological risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0026
+  name: Embedded dataset bias
+  description: Harmful societal or historical biases are present in the training data
+    and become encoded in the model. This leads to unfair outcomes, discrimination
+    and compliance issues.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Legal risk; Reputational risk; Human resources risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0027
+  name: Poor data curation practices
+  description: Data is collected, filtered or prepared inconsistently, without quality
+    controls or ethical oversight. These weaknesses undermine the reliability and
+    fairness of the model.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Compliance risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0028
+  name: Risky or incorrect retraining
+  description: When retraining processes are unmanaged, new data can introduce regressions
+    or erase important learned behaviors. Models may degrade without clear warning.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Technological risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0029
+  name: Malicious data poisoning
+  description: Attackers or compromised pipelines may inject deceptive samples into
+    the training dataset. This allows models to be manipulated into harmful or targeted
+    behaviors.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Operational risk
+  severity: High
+  likelihood: Unlikely
+- id: qube-ibm-0030
+  name: Presence of personal data in training
+  description: The dataset unintentionally includes personal or sensitive information.
+    This creates regulatory exposure and ethical concerns if the model reproduces
+    this content.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0031
+  name: Reidentification through dataset content
+  description: Even anonymized training data can sometimes be matched with external
+    datasets to reveal identities. This undermines privacy protections and exposes
+    organizations to scrutiny.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Compliance risk; Legal risk
+  severity: High
+  likelihood: Unlikely
+- id: qube-ibm-0032
+  name: Misalignment with data privacy rights
+  description: The collected data may not comply with user consent, regional data
+    laws or deletion requests. These gaps can trigger legal disputes or force retraining
+    from scratch.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0033
+  name: Opaque training dataset
+  description: Teams lack visibility into how the dataset was sourced, filtered or
+    labeled. This opacity makes audits difficult and weakens trust in the model's
+    foundations.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0034
+  name: Unverified dataset provenance
+  description: The origin, licensing or intended use of the data is unclear. This
+    creates IP uncertainty and risks models being built on unauthorized or unethical
+    sources.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk; Third-party or vendor risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0035
+  name: Restrictions on data acquisition
+  description: Regulations or contractual terms limit which datasets the organization
+    can legally collect or purchase. Violating these rules exposes projects to penalties
+    or forced shutdowns.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0036
+  name: Restrictions on data usage
+  description: Some data is licensed only for research or non-commercial use. Training
+    models beyond those boundaries creates legal liabilities and reputational issues.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0037
+  name: Restrictions on data transfer
+  description: Cross-border data flows may violate regional laws or internal policies.
+    These constraints impact cloud architecture, storage, and model training pipelines.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Legal risk; Strategic risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0038
+  name: Confidential material embedded in training data
+  description: Internal documents, trade secrets or customer records may appear in
+    datasets without authorization. Models trained on such data risk exposing sensitive
+    information later.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Cybersecurity risk; Legal risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0039
+  name: Insufficient rights to use training data
+  description: The dataset may be protected by copyright or license terms that don't
+    allow model training or redistribution. Using it improperly can lead to lawsuits
+    and loss of trust.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk; Strategic risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0040
+  name: Low inference accuracy
+  description: The model may generate incorrect outputs when handling real-world data
+    not seen during training. These mistakes can be subtle and hard to detect in complex
+    workflows. In high-impact domains this becomes a reliability concern.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Technological risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0041
+  name: Evasion-based inference attack
+  description: Attackers craft inputs that intentionally mislead the model into producing
+    wrong or unsafe outputs. These attacks often bypass normal guardrails and exploit
+    model blind spots.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Technological risk
+  severity: High
+  likelihood: Unlikely
+- id: qube-ibm-0042
+  name: Model extraction attempt
+  description: An attacker sends repeated, carefully designed prompts to reverse-engineer
+    parts of the model. Over time this leaks intellectual property and reduces competitive
+    advantage.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Legal risk; Strategic risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0043
+  name: Jailbreaking the model
+  description: Users attempt to bypass safety rules through adversarial prompting
+    or instruction manipulation. Successful jailbreaks allow harmful output generation
+    or restricted functionality.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Compliance risk; Operational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0044
+  name: IP exposure in prompts
+  description: Users may include confidential designs, source code or proprietary
+    knowledge directly in prompts. This information may be logged, cached or indirectly
+    surfaced later.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Legal risk; Reputational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0045
+  name: Sensitive data exposure in prompts
+  description: Prompts may contain personal information or confidential business details.
+    If mishandled, this data can leak into analytics logs or reappear in outputs.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0047
+  name: Prompt leaking through responses
+  description: The model may reveal parts of its own system prompt, chain-of-thought
+    hints or prior interactions. These disclosures weaken security and reveal internal
+    logic.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0048
+  name: Prompt priming manipulation
+  description: Attackers manipulate earlier conversation context to influence how
+    the model interprets later prompts. This leads to biased or harmful outcomes without
+    clear visibility.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0050
+  name: Direct instruction override
+  description: Simple but forceful instructions are crafted to convince the model
+    to ignore its guardrails. These attacks exploit limitations in safety alignment.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Operational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0051
+  name: Encoded malicious inputs
+  description: Attackers embed harmful instructions inside encoded or obfuscated sequences
+    (base64, unicode tricks, special tokens). Models may decode and execute them unintentionally.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Operational risk; Technological risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0052
+  name: Indirect-objective manipulation
+  description: Attackers instruct the model through indirect cues, such as asking
+    it to emulate another agent or persona. These pathways often bypass standard safeguards.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0053
+  name: Social-engineering prompt attack
+  description: Attackers craft emotionally manipulative or authoritative prompts to
+    trick the model into harmful behavior. These prompts exploit trust and politeness
+    patterns in the model.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Human resources risk; Operational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0054
+  name: Special-token exploits
+  description: Models may respond unpredictably to rare or reserved tokens that behave
+    differently from normal text. Attackers exploit these quirks to destabilize the
+    system.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Technological risk; Cybersecurity risk
+  severity: Medium
+  likelihood: Unlikely
+- id: qube-ibm-0057
+  name: Biased decision outputs
+  description: The model may generate outputs that consistently favor or disadvantage
+    certain groups. These biased patterns appear in scoring, recommendations or evaluations
+    and can be difficult to detect. Organizations risk compliance violations and reputational
+    harm.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Legal risk; Reputational risk; Human resources risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0058
+  name: Skewed content generation
+  description: Outputs may reflect subtle biases from training data, producing unbalanced
+    summaries, suggestions or narratives. These distortions influence real decisions
+    and user perceptions.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Reputational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0059
+  name: Harmful advisory output
+  description: The model may propose unsafe actions, incorrect instructions or dangerous
+    recommendations. Users might act on them without verifying accuracy. This risk
+    grows in domains like healthcare or finance.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Legal risk; Safety risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0060
+  name: Unsafe code generation
+  description: When generating code, the model may introduce security vulnerabilities
+    or flawed logic. Developers may trust the output too readily, leading to exploitable
+    systems.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Technological risk; Operational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0061
+  name: Toxic or offensive output
+  description: The model may generate language that is insulting, harmful or inappropriate.
+    Even rare incidents damage trust and can have regulatory implications.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Reputational risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0062
+  name: Incomplete or misleading advice
+  description: The model may provide partially correct answers that omit critical
+    details. These subtle gaps can mislead users more than outright errors.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Safety risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0063
+  name: Overtrust in generated outputs
+  description: Users may rely heavily on AI-generated responses without validating
+    them. This leads to poor decision-making, especially in high-stakes environments.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Strategic risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0064
+  name: Harmful use of generated output
+  description: End users may deliberately weaponize the model's output (e.g., for
+    fraud, manipulation or cyberattacks). The model becomes an indirect enabler of
+    harmful activity.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Legal risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0065
+  name: Disinformation generation
+  description: The model can produce highly realistic but false content that spreads
+    quickly. This can influence public opinion or damage institutional credibility.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Reputational risk; Legal risk; Societal risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0066
+  name: Nonconsensual content generation
+  description: The model may be used to generate content involving individuals without
+    their consent, including impersonation. This creates ethical and privacy violations.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Data privacy risk; Reputational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0067
+  name: Propagation of toxic content
+  description: The model may repeat or amplify harmful language it has been exposed
+    to. These outputs negatively affect communities and user wellbeing.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Reputational risk; Compliance risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0068
+  name: Improper contextual usage
+  description: Outputs may be applied outside their intended purpose, leading to misuse.
+    Even harmless-looking responses cause harm when placed into the wrong business
+    flow.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Compliance risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0069
+  name: Lack of user disclosure
+  description: When the output does not clarify that it is AI-generated, users may
+    interpret it as authoritative or human-written. This transparency gap misleads
+    stakeholders.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Reputational risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0070
+  name: Hallucinatory incorrect output
+  description: The model may confidently generate content that is entirely fabricated.
+    These hallucinations often appear plausible, increasing the risk of being taken
+    as truth.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Safety risk; Reputational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0071
+  name: Exposure of private information through output
+  description: The model might unintentionally output private data learned from training
+    or previous interactions. This creates legal exposure and privacy violations.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0072
+  name: Copyright-sensitive content generation
+  description: Outputs may resemble or replicate copyrighted material. This introduces
+    intellectual property disputes and business risk.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk; Reputational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0073
+  name: Disclosure of confidential information
+  description: The model can unknowingly reproduce internal documents, secrets or
+    proprietary designs. These exposures are difficult to detect and mitigate post-incident.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Data privacy risk; Legal risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0074
+  name: Opaque reasoning in output
+  description: The model produces conclusions without explaining how it arrived at
+    them. This reduces reliability and complicates human validation.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Compliance risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0076
+  name: Untraceable output origins
+  description: It becomes unclear whether an output was generated from training data,
+    retrieved material or internal heuristics. This ambiguity obstructs audits and
+    legal review.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Legal risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0077
+  name: Inaccessible training-source context
+  description: Users and auditors cannot determine the training datasets behind specific
+    outputs. This makes it difficult to assess fairness, privacy exposure or legal
+    compliance.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Legal risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0078
+  name: Insufficient data transparency
+  description: Teams may not clearly understand how data was sourced, processed or
+    validated before being used in an AI system. This lack of clarity complicates
+    audits and weakens trust. It often leads to compliance gaps.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0080
+  name: Opaque system-level behavior
+  description: Even if individual components are documented, the full system behavior
+    becomes unpredictable when interactions scale. Organizations struggle to map cause
+    and effect across the pipeline.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Strategic risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0081
+  name: Insufficient domain expertise
+  description: Teams building or deploying models may lack deep knowledge of the domain
+    where the AI is applied. This leads to misinterpretation of outputs, weak oversight
+    and flawed decision-making.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Human resources risk; Operational risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0082
+  name: Poor use-case definition
+  description: AI systems may be deployed into workflows without clearly defining
+    scope, boundaries or intended outcomes. Ambiguous goals increase the risk of misuse
+    or misalignment.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Strategic risk; Operational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0084
+  name: Incorrect or shallow risk testing
+  description: Tests may be rushed, incomplete or misaligned with actual deployment
+    conditions. This produces a false sense of confidence and allows major issues
+    to escape detection.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0085
+  name: Lack of diversity in test coverage
+  description: Testing may omit demographic groups, environmental conditions or linguistic
+    variations. AI performance then becomes uneven across users and contexts.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Reputational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0086
+  name: Temporal drift in performance
+  description: AI systems degrade over time because real-world data shifts, user behavior
+    changes or context evolves. Without continuous monitoring, the system becomes
+    less accurate and less safe.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Strategic risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0087
+  name: Model usage rights uncertainty
+  description: Teams may be unsure whether they legally have the rights to use a model
+    for certain purposes. These uncertainties create legal exposure and can halt deployments
+    abruptly.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0088
+  name: Ambiguous legal accountability
+  description: It may be unclear who is legally responsible for an AI-driven decision
+    or outcome. This creates conflicts between teams, vendors and regulators, especially
+    during incidents.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk; Strategic risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0089
+  name: Unclear ownership of generated content
+  description: AI-generated outputs may not have a clear owner under current IP frameworks.
+    This ambiguity complicates commercial use and contract obligations.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Strategic risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0090
+  name: Environmental impact of AI operations
+  description: Large-scale model training and inference consume significant energy.
+    Without monitoring, organizations may exceed sustainability targets or face public
+    criticism.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Environmental risk; Reputational risk
+  severity: Low
+  likelihood: Possible
+- id: qube-ibm-0092
+  name: Human exploitation through automation
+  description: AI-driven workflows may pressure workers, accelerate productivity expectations
+    or automate oversight unfairly. These issues create workplace inequality and ethical
+    concerns.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Human resources risk; Reputational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0093
+  name: Workforce disruption and job displacement
+  description: AI adoption can restructure teams and eliminate roles unexpectedly.
+    Poor communication and planning amplify morale loss and resistance to adoption.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Human resources risk; Strategic risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0094
+  name: Reduced human agency in oversight processes
+  description: As AI automates decision-making, human reviewers may be sidelined or
+    feel unable to intervene. This weakens governance and accountability mechanisms.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Strategic risk; Compliance risk; Operational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0095
+  name: Cultural homogenization via AI systems
+  description: AI-driven outputs may standardize communication, creativity and expression
+    in ways that suppress cultural diversity. This subtly shapes user behavior over
+    time.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Societal risk; Reputational risk
+  severity: Medium
+  likelihood: Unlikely
+- id: qube-ibm-0096
+  name: Academic integrity risks
+  description: Students or researchers may misuse AI to bypass learning, write assignments
+    or generate research. This erodes educational trust and assessment integrity.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Educational risk; Reputational risk
+  severity: Medium
+  likelihood: Likely
+- id: qube-ibm-0097
+  name: AI-enabled plagiarism
+  description: AI can generate content that is too similar to copyrighted or academic
+    sources. Users may unknowingly commit plagiarism, triggering disciplinary or legal
+    consequences.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Educational risk; Legal risk; Reputational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0098
+  name: Exclusion of certain user groups
+  description: AI systems may work poorly for users with specific accents, disabilities,
+    languages or cultural backgrounds. This exclusion reduces accessibility and harms
+    user experience.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Societal risk; Reputational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0099
+  name: Realistic but incorrect content generation
+  description: Generative models can produce text that looks polished and authoritative
+    but is factually wrong. These errors are more likely to be believed because of
+    the natural writing style. This increases misinformation risks and misinformed
+    decision-making.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Reputational risk; Safety risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0100
+  name: Highly plausible hallucinations
+  description: Hallucinations in generative models often appear coherent and detailed,
+    making them harder to detect. Users may adopt them as truth, causing cascading
+    errors in workflows. This is especially dangerous in compliance-heavy domains.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Compliance risk; Reputational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0101
+  name: Synthetic content abuse at scale
+  description: Generative AI enables rapid creation of harmful media such as phishing
+    emails, impersonations or fraud campaigns. Attackers gain efficiency and sophistication
+    with minimal effort.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Societal risk; Legal risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0102
+  name: Manipulative or persuasive output
+  description: Generative models can craft emotionally engaging or persuasive content
+    that influences behavior. This raises risks of manipulation in politics, finance
+    or consumer decisions.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Societal risk; Reputational risk; Legal risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0103
+  name: Deepfake-style synthetic media generation
+  description: Models capable of generating images, video or audio can be misused
+    to create realistic fabrications. These outputs can damage reputations, enable
+    fraud or undermine trust.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Cybersecurity risk; Legal risk; Reputational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0104
+  name: Unintentional disclosure of sensitive training patterns
+  description: Generative models may reproduce phrases, structures or snippets that
+    resemble sensitive training data. This happens even without explicit memorization
+    and creates privacy/legal risk.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Legal risk; Compliance risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0105
+  name: Amplified copyright exposure
+  description: Generated text or media may resemble copyrighted works, even when not
+    an exact match. Organizations face IP risks when outputs are used commercially.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Legal risk; Compliance risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0106
+  name: Propagating biased generative patterns
+  description: Generative models may amplify biases through storytelling, examples
+    or structural patterns. These subtle biases spread through downstream content
+    or decisions.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Compliance risk; Reputational risk; Societal risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0107
+  name: Unsafe reasoning chains
+  description: Generative models sometimes produce step-by-step reasoning that seems
+    rational but contains flaws or unsafe assumptions. These errors mislead users
+    and weaken safety.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Safety risk; Operational risk
+  severity: High
+  likelihood: Possible
+- id: qube-ibm-0108
+  name: Self-reinforcing generative drift
+  description: When generative outputs are fed back into systems as new data, the
+    model begins amplifying its own artifacts and distortions. This causes long-term
+    degradation of quality and fairness.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Technological risk; Operational risk; Strategic risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0109
+  name: Generative scaling misuse
+  description: The ability to mass-produce text, audio or visuals at near-zero cost
+    enables large-scale campaigns — both beneficial and harmful. Without controls,
+    this increases societal and regulatory concerns.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Societal risk; Legal risk; Reputational risk
+  severity: High
+  likelihood: Likely
+- id: qube-ibm-0110
+  name: Contextual overfitting in generation
+  description: Generative models sometimes overfit to the local context, producing
+    outputs that reflect prompt bias rather than objective reasoning. This leads to
+    skewed or misleading content.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Technological risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0111
+  name: Overpersonalized or invasive generation
+  description: Models can produce content that feels too personalized based on small
+    user inputs, making users feel surveilled or profiled. This harms trust and creates
+    privacy tension.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Data privacy risk; Reputational risk
+  severity: Medium
+  likelihood: Possible
+- id: qube-ibm-0112
+  name: Loss of human creativity diversity
+  description: Overuse of generative tools can lead to homogenized writing style,
+    visuals or expression. Organizations may slowly lose creative originality in marketing,
+    design or communication.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Strategic risk; Reputational risk; Societal risk
+  severity: Medium
+  likelihood: Unlikely
+- id: qube-ibm-0113
+  name: Misleading confidence in AI authority
+  description: Generative AI tends to sound polished and confident, even when wrong.
+    This stylistic authority encourages users to overtrust the system beyond safe
+    limits.
+  isDefinedByTaxonomy: qube-legacy-ibm
+  tag: ibm
+  riskCategory: Operational risk; Strategic risk
+  severity: Medium
+  likelihood: Likely

@@ -1,0 +1,2222 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model UseCase {
+  id                               String              @id @default(uuid())
+  title                            String
+  problemStatement                 String
+  proposedAISolution               String
+  currentState                     String
+  desiredState                     String
+  primaryStakeholders              String[]
+  secondaryStakeholders            String[]
+  successCriteria                  String
+  problemValidation                String
+  solutionHypothesis               String
+  keyAssumptions                   String
+  initialROI                       String
+  confidenceLevel                  Int
+  operationalImpactScore           Int
+  productivityImpactScore          Int
+  revenueImpactScore               Int
+  implementationComplexity         Int
+  estimatedTimeline                String
+  requiredResources                String
+  createdAt                        DateTime            @default(now())
+  updatedAt                        DateTime            @updatedAt
+  priority                         String?
+  stage                            String?
+  businessFunction                 String?
+  aiucId                           Int
+  estimatedTimelineMonths          String?             @default("")
+  initialCost                      String?             @default("")
+  keyBenefits                      String?             @default("")
+  plannedStartDate                 String?             @default("")
+  organizationId                   String?
+  userId                           String?
+  // Approvers
+  legalApprover                      String?
+  riskApprover                       String?
+  businessOwner                      String?
+  governanceApprover                 String?
+  // New pillar review statuses
+  requirementsReviewStatus           String?             @default("NOT_READY_FOR_REVIEW")
+  technicalReviewStatus              String?             @default("NOT_READY_FOR_REVIEW")
+  businessReviewStatus               String?             @default("NOT_READY_FOR_REVIEW")
+  responsibleEthicalReviewStatus     String?             @default("NOT_READY_FOR_REVIEW")
+  legalRegulatoryReviewStatus        String?             @default("NOT_READY_FOR_REVIEW")
+  dataReadinessReviewStatus          String?             @default("NOT_READY_FOR_REVIEW")
+  finopsReviewStatus                 String?             @default("NOT_READY_FOR_REVIEW")
+  // Governance & Compliance
+  regulatoryFrameworks               String[]            @default([])
+  industryStandards                  String[]            @default([])
+  // New overview fields
+  aiType                             String?
+  executiveSponsor                   String?
+  answers                          Answer[]
+  Approval                         Approval?
+  assessmentExpansion              AssessmentExpansion?
+  euAiActAssessments               EuAiActAssessment?
+  finopsData                       FinOps?
+  guardrails                       Guardrail[]
+  iso27001Assessments              Iso27001Assessment?
+  iso42001Assessments              Iso42001Assessment?
+  Lock                             Lock[]
+  promptTemplates                  PromptTemplate[]
+  risks                            Risk[]
+  threats                          Threat[]
+  uaeAiAssessments                 UaeAiAssessment?
+  organization                     Organization?       @relation(fields: [organizationId], references: [id])
+  user                             User?               @relation(fields: [userId], references: [id])
+
+  @@unique([aiucId, organizationId])
+  @@unique([aiucId, userId])
+  @@index([stage])
+  @@index([priority])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([stage, priority])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([organizationId, userId])
+}
+
+model FinOps {
+  useCaseId       String  @id
+  ROI             Float
+  netValue        Float
+  apiCostBase     Float
+  cumOpCost       Float
+  cumValue        Float
+  devCostBase     Float
+  infraCostBase   Float
+  opCostBase      Float
+  totalInvestment Float
+  valueBase       Float
+  valueGrowthRate Float
+  budgetRange      String?
+  breakEvenMonth   Int?
+  source           String?   @default("manual")
+  lastAggregatedAt DateTime?
+  useCase          UseCase @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+}
+
+model Approval {
+  id                        String   @id @default(uuid())
+  useCaseId                 String   @unique
+  governanceName            String?
+  governanceStatus          String?
+  governanceComment         String?
+  riskName                  String?
+  riskStatus                String?
+  riskComment               String?
+  legalName                 String?
+  legalStatus               String?
+  legalComment              String?
+  businessFunction          String?
+  businessName              String?
+  businessStatus            String?
+  businessComment           String?
+  finalQualification        String?
+  updatedAt                 DateTime @updatedAt
+  createdAt                 DateTime @default(now())
+  aiEthicsComment           String?
+  aiEthicsName              String?
+  aiEthicsStatus            String?
+  aiGovernanceComment       String?
+  aiGovernanceName          String?
+  aiGovernanceStatus        String?
+  modelValidationComment    String?
+  modelValidationName       String?
+  modelValidationStatus     String?
+  aiEthicsRating            Float?
+  aiGovernanceRating        Float?
+  businessRating            Float?
+  governanceRating          Float?
+  legalRating               Float?
+  modelValidationRating     Float?
+  riskRating                Float?
+  aiEthicsConditions        String[]
+  aiGovernanceConditions    String[]
+  businessConditions        String[]
+  governanceConditions      String[]
+  legalConditions           String[]
+  modelValidationConditions String[]
+  riskConditions            String[]
+  useCase                   UseCase  @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+
+  @@index([governanceStatus])
+  @@index([riskStatus])
+  @@index([legalStatus])
+  @@index([businessStatus])
+  @@index([finalQualification])
+  @@index([aiGovernanceStatus])
+  @@index([modelValidationStatus])
+  @@index([aiEthicsStatus])
+}
+
+model Vendor {
+  id               String            @id @default(uuid())
+  name             String
+  category         String
+  website          String?
+  contactPerson    String?
+  contactEmail     String?
+  assessmentDate   DateTime?
+  overallScore     Float             @default(0.0)
+  status           VendorStatus      @default(IN_ASSESSMENT)
+  notes            String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  organizationId   String?
+  userId           String?
+  approvalAreas    ApprovalArea[]
+  assessmentScores AssessmentScore[]
+  organization     Organization?     @relation(fields: [organizationId], references: [id])
+  user             User?             @relation(fields: [userId], references: [id])
+
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
+  @@index([overallScore])
+  @@index([category, status])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model AssessmentScore {
+  id          String   @id @default(uuid())
+  vendorId    String
+  category    String
+  subcategory String
+  score       Int      @db.SmallInt
+  comment     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  vendor      Vendor   @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, category, subcategory])
+}
+
+model ApprovalArea {
+  id           String           @id @default(uuid())
+  vendorId     String
+  area         ApprovalAreaType
+  status       ApprovalStatus   @default(PENDING)
+  approvedBy   String?
+  approvedDate DateTime?
+  comments     String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  vendor       Vendor           @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, area])
+}
+
+model EuAiActTopic {
+  id          String            @id @default(uuid())
+  topicId     String            @unique
+  title       String
+  description String
+  orderIndex  Int
+  subtopics   EuAiActSubtopic[]
+
+  @@index([orderIndex])
+}
+
+model EuAiActSubtopic {
+  id          String            @id @default(uuid())
+  subtopicId  String            @unique
+  title       String
+  description String
+  orderIndex  Int
+  topicId     String
+  questions   EuAiActQuestion[]
+  topic       EuAiActTopic      @relation(fields: [topicId], references: [topicId])
+
+  @@index([topicId, orderIndex])
+}
+
+model EuAiActQuestion {
+  id         String          @id @default(uuid())
+  questionId String          @unique
+  question   String
+  priority   String
+  answerType String
+  orderIndex Int
+  subtopicId String
+  answers    EuAiActAnswer[]
+  subtopic   EuAiActSubtopic @relation(fields: [subtopicId], references: [subtopicId])
+
+  @@index([subtopicId, orderIndex])
+}
+
+model EuAiActAnswer {
+  id            String            @id @default(uuid())
+  answer        String?
+  evidenceFiles String[]
+  status        String            @default("pending")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  questionId    String
+  assessmentId  String
+  assessment    EuAiActAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question      EuAiActQuestion   @relation(fields: [questionId], references: [questionId])
+
+  @@unique([questionId, assessmentId])
+  @@index([assessmentId])
+}
+
+model EuAiActAssessment {
+  id                          String                            @id @default(uuid())
+  useCaseId                   String                            @unique
+  status                      String                            @default("in_progress")
+  progress                    Float                             @default(0)
+  createdAt                   DateTime                          @default(now())
+  updatedAt                   DateTime                          @updatedAt
+  applicableAnnexCategories   String[]                          @default([])
+  classificationDate          DateTime?
+  hasProhibitedPractices      Boolean                           @default(false)
+  isSubjectToAct              Boolean?
+  prohibitedPracticesList     String[]                          @default([])
+  riskClassificationCompleted Boolean                           @default(false)
+  riskLevel                   String?
+  riskLevelRationale          String?
+  answers                     EuAiActAnswer[]
+  useCase                     UseCase                           @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  controls                    EuAiActControl[]
+  riskClassificationAnswers   EuAiActRiskClassificationAnswer[]
+
+  @@index([status])
+  @@index([riskLevel])
+  @@index([riskClassificationCompleted])
+}
+
+model EuAiActRiskClassificationAnswer {
+  id           String            @id @default(uuid())
+  assessmentId String
+  questionId   String
+  answer       String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  assessment   EuAiActAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, questionId])
+  @@index([assessmentId])
+}
+
+model EuAiActControlCategory {
+  id          String                 @id @default(uuid())
+  categoryId  String                 @unique
+  title       String
+  description String
+  orderIndex  Int
+  controls    EuAiActControlStruct[]
+
+  @@index([orderIndex])
+}
+
+model EuAiActControlStruct {
+  id          String                    @id @default(uuid())
+  controlId   String                    @unique
+  title       String
+  description String
+  orderIndex  Int
+  categoryId  String
+  instances   EuAiActControl[]
+  category    EuAiActControlCategory    @relation(fields: [categoryId], references: [categoryId])
+  subcontrols EuAiActSubcontrolStruct[]
+
+  @@index([categoryId, orderIndex])
+}
+
+model EuAiActSubcontrolStruct {
+  id           String               @id @default(uuid())
+  subcontrolId String               @unique
+  title        String
+  description  String
+  orderIndex   Int
+  controlId    String
+  instances    EuAiActSubcontrol[]
+  control      EuAiActControlStruct @relation(fields: [controlId], references: [controlId])
+
+  @@index([controlId, orderIndex])
+}
+
+model EuAiActControl {
+  id            String               @id @default(uuid())
+  status        String               @default("pending")
+  notes         String?
+  evidenceFiles String[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  controlId     String
+  assessmentId  String
+  assessment    EuAiActAssessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  controlStruct EuAiActControlStruct @relation(fields: [controlId], references: [controlId])
+  subcontrols   EuAiActSubcontrol[]
+
+  @@unique([controlId, assessmentId])
+  @@index([assessmentId])
+}
+
+model EuAiActSubcontrol {
+  id               String                  @id @default(uuid())
+  status           String                  @default("pending")
+  notes            String?
+  evidenceFiles    String[]
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+  subcontrolId     String
+  controlId        String
+  control          EuAiActControl          @relation(fields: [controlId], references: [id], onDelete: Cascade)
+  subcontrolStruct EuAiActSubcontrolStruct @relation(fields: [subcontrolId], references: [subcontrolId])
+
+  @@unique([subcontrolId, controlId])
+  @@index([controlId])
+}
+
+model Iso42001Clause {
+  id          String              @id @default(uuid())
+  clauseId    String              @unique
+  title       String
+  description String
+  orderIndex  Int
+  subclauses  Iso42001Subclause[]
+
+  @@index([orderIndex])
+}
+
+model Iso42001Subclause {
+  id               String                      @id @default(uuid())
+  subclauseId      String                      @unique
+  title            String
+  summary          String
+  questions        String[]
+  evidenceExamples String[]
+  orderIndex       Int
+  clauseId         String
+  clause           Iso42001Clause              @relation(fields: [clauseId], references: [clauseId])
+  instances        Iso42001SubclauseInstance[]
+
+  @@index([clauseId, orderIndex])
+}
+
+model Iso42001SubclauseInstance {
+  id             String             @id @default(uuid())
+  implementation String?
+  evidenceFiles  String[]
+  status         String             @default("pending")
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  subclauseId    String
+  assessmentId   String
+  assessment     Iso42001Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  subclause      Iso42001Subclause  @relation(fields: [subclauseId], references: [subclauseId])
+
+  @@unique([subclauseId, assessmentId])
+  @@index([assessmentId])
+}
+
+model Iso42001Assessment {
+  id         String                      @id @default(uuid())
+  useCaseId  String                      @unique
+  status     String                      @default("in_progress")
+  progress   Float                       @default(0)
+  createdAt  DateTime                    @default(now())
+  updatedAt  DateTime                    @updatedAt
+  annexes    Iso42001AnnexInstance[]
+  useCase    UseCase                     @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  subclauses Iso42001SubclauseInstance[]
+
+  @@index([status])
+}
+
+model Iso42001AnnexCategory {
+  id          String              @id @default(uuid())
+  categoryId  String              @unique
+  title       String
+  description String
+  orderIndex  Int
+  items       Iso42001AnnexItem[]
+
+  @@index([orderIndex])
+}
+
+model Iso42001AnnexItem {
+  id          String                  @id @default(uuid())
+  itemId      String                  @unique
+  title       String
+  description String
+  guidance    String
+  orderIndex  Int
+  categoryId  String
+  instances   Iso42001AnnexInstance[]
+  category    Iso42001AnnexCategory   @relation(fields: [categoryId], references: [categoryId])
+
+  @@index([categoryId, orderIndex])
+}
+
+model Iso42001AnnexInstance {
+  id             String             @id @default(uuid())
+  assessmentId   String
+  status         String             @default("NOT_STARTED")
+  evidenceFiles  String[]
+  implementation String?
+  itemId         String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  item           Iso42001AnnexItem  @relation(fields: [itemId], references: [itemId], map: "Iso42001AnnexInstance_annexItemId_fkey")
+  assessment     Iso42001Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, itemId], map: "Iso42001AnnexInstance_assessmentId_annexItemId_key")
+  @@index([assessmentId])
+}
+
+model Iso27001Clause {
+  id          String              @id @default(uuid())
+  clauseId    String              @unique
+  title       String
+  description String
+  orderIndex  Int
+  subclauses  Iso27001Subclause[]
+
+  @@index([orderIndex])
+}
+
+model Iso27001Subclause {
+  id               String                      @id @default(uuid())
+  subclauseId      String                      @unique
+  title            String
+  summary          String
+  questions        String[]
+  evidenceExamples String[]
+  orderIndex       Int
+  clauseId         String
+  clause           Iso27001Clause              @relation(fields: [clauseId], references: [clauseId])
+  instances        Iso27001SubclauseInstance[]
+
+  @@index([clauseId, orderIndex])
+}
+
+model Iso27001SubclauseInstance {
+  id             String             @id @default(uuid())
+  implementation String?
+  evidenceFiles  String[]
+  status         String             @default("pending")
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @default(now()) @updatedAt
+  subclauseId    String
+  assessmentId   String
+  assessment     Iso27001Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  subclause      Iso27001Subclause  @relation(fields: [subclauseId], references: [subclauseId])
+
+  @@unique([subclauseId, assessmentId])
+  @@index([assessmentId])
+}
+
+model Iso27001Assessment {
+  id         String                      @id @default(uuid())
+  useCaseId  String                      @unique
+  status     String                      @default("in_progress")
+  progress   Float                       @default(0)
+  createdAt  DateTime                    @default(now())
+  updatedAt  DateTime                    @default(now()) @updatedAt
+  annexes    Iso27001AnnexInstance[]
+  useCase    UseCase                     @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  subclauses Iso27001SubclauseInstance[]
+
+  @@index([status])
+}
+
+model Iso27001AnnexCategory {
+  id          String              @id @default(uuid())
+  categoryId  String              @unique
+  title       String
+  description String
+  orderIndex  Int
+  items       Iso27001AnnexItem[]
+
+  @@index([orderIndex])
+}
+
+model Iso27001AnnexItem {
+  id          String                  @id @default(uuid())
+  itemId      String                  @unique
+  title       String
+  description String
+  guidance    String
+  orderIndex  Int
+  categoryId  String
+  instances   Iso27001AnnexInstance[]
+  category    Iso27001AnnexCategory   @relation(fields: [categoryId], references: [categoryId])
+
+  @@index([categoryId, orderIndex])
+}
+
+model Iso27001AnnexInstance {
+  id             String             @id @default(uuid())
+  assessmentId   String
+  status         String             @default("NOT_STARTED")
+  evidenceFiles  String[]
+  implementation String?
+  itemId         String
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  assessment     Iso27001Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  item           Iso27001AnnexItem  @relation(fields: [itemId], references: [itemId])
+
+  @@unique([assessmentId, itemId])
+  @@index([assessmentId])
+}
+
+model UaeAiControl {
+  id            String                 @id @default(uuid())
+  controlId     String                 @unique
+  title         String
+  description   String
+  legalBasis    String
+  evidenceTypes String[]
+  orderIndex    Int
+  instances     UaeAiControlInstance[]
+
+  @@index([orderIndex])
+}
+
+model UaeAiControlInstance {
+  id             String          @id @default(uuid())
+  assessmentId   String
+  controlId      String
+  implementation String?
+  evidenceFiles  String[]
+  score          Int             @default(0) @db.SmallInt
+  notes          String?
+  status         String          @default("pending")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  assessment     UaeAiAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  control        UaeAiControl    @relation(fields: [controlId], references: [controlId])
+
+  @@unique([assessmentId, controlId])
+  @@index([assessmentId])
+}
+
+model UaeAiAssessment {
+  id              String                 @id @default(uuid())
+  useCaseId       String                 @unique
+  status          String                 @default("in_progress")
+  progress        Float                  @default(0)
+  totalScore      Float                  @default(0)
+  weightedScore   Float                  @default(0)
+  maturityLevel   String                 @default("not_assessed")
+  riskImpactLevel String                 @default("low")
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  useCase         UseCase                @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  controls        UaeAiControlInstance[]
+
+  @@index([status])
+  @@index([maturityLevel])
+  @@index([riskImpactLevel])
+}
+
+model User {
+  id                                              String                @id @default(uuid())
+  clerkId                                         String                @unique
+  email                                           String                @unique
+  firstName                                       String?
+  lastName                                        String?
+  role                                            UserRole              @default(USER)
+  organizationId                                  String?
+  isActive                                        Boolean               @default(true)
+  createdAt                                       DateTime              @default(now())
+  updatedAt                                       DateTime              @updatedAt
+  invitations                                     Invitation[]          @relation("InvitedBy")
+  LLMApiConfiguration                             LLMApiConfiguration[]
+  Lock                                            Lock[]
+  PromptDeployment                                PromptDeployment[]
+  PromptTemplate_PromptTemplate_createdByIdToUser PromptTemplate[]      @relation("PromptTemplate_createdByIdToUser")
+  PromptTemplate_PromptTemplate_userIdToUser      PromptTemplate[]      @relation("PromptTemplate_userIdToUser")
+  PromptTestRun                                   PromptTestRun[]
+  PromptVersion                                   PromptVersion[]
+  useCases                                        UseCase[]
+  organization                                    Organization?         @relation(fields: [organizationId], references: [id])
+  vendors                                         Vendor[]
+
+  @@index([email])
+  @@index([organizationId])
+  @@index([role])
+}
+
+model AiModel {
+  id             String       @id @default(uuid())
+  organizationId String
+  modelName      String
+  apiKey         String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  providerName   String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, modelName])
+  @@index([organizationId])
+}
+
+model Organization {
+  id                     String                  @id @default(uuid())
+  name                   String
+  domain                 String?                 @unique
+  isActive               Boolean                 @default(true)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  governanceCharterId    String?
+  aiModels               AiModel[]
+  auditLogs              AuditLog[]
+  carbonFootprints       CarbonFootprint[]
+  changeManagementPlans  ChangeManagementPlan[]
+  competencyFrameworks   CompetencyFramework[]
+  complianceCalendar     ComplianceCalendar[]
+  cultureAssessments     CultureAssessment[]
+  energyConsumptions     EnergyConsumption[]
+  governanceAlerts       GovernanceAlert[]
+  governanceBodies       GovernanceBody[]
+  governanceKPIs         GovernanceKPI[]
+  greenAIRecommendations GreenAIRecommendation[]
+  incidents              Incident[]
+  invitations            Invitation[]            @relation("OrganizationInvitations")
+  maturityAssessments    MaturityAssessment[]
+  governanceCharter      GovernanceCharter?      @relation(fields: [governanceCharterId], references: [id])
+  periodicReviews        PeriodicReview[]
+  policyExceptions       PolicyException[]
+  policyVersions         PolicyVersion[]
+  PromptTemplate         PromptTemplate[]
+  Question               Question[]
+  sustainabilityMetrics  SustainabilityMetrics[]
+  trainingPrograms       TrainingProgram[]
+  useCases               UseCase[]
+  users                  User[]
+  vendors                Vendor[]
+
+  @@index([name])
+  @@index([domain])
+}
+
+model Invitation {
+  id             String           @id @default(uuid())
+  email          String
+  role           UserRole         @default(USER)
+  organizationId String
+  invitedById    String
+  status         InvitationStatus @default(PENDING)
+  token          String           @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  invitedBy      User             @relation("InvitedBy", fields: [invitedById], references: [id])
+  organization   Organization     @relation("OrganizationInvitations", fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([status])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+model Risk {
+  id               String                @id @default(uuid())
+  useCaseId        String
+  category         String
+  riskLevel        String
+  riskScore        Float
+  title            String
+  description      String
+  impact           String
+  likelihood       String
+  status           RiskStatus            @default(OPEN)
+  assignedTo       String?
+  assignedToName   String?
+  assignedToEmail  String?
+  mitigationPlan   String?
+  mitigationStatus String?
+  targetDate       DateTime?
+  actualDate       DateTime?
+  notes            String?
+  createdAt        DateTime              @default(now())
+  createdBy        String
+  createdByName    String
+  createdByEmail   String
+  updatedAt        DateTime              @updatedAt
+  updatedBy        String?
+  updatedByName    String?
+  updatedByEmail   String?
+  closedAt         DateTime?
+  closedBy         String?
+  closedByName     String?
+  closedByEmail    String?
+  closureReason    String?
+  sourceId         String?
+  sourceMetadata   Json?
+  sourceType       String?
+  relatedIncidents IncidentRiskMapping[]
+  useCase          UseCase               @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  mitreTechniques  MitreTechnique[]      @relation("RiskMitreTechniques")
+
+  @@index([useCaseId])
+  @@index([status])
+  @@index([category])
+  @@index([riskLevel])
+  @@index([createdAt])
+  @@index([sourceType, sourceId])
+}
+
+model MitreTechnique {
+  id          String   @id @default(uuid())
+  techniqueId String   @unique
+  tactic      String
+  technique   String
+  description String
+  mitigation  String?
+  detection   String?
+  caseStudies Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  risks       Risk[]   @relation("RiskMitreTechniques")
+
+  @@index([tactic])
+  @@index([techniqueId])
+}
+
+model IncidentRiskMapping {
+  id          String   @id @default(uuid())
+  incidentId  String
+  riskId      String
+  mappingType String
+  confidence  String   @default("medium")
+  notes       String?
+  createdAt   DateTime @default(now())
+  incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  risk        Risk     @relation(fields: [riskId], references: [id], onDelete: Cascade)
+
+  @@unique([incidentId, riskId])
+  @@index([incidentId])
+  @@index([riskId])
+}
+
+model LLMApiConfiguration {
+  id        String   @id @default(uuid())
+  service   String
+  endpoint  String?
+  model     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  apiKey    String
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, service])
+  @@index([userId, isActive])
+}
+
+model PromptDeployment {
+  id             String         @id @default(uuid())
+  environment    String
+  templateId     String
+  versionId      String
+  deployedAt     DateTime       @default(now())
+  deployedById   String
+  isActive       Boolean        @default(true)
+  User           User           @relation(fields: [deployedById], references: [id])
+  PromptTemplate PromptTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  PromptVersion  PromptVersion  @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@unique([templateId, environment])
+  @@index([deployedAt])
+  @@index([environment, isActive])
+}
+
+model PromptTemplate {
+  id                                    String             @id @default(uuid())
+  name                                  String
+  description                           String?
+  content                               Json
+  variables                             String[]
+  settings                              Json
+  type                                  String
+  service                               String
+  useCaseId                             String
+  organizationId                        String?
+  userId                                String?
+  createdAt                             DateTime           @default(now())
+  updatedAt                             DateTime           @updatedAt
+  createdById                           String
+  tags                                  String[]           @default([])
+  PromptDeployment                      PromptDeployment[]
+  User_PromptTemplate_createdByIdToUser User               @relation("PromptTemplate_createdByIdToUser", fields: [createdById], references: [id])
+  Organization                          Organization?      @relation(fields: [organizationId], references: [id])
+  UseCase                               UseCase            @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  User_PromptTemplate_userIdToUser      User?              @relation("PromptTemplate_userIdToUser", fields: [userId], references: [id])
+  PromptTestRun                         PromptTestRun[]
+  PromptVersion                         PromptVersion[]
+
+  @@index([createdAt])
+  @@index([organizationId])
+  @@index([useCaseId])
+  @@index([userId])
+}
+
+model PromptTestRun {
+  id               String         @id @default(uuid())
+  versionId        String
+  variables        Json
+  tokensUsed       Int            @default(0)
+  cost             Float          @default(0)
+  latencyMs        Int            @default(0)
+  status           String
+  error            String?
+  createdAt        DateTime       @default(now())
+  model            String
+  promptTemplateId String
+  requestContent   Json
+  responseContent  String
+  service          String
+  settings         Json
+  userId           String
+  inputTokens      Int?           @default(0)
+  outputTokens     Int?           @default(0)
+  PromptTemplate   PromptTemplate @relation(fields: [promptTemplateId], references: [id], onDelete: Cascade)
+  User             User           @relation(fields: [userId], references: [id])
+
+  @@index([createdAt])
+  @@index([promptTemplateId])
+  @@index([status])
+  @@index([userId])
+  @@index([versionId])
+}
+
+model PromptVersion {
+  id               String             @id @default(uuid())
+  versionSha       String             @unique
+  versionNumber    Int
+  content          Json
+  settings         Json
+  variables        String[]
+  commitMessage    String
+  templateId       String
+  createdAt        DateTime           @default(now())
+  createdById      String
+  versionNotes     String?
+  PromptDeployment PromptDeployment[]
+  User             User               @relation(fields: [createdById], references: [id])
+  PromptTemplate   PromptTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([templateId, versionNumber])
+}
+
+model Lock {
+  id         String    @id @default(dbgenerated("gen_random_uuid()"))
+  useCaseId  String
+  userId     String
+  type       LockType
+  acquiredAt DateTime  @default(now())
+  expiresAt  DateTime
+  isActive   Boolean   @default(true)
+  scope      LockScope @default(ASSESS)
+  UseCase    UseCase   @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  User       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([useCaseId, userId, type, scope])
+  @@index([expiresAt])
+  @@index([isActive])
+  @@index([type])
+  @@index([useCaseId])
+  @@index([userId])
+  @@index([scope])
+}
+
+model GoldenEntry {
+  id               String         @id @default(uuid())
+  datasetId        String
+  category         String
+  inputSpec        Json
+  expectedOutputs  Json
+  metadata         Json
+  quality          Json?
+  version          Int            @default(1)
+  previousVersions Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  dataset          GoldenDataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  reviews          GoldenReview[]
+
+  @@index([datasetId])
+  @@index([category])
+  @@index([createdAt])
+}
+
+model GoldenReview {
+  id          String      @id @default(uuid())
+  entryId     String
+  reviewer    String
+  scores      Json
+  decision    String
+  comments    String?
+  suggestions Json?
+  timestamp   DateTime    @default(now())
+  entry       GoldenEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  @@index([entryId])
+  @@index([reviewer])
+  @@index([timestamp])
+}
+
+model Evaluation {
+  id            String             @id @default(uuid())
+  useCaseId     String
+  name          String
+  description   String?
+  configuration Json
+  status        String             @default("pending")
+  startedAt     DateTime?
+  completedAt   DateTime?
+  summary       Json?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  results       EvaluationResult[]
+
+  @@index([useCaseId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EvaluationResult {
+  id             String     @id @default(uuid())
+  evaluationId   String
+  category       String
+  testType       String
+  input          Json
+  expectedOutput Json?
+  actualOutput   Json?
+  metrics        Json
+  passed         Boolean
+  severity       String?
+  details        Json?
+  timestamp      DateTime   @default(now())
+  evaluation     Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+
+  @@index([evaluationId])
+  @@index([category])
+  @@index([passed])
+  @@index([timestamp])
+}
+
+model Guardrail {
+  id              String           @id @default(uuid())
+  useCaseId       String
+  name            String
+  description     String?
+  approach        String
+  configuration   Json
+  reasoning       Json?
+  confidence      Float?
+  status          String           @default("draft")
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  publishedAt     DateTime?
+  approvedAt      DateTime?
+  approvedBy      String?
+  editedAt        DateTime?
+  editedBy        String?
+  isEdited        Boolean          @default(false)
+  rejectedAt      DateTime?
+  rejectedBy      String?
+  rejectionReason String?
+  version         Int              @default(1)
+  useCase         UseCase          @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+  auditLogs       GuardrailAudit[]
+  rules           GuardrailRule[]
+
+  @@index([useCaseId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model GuardrailRule {
+  id              String              @id @default(uuid())
+  guardrailId     String
+  type            String
+  severity        String
+  rule            String
+  description     String
+  rationale       String?
+  implementation  Json
+  conditions      Json?
+  exceptions      Json?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  approvedAt      DateTime?
+  approvedBy      String?
+  editedAt        DateTime?
+  editedBy        String?
+  isCustom        Boolean             @default(false)
+  isEdited        Boolean             @default(false)
+  originalValue   Json?
+  rejectedAt      DateTime?
+  rejectedBy      String?
+  rejectionReason String?
+  status          GuardrailRuleStatus @default(PENDING)
+  comments        GuardrailComment[]
+  guardrail       Guardrail           @relation(fields: [guardrailId], references: [id], onDelete: Cascade)
+
+  @@index([guardrailId])
+  @@index([type])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model GuardrailComment {
+  id        String        @id @default(uuid())
+  ruleId    String
+  userId    String
+  userName  String
+  content   String
+  createdAt DateTime      @default(now())
+  rule      GuardrailRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  @@index([ruleId])
+  @@index([createdAt])
+}
+
+model GuardrailAudit {
+  id          String    @id @default(uuid())
+  guardrailId String
+  ruleId      String?
+  action      String
+  userId      String
+  userName    String
+  changes     Json?
+  timestamp   DateTime  @default(now())
+  guardrail   Guardrail @relation(fields: [guardrailId], references: [id], onDelete: Cascade)
+
+  @@index([guardrailId])
+  @@index([timestamp])
+}
+
+model GuardrailJob {
+  id          String    @id @default(uuid())
+  useCaseId   String
+  status      String    @default("pending")
+  progress    Int       @default(0)
+  currentStep String?
+  result      Json?
+  error       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  completedAt DateTime?
+
+  @@index([useCaseId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model EvaluationJob {
+  id                 String    @id @default(uuid())
+  useCaseId          String
+  guardrailsId       String?
+  generationStrategy String    @default("comprehensive")
+  testIntensity      String    @default("standard")
+  status             String    @default("pending")
+  progress           Int       @default(0)
+  currentStep        String?
+  result             Json?
+  error              String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  completedAt        DateTime?
+
+  @@index([useCaseId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ObservabilitySession {
+  id             String    @id @default(dbgenerated("gen_random_uuid()"))
+  sessionId      String    @unique
+  useCaseId      String?
+  useCaseTitle   String?
+  sessionType    String
+  status         String    @default("running")
+  startTime      DateTime  @default(now())
+  endTime        DateTime?
+  duration       Int?
+  totalLLMCalls  Int       @default(0)
+  totalTokens    Int       @default(0)
+  totalCost      Float     @default(0)
+  agentsInvolved String[]
+  langsmithUrl   String?
+  langsmithRunId String?
+  metadata       Json?
+  errors         Json?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @default(now()) @updatedAt
+
+  @@index([useCaseId])
+  @@index([sessionType])
+  @@index([status])
+  @@index([startTime])
+}
+
+model GoldenDataset {
+  id               String        @id
+  useCaseId        String
+  version          String        @default("1.0.0")
+  name             String
+  description      String
+  metadata         Json
+  statistics       Json?
+  qualityMetrics   Json?
+  validationStatus Json?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  publishedAt      DateTime?
+  entries          GoldenEntry[]
+
+  @@index([createdAt])
+  @@index([publishedAt])
+  @@index([useCaseId])
+}
+
+model QuestionTemplate {
+  id                  String           @id @default(uuid())
+  text                String
+  type                QuestionType
+  stage               Stage
+  isInactive          Boolean          @default(false)
+  quickAssessment     Boolean          @default(false)
+  coreQuestion        Boolean          @default(false)
+  orderIndex          Int              @default(0)
+  subCategory         String?
+  aiAutomationTier    Int?
+  aiAgentGuidance     String?
+  questionNumber      Int?
+  answers             Answer[]
+  optionTemplates     OptionTemplate[]
+  questions           Question[]
+
+  @@index([stage, orderIndex])
+  @@index([stage, subCategory])
+}
+
+model OptionTemplate {
+  id                 String           @id @default(uuid())
+  text               String
+  questionTemplateId String
+  questionTemplate   QuestionTemplate @relation(fields: [questionTemplateId], references: [id], onDelete: Cascade)
+}
+
+model Question {
+  id                  String            @id @default(uuid())
+  text                String
+  type                QuestionType
+  templateId          String?
+  organizationId      String            @default("1d431de5-265f-455b-88ca-76b2d2934e8f")
+  stage               Stage
+  isInactive          Boolean           @default(false)
+  quickAssessment     Boolean           @default(false)
+  coreQuestion        Boolean           @default(false)
+  orderIndex          Int               @default(0)
+  subCategory         String?
+  aiAutomationTier    Int?
+  aiAgentGuidance     String?
+  questionNumber      Int?
+  answers             Answer[]
+  options             Option[]
+  Organization        Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  template            QuestionTemplate? @relation(fields: [templateId], references: [id])
+
+  @@index([stage, orderIndex])
+  @@index([stage, subCategory])
+}
+
+model Option {
+  id         String   @id @default(uuid())
+  text       String
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+}
+
+model Answer {
+  id               String            @id @default(uuid())
+  questionId       String?
+  value            Json
+  useCaseId        String
+  templateId       String?
+  score            Int?
+  priority         String?
+  notes            String?
+  ownerAction      String?
+  costType         String?
+  estMonthlyCost   Float?
+  estOneTimeCost   Float?
+  question         Question?         @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionTemplate QuestionTemplate? @relation(fields: [templateId], references: [id])
+  useCase          UseCase           @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+}
+
+model AssessmentExpansion {
+  id                        String    @id @default(uuid())
+  useCaseId                 String    @unique
+  status                    String    @default("pending") // pending | expanding | completed | failed
+
+  requirementsProfile       Json?
+  technicalProfile          Json?
+  businessProfile           Json?
+  responsibleEthicalProfile Json?
+  legalRegulatoryProfile    Json?
+  dataReadinessProfile      Json?
+  finopsProfile             Json?
+
+  coreAnswerCount           Int       @default(0)
+  expandedFieldCount        Int       @default(0)
+  overallConfidence         Float     @default(0)
+  modelUsed                 String?
+  tokenUsage                Json?
+  expansionDuration         Int?
+
+  userReviewed              Boolean   @default(false)
+  reviewedAt                DateTime?
+  reviewedBy                String?
+  userOverrides             Json?
+
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+  useCase                   UseCase   @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+model Threat {
+  id                String   @id @default(uuid())
+  useCaseId         String
+  title             String
+  description       String
+  category          String   // STRIDE category
+  framework         String   // 'STRIDE' | 'MITRE-ATLAS'
+  severity          String   // Critical, High, Medium, Low
+  severityScore     Float
+  likelihood        String
+  attackVector      String?
+  affectedAsset     String?
+  mitigationPlan    String?
+  mitreTechniqueIds String[]
+  justification     String?
+  sourceType        String   @default("llm-assessment")
+  status            String   @default("OPEN")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  createdBy         String?
+  createdByName     String?
+  createdByEmail    String?
+  useCase           UseCase  @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+
+  @@index([useCaseId])
+  @@index([category])
+}
+
+model GovernanceBody {
+  id             String              @id @default(uuid())
+  organizationId String
+  name           String
+  type           GovernanceBodyType
+  description    String?
+  charter        String?
+  mandate        String?
+  scope          String?
+  parentId       String?
+  orderIndex     Int                 @default(0)
+  isActive       Boolean             @default(true)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  meetings       GovernanceMeeting[]
+  members        GovernanceRole[]
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([isActive])
+}
+
+model GovernanceRole {
+  id               String             @id @default(uuid())
+  organizationId   String
+  governanceBodyId String?
+  userId           String?
+  roleTitle        String
+  roleType         GovernanceRoleType
+  responsibilities String?
+  raci             Json?
+  isActive         Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  governanceBody   GovernanceBody?    @relation(fields: [governanceBodyId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([governanceBodyId])
+  @@index([userId])
+  @@index([roleType])
+}
+
+model DecisionAuthority {
+  id             String   @id @default(uuid())
+  organizationId String
+  decisionType   String
+  riskLevel      String?
+  investmentMin  Float?
+  investmentMax  Float?
+  approverRole   String
+  escalationRole String?
+  description    String?
+  conditions     Json?
+  orderIndex     Int      @default(0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([decisionType])
+  @@index([riskLevel])
+}
+
+model EscalationRule {
+  id               String   @id @default(uuid())
+  organizationId   String
+  triggerType      String
+  triggerCondition Json
+  escalateTo       String
+  escalationPath   Json?
+  notifyEmails     String[]
+  autoEscalate     Boolean  @default(true)
+  description      String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([triggerType])
+  @@index([isActive])
+}
+
+model GovernanceMeeting {
+  id               String                @id @default(uuid())
+  organizationId   String
+  governanceBodyId String
+  title            String
+  meetingType      GovernanceMeetingType
+  frequency        String?
+  scheduledDate    DateTime
+  duration         Int?
+  agenda           Json?
+  attendees        String[]
+  minutes          String?
+  decisions        Json?
+  actionItems      Json?
+  status           MeetingStatus         @default(SCHEDULED)
+  completedAt      DateTime?
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  governanceBody   GovernanceBody        @relation(fields: [governanceBodyId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([governanceBodyId])
+  @@index([scheduledDate])
+  @@index([status])
+  @@index([meetingType])
+}
+
+model GovernanceCharter {
+  id              String         @id @default(uuid())
+  organizationId  String         @unique
+  mission         String?
+  vision          String?
+  principles      String[]
+  objectives      String[]
+  scope           String?
+  mandate         String?
+  decisionRights  Json?
+  escalationPaths Json?
+  reviewCycle     String?
+  approvedBy      String?
+  approvedAt      DateTime?
+  version         Int            @default(1)
+  isActive        Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  Organization    Organization[]
+
+  @@index([organizationId])
+}
+
+model TrainingProgram {
+  id             String               @id @default(uuid())
+  organizationId String
+  title          String
+  description    String?
+  category       TrainingCategory
+  level          TrainingLevel
+  duration       Int?
+  content        Json?
+  prerequisites  String[]
+  targetRoles    String[]
+  isRequired     Boolean              @default(false)
+  passingScore   Int?
+  certificateUrl String?
+  isActive       Boolean              @default(true)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  completions    TrainingCompletion[]
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([category])
+  @@index([isRequired])
+  @@index([isActive])
+}
+
+model TrainingCompletion {
+  id             String           @id @default(uuid())
+  userId         String
+  programId      String
+  organizationId String
+  status         CompletionStatus @default(NOT_STARTED)
+  progress       Int              @default(0)
+  score          Int?
+  startedAt      DateTime?
+  completedAt    DateTime?
+  expiresAt      DateTime?
+  certificateUrl String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  program        TrainingProgram  @relation(fields: [programId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, programId])
+  @@index([userId])
+  @@index([programId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model CompetencyFramework {
+  id                 String             @id @default(uuid())
+  organizationId     String
+  roleTitle          String
+  category           CompetencyCategory
+  competencies       Json
+  proficiencyLevels  Json
+  assessmentCriteria Json?
+  isActive           Boolean            @default(true)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  organization       Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([roleTitle])
+  @@index([category])
+}
+
+model CultureAssessment {
+  id               String           @id @default(uuid())
+  organizationId   String
+  assessmentDate   DateTime
+  responses        Json
+  aggregatedScores Json
+  insights         String?
+  recommendations  Json?
+  conductedBy      String?
+  status           AssessmentStatus @default(IN_PROGRESS)
+  completedAt      DateTime?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  organization     Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([assessmentDate])
+  @@index([status])
+}
+
+model ChangeManagementPlan {
+  id             String       @id @default(uuid())
+  organizationId String
+  initiativeName String
+  description    String?
+  objectives     String[]
+  stakeholders   Json
+  phases         Json
+  kpis           Json?
+  risks          Json?
+  mitigationPlan String?
+  status         ChangeStatus @default(PLANNING)
+  startDate      DateTime?
+  targetDate     DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([status])
+}
+
+model CarbonFootprint {
+  id                 String       @id @default(uuid())
+  useCaseId          String
+  organizationId     String
+  modelName          String?
+  provider           String?
+  trainingEmissions  Float?
+  inferenceEmissions Float?
+  totalEmissions     Float?
+  energyConsumption  Float?
+  computeHours       Float?
+  measurementDate    DateTime
+  calculationMethod  String?
+  metadata           Json?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([useCaseId])
+  @@index([organizationId])
+  @@index([measurementDate])
+}
+
+model EnergyConsumption {
+  id              String       @id @default(uuid())
+  useCaseId       String?
+  organizationId  String
+  resourceType    String
+  provider        String?
+  region          String?
+  consumption     Float
+  cost            Float?
+  carbonIntensity Float?
+  periodStart     DateTime
+  periodEnd       DateTime
+  metadata        Json?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([useCaseId])
+  @@index([organizationId])
+  @@index([periodStart])
+  @@index([resourceType])
+}
+
+model SustainabilityMetrics {
+  id                     String       @id @default(uuid())
+  organizationId         String
+  metricDate             DateTime
+  totalCarbonFootprint   Float?
+  totalEnergyConsumption Float?
+  greenEnergyPercentage  Float?
+  efficiencyScore        Float?
+  costPerRequest         Float?
+  carbonPerRequest       Float?
+  recommendations        Json?
+  trends                 Json?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  organization           Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([metricDate])
+}
+
+model GreenAIRecommendation {
+  id                   String               @id @default(uuid())
+  useCaseId            String
+  organizationId       String
+  category             GreenAICategory
+  title                String
+  description          String
+  potentialSavings     Json?
+  implementationEffort String?
+  priority             String?
+  status               RecommendationStatus @default(PENDING)
+  implementedAt        DateTime?
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  organization         Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([useCaseId])
+  @@index([organizationId])
+  @@index([category])
+  @@index([status])
+}
+
+model GovernanceKPI {
+  id              String       @id @default(uuid())
+  organizationId  String
+  name            String
+  description     String?
+  category        KPICategory
+  target          Float
+  current         Float?
+  unit            String?
+  trend           String?
+  status          KPIStatus    @default(ON_TRACK)
+  measurementDate DateTime
+  formula         String?
+  dataSource      String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([category])
+  @@index([measurementDate])
+  @@index([status])
+}
+
+model ComplianceCalendar {
+  id             String              @id @default(uuid())
+  organizationId String
+  title          String
+  description    String?
+  framework      String?
+  eventType      ComplianceEventType
+  dueDate        DateTime
+  reminderDays   Int[]               @default([30, 14, 7, 1])
+  assignedTo     String[]
+  status         CalendarEventStatus @default(UPCOMING)
+  completedAt    DateTime?
+  evidence       String[]
+  notes          String?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([framework])
+  @@index([dueDate])
+  @@index([status])
+  @@index([eventType])
+}
+
+model GovernanceAlert {
+  id              String        @id @default(uuid())
+  organizationId  String
+  useCaseId       String?
+  alertType       AlertType
+  severity        AlertSeverity
+  title           String
+  description     String
+  source          String?
+  triggeredBy     Json?
+  status          AlertStatus   @default(ACTIVE)
+  assignedTo      String?
+  resolvedBy      String?
+  resolvedAt      DateTime?
+  resolutionNotes String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([useCaseId])
+  @@index([alertType])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model PeriodicReview {
+  id              String       @id @default(uuid())
+  organizationId  String
+  reviewType      ReviewType
+  subject         String
+  subjectId       String?
+  scheduledDate   DateTime
+  reviewers       String[]
+  findings        Json?
+  recommendations Json?
+  actionItems     Json?
+  status          ReviewStatus @default(SCHEDULED)
+  completedAt     DateTime?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([reviewType])
+  @@index([scheduledDate])
+  @@index([status])
+}
+
+model PolicyVersion {
+  id             String       @id @default(uuid())
+  organizationId String
+  policyName     String
+  version        String
+  content        String
+  summary        String?
+  changes        String?
+  status         PolicyStatus @default(DRAFT)
+  approvedBy     String?
+  approvedAt     DateTime?
+  publishedAt    DateTime?
+  effectiveDate  DateTime?
+  expiryDate     DateTime?
+  attestations   Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([policyName])
+  @@index([status])
+  @@index([effectiveDate])
+}
+
+model PolicyException {
+  id             String          @id @default(uuid())
+  organizationId String
+  policyName     String
+  useCaseId      String?
+  requestedBy    String
+  justification  String
+  riskAssessment Json?
+  approverRole   String
+  approvedBy     String?
+  status         ExceptionStatus @default(PENDING)
+  grantedAt      DateTime?
+  expiresAt      DateTime?
+  reviewDate     DateTime?
+  conditions     String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([useCaseId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+model Incident {
+  id                 String                @id @default(uuid())
+  organizationId     String
+  useCaseId          String?
+  title              String
+  description        String
+  severity           IncidentSeverity
+  status             IncidentStatus        @default(OPEN)
+  category           String?
+  impact             String?
+  rootCause          String?
+  reportedBy         String
+  reportedAt         DateTime              @default(now())
+  assignedTo         String?
+  resolvedBy         String?
+  resolvedAt         DateTime?
+  resolution         String?
+  lessons            String?
+  metadata           Json?
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  aiidIncidentId     Int?
+  aiidMetadata       Json?
+  caseSummary        String?
+  evidenceUrls       String[]
+  lessonsLearned     String?
+  preventiveMeasures Json?
+  technicalCause     String?
+  organization       Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  relatedRisks       IncidentRiskMapping[]
+
+  @@index([organizationId])
+  @@index([useCaseId])
+  @@index([severity])
+  @@index([status])
+  @@index([reportedAt])
+  @@index([aiidIncidentId])
+}
+
+model AuditLog {
+  id              String       @id @default(uuid())
+  organizationId  String
+  useCaseId       String?
+  auditType       AuditType
+  title           String
+  description     String?
+  auditor         String
+  scope           String?
+  findings        Json?
+  recommendations Json?
+  status          AuditStatus  @default(PLANNED)
+  scheduledDate   DateTime
+  completedDate   DateTime?
+  followUpDate    DateTime?
+  evidence        String[]
+  timestamp       DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([useCaseId])
+  @@index([auditType])
+  @@index([status])
+  @@index([scheduledDate])
+  @@index([timestamp])
+}
+
+model MaturityAssessment {
+  id                String        @id @default(uuid())
+  organizationId    String
+  assessmentDate    DateTime
+  overallLevel      MaturityLevel
+  dimensions        Json
+  strengths         String[]
+  gaps              String[]
+  recommendations   Json?
+  assessedBy        String?
+  methodology       String?
+  nextAssessmentDue DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  organization      Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([assessmentDate])
+  @@index([overallLevel])
+}
+
+enum GuardrailRuleStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EDITED
+}
+
+enum QuestionType {
+  CHECKBOX
+  RADIO
+  TEXT
+  SLIDER
+  RISK
+  TEXT_MINI
+}
+
+enum RiskStatus {
+  OPEN
+  IN_PROGRESS
+  MITIGATED
+  ACCEPTED
+  CLOSED
+}
+
+enum VendorStatus {
+  IN_ASSESSMENT
+  APPROVED
+  REJECTED
+  ON_HOLD
+}
+
+enum ApprovalAreaType {
+  PROCUREMENT
+  LEGAL
+  GOVERNANCE
+  COMPLIANCE
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Priority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum UserRole {
+  QZEN_ADMIN
+  ORG_ADMIN
+  ORG_USER
+  USER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+  CANCELLED
+}
+
+enum LockType {
+  SHARED
+  EXCLUSIVE
+}
+
+enum LockScope {
+  ASSESS
+  EDIT
+  GOVERNANCE_EU_AI_ACT
+  GOVERNANCE_ISO_42001
+  GOVERNANCE_UAE_AI
+  GOVERNANCE_ISO_27001
+}
+
+enum Stage {
+  REQUIREMENTS
+  TECHNICAL
+  BUSINESS
+  RESPONSIBLE_ETHICAL
+  LEGAL_REGULATORY
+  DATA_READINESS
+  FINOPS
+}
+
+enum GovernanceBodyType {
+  BOARD
+  COMMITTEE
+  COUNCIL
+  WORKING_GROUP
+  CENTER_OF_EXCELLENCE
+}
+
+enum GovernanceRoleType {
+  EXECUTIVE
+  GOVERNANCE_LEAD
+  RISK_OFFICER
+  COMPLIANCE_OFFICER
+  ETHICS_OFFICER
+  TECHNICAL_LEAD
+  BUSINESS_REPRESENTATIVE
+  ADVISOR
+}
+
+enum GovernanceMeetingType {
+  STRATEGIC_REVIEW
+  APPROVAL_REVIEW
+  RISK_REVIEW
+  COMPLIANCE_REVIEW
+  AD_HOC
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  RESCHEDULED
+}
+
+enum TrainingCategory {
+  AI_LITERACY
+  AI_ETHICS
+  AI_SECURITY
+  GOVERNANCE_BASICS
+  RESPONSIBLE_AI
+  TECHNICAL_SKILLS
+  COMPLIANCE
+}
+
+enum TrainingLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum CompletionStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  EXPIRED
+  FAILED
+}
+
+enum CompetencyCategory {
+  TECHNICAL
+  GOVERNANCE
+  ETHICS
+  RISK_MANAGEMENT
+  COMPLIANCE
+  LEADERSHIP
+}
+
+enum AssessmentStatus {
+  PLANNING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ChangeStatus {
+  PLANNING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum GreenAICategory {
+  MODEL_OPTIMIZATION
+  COMPUTE_EFFICIENCY
+  DATA_REDUCTION
+  CARBON_OFFSET
+  GREEN_INFRASTRUCTURE
+}
+
+enum RecommendationStatus {
+  PENDING
+  APPROVED
+  IN_PROGRESS
+  IMPLEMENTED
+  REJECTED
+  DEFERRED
+}
+
+enum KPICategory {
+  SPEED
+  QUALITY
+  RISK
+  COMPLIANCE
+  VALUE
+  TRAINING
+  COVERAGE
+}
+
+enum KPIStatus {
+  ON_TRACK
+  AT_RISK
+  OFF_TRACK
+  EXCEEDED
+}
+
+enum ComplianceEventType {
+  AUDIT
+  REVIEW
+  SUBMISSION
+  RENEWAL
+  ASSESSMENT
+  TRAINING_DEADLINE
+}
+
+enum CalendarEventStatus {
+  UPCOMING
+  DUE_SOON
+  OVERDUE
+  COMPLETED
+  CANCELLED
+}
+
+enum AlertType {
+  RISK
+  COMPLIANCE
+  PERFORMANCE
+  SECURITY
+  DEADLINE
+  ANOMALY
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  IN_PROGRESS
+  RESOLVED
+  FALSE_POSITIVE
+}
+
+enum ReviewType {
+  USE_CASE
+  POLICY
+  FRAMEWORK
+  GOVERNANCE
+  RISK
+  VENDOR
+}
+
+enum ReviewStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  POSTPONED
+  CANCELLED
+}
+
+enum PolicyStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ExceptionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+  REVOKED
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum AuditType {
+  COMPLIANCE
+  SECURITY
+  PERFORMANCE
+  ETHICS
+  OPERATIONAL
+  TECHNICAL
+}
+
+enum AuditStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum MaturityLevel {
+  LEVEL_1_INITIAL
+  LEVEL_2_DEVELOPING
+  LEVEL_3_DEFINED
+  LEVEL_4_MANAGED
+  LEVEL_5_OPTIMIZING
+}

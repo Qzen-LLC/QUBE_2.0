@@ -1,0 +1,1179 @@
+[
+  {
+    "questionNumber": 1,
+    "subCategory": "AI Model & API Costs",
+    "text": "What are the AI model API costs including per-call pricing and token costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Calculate from expected request volume, average token usage, and provider pricing.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 2,
+    "subCategory": "AI Model & API Costs",
+    "text": "What is the cost per API call/request for each model being considered?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Look up current pricing for shortlisted models and tiers.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 3,
+    "subCategory": "AI Model & API Costs",
+    "text": "What are the input vs. output token cost differentials?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate from model pricing and expected input/output token ratios.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 4,
+    "subCategory": "AI Model & API Costs",
+    "text": "What batch vs. real-time pricing differences exist?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Compare batch and real-time pricing for applicable providers.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 5,
+    "subCategory": "AI Model & API Costs",
+    "text": "What are the costs for fine-tuning models?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate fine-tuning costs from data volume, model size, and provider pricing."
+  },
+  {
+    "questionNumber": 6,
+    "subCategory": "AI Model & API Costs",
+    "text": "What reserved capacity or committed use discounts are available?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research volume discounts and commitment options for each provider.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 7,
+    "subCategory": "AI Model & API Costs",
+    "text": "How will API cost spikes from unexpected usage be controlled?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design cost control mechanisms (rate limits, budgets, alerts).",
+    "type": "RADIO",
+    "options": [
+      "Hard rate limits",
+      "Soft budget alerts",
+      "Auto-scaling with caps",
+      "No controls in place",
+      "Under evaluation"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 8,
+    "subCategory": "AI Model & API Costs",
+    "text": "What is the cost projection for 1x, 5x, and 10x current usage?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Model cost scaling at different usage multipliers.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 9,
+    "subCategory": "AI Model & API Costs",
+    "text": "What are the embedding model costs for RAG implementation?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate embedding costs from document volume and refresh frequency.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 10,
+    "subCategory": "AI Model & API Costs",
+    "text": "What prompt caching or response caching savings are achievable?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate cache hit rates and associated cost savings.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 11,
+    "subCategory": "AI Model & API Costs",
+    "text": "What multi-model routing cost optimization is possible (cheaper models for simpler queries)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design model routing strategy with cost-quality trade-offs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 12,
+    "subCategory": "AI Model & API Costs",
+    "text": "What are the costs for content safety and moderation APIs?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Price out moderation API costs based on expected call volume.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 13,
+    "subCategory": "Infrastructure Costs",
+    "text": "What are the total compute, GPU, and database hosting infrastructure costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Size and price compute resources from deployment architecture.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 14,
+    "subCategory": "Infrastructure Costs",
+    "text": "What GPU/TPU rental or purchase costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Price GPU options (cloud instances, reserved, spot) for inference workloads.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 15,
+    "subCategory": "Infrastructure Costs",
+    "text": "What vector database hosting costs are expected?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Price vector DB options based on index size and query volume.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 16,
+    "subCategory": "Infrastructure Costs",
+    "text": "What data storage costs are projected (S3, databases, caches)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate storage costs from data volume and access patterns.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 17,
+    "subCategory": "Infrastructure Costs",
+    "text": "What networking and data transfer costs are expected?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Estimate egress and inter-service data transfer costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 18,
+    "subCategory": "Infrastructure Costs",
+    "text": "What monitoring and observability platform costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Price monitoring tools (LangSmith, Datadog, etc.) for expected data volume.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 19,
+    "subCategory": "Infrastructure Costs",
+    "text": "What CDN and edge computing costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Estimate CDN costs from geographic distribution and request patterns.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 20,
+    "subCategory": "Infrastructure Costs",
+    "text": "What are the costs for development and staging environments?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Size non-production environments and calculate costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 21,
+    "subCategory": "Infrastructure Costs",
+    "text": "What disaster recovery infrastructure costs are required?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate DR infrastructure costs from RPO/RTO requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 22,
+    "subCategory": "Infrastructure Costs",
+    "text": "What auto-scaling cost implications exist for peak loads?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Model peak load costs based on traffic patterns and scaling policies.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 23,
+    "subCategory": "Infrastructure Costs",
+    "text": "What is the total monthly infrastructure run cost?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum all infrastructure cost components for monthly total.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 24,
+    "subCategory": "Development Costs",
+    "text": "What is the total team cost including developer-months for AI development?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Calculate team cost from required roles, rates, and timeline.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 25,
+    "subCategory": "Development Costs",
+    "text": "How many developer-months are needed for initial implementation?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate effort from scope, complexity, and team size.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 26,
+    "subCategory": "Development Costs",
+    "text": "What external contractor or consulting costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify specialized skills needing external support and estimate costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 27,
+    "subCategory": "Development Costs",
+    "text": "What AI/ML tool licensing costs are needed (development, testing, deployment)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Inventory required tools and look up licensing costs."
+  },
+  {
+    "questionNumber": 28,
+    "subCategory": "Development Costs",
+    "text": "What training and upskilling costs are needed for the team?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify training needs and estimate certification/course costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 29,
+    "subCategory": "Development Costs",
+    "text": "What data labeling and annotation costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate labeling costs from data volume and complexity."
+  },
+  {
+    "questionNumber": 30,
+    "subCategory": "Development Costs",
+    "text": "What testing and quality assurance costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate testing effort and costs from scope and quality requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 31,
+    "subCategory": "Development Costs",
+    "text": "What UX/UI design costs are needed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate design effort from interface complexity and iterations.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 32,
+    "subCategory": "Development Costs",
+    "text": "What project management overhead is expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate PM cost as percentage of total development effort.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 33,
+    "subCategory": "Development Costs",
+    "text": "What is the total estimated build cost?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum all development cost components.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 34,
+    "subCategory": "Operational Costs",
+    "text": "What ongoing maintenance team costs are expected (SRE, DevOps, ML Engineering)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate maintenance FTE needs from system complexity and SLA requirements."
+  },
+  {
+    "questionNumber": 35,
+    "subCategory": "Operational Costs",
+    "text": "What model retraining and update costs are projected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate retraining frequency and associated compute costs."
+  },
+  {
+    "questionNumber": 36,
+    "subCategory": "Operational Costs",
+    "text": "What data pipeline operational costs are expected?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate pipeline compute and orchestration costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 37,
+    "subCategory": "Operational Costs",
+    "text": "What customer support costs are attributed to AI features?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate support ticket volume and cost per ticket.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 38,
+    "subCategory": "Operational Costs",
+    "text": "What security and compliance operational costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate security monitoring and compliance activity costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 39,
+    "subCategory": "Operational Costs",
+    "text": "What vendor management and procurement costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate vendor management overhead.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 40,
+    "subCategory": "Operational Costs",
+    "text": "What incident response and on-call costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate on-call costs from expected incident frequency and severity.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 41,
+    "subCategory": "Operational Costs",
+    "text": "What documentation and knowledge management costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate effort for maintaining technical documentation.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 42,
+    "subCategory": "Operational Costs",
+    "text": "What is the total monthly operational run cost?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum all operational cost components for monthly total.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 43,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What AI platform licensing costs apply (Azure AI, AWS Bedrock, GCP Vertex)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Look up platform pricing for expected usage levels.",
+    "type": "CHECKBOX",
+    "options": [
+      "OpenAI API",
+      "Anthropic API",
+      "Google Vertex AI",
+      "AWS Bedrock",
+      "Azure OpenAI",
+      "Hugging Face",
+      "Self-hosted models",
+      "Other"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 44,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What third-party API subscription costs are needed?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Inventory required third-party APIs and pricing tiers.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 45,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What MLOps platform licensing costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Price MLOps platforms based on team size and usage.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 46,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What data platform licensing costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate data platform costs from data volume and feature needs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 47,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What security and compliance tool licensing costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Price security tools based on scope and features needed.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 48,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What development tool licensing costs apply (IDE, CI/CD, testing)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Inventory development tools and per-seat pricing.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 49,
+    "subCategory": "Licensing & Subscriptions",
+    "text": "What total annual licensing and subscription cost is expected?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum all licensing costs for annual total.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 50,
+    "subCategory": "Cost Optimization",
+    "text": "What cost optimization strategies and efficiency improvement plans are in place?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose optimization strategies (caching, batching, model routing, prompt compression).",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 51,
+    "subCategory": "Cost Optimization",
+    "text": "What reserved instance or savings plan opportunities exist?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Analyze usage patterns for reserved pricing opportunities.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 52,
+    "subCategory": "Cost Optimization",
+    "text": "How will spot/preemptible instances be used to reduce costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify workloads suitable for spot instances and estimate savings.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 53,
+    "subCategory": "Cost Optimization",
+    "text": "What auto-scaling policies will optimize cost efficiency?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design scaling policies that balance cost and performance.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 54,
+    "subCategory": "Cost Optimization",
+    "text": "How will unused or idle resources be identified and eliminated?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set up resource utilization monitoring and cleanup automation.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 55,
+    "subCategory": "Cost Optimization",
+    "text": "What token optimization strategies will reduce API costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose prompt compression and output limiting strategies.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 56,
+    "subCategory": "Cost Optimization",
+    "text": "How will cost per transaction/query be tracked and optimized?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set up cost-per-unit tracking and optimization targets.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 57,
+    "subCategory": "Cost Optimization",
+    "text": "What model distillation or smaller model substitution opportunities exist?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify tasks where smaller, cheaper models can maintain quality.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 58,
+    "subCategory": "Cost Optimization",
+    "text": "What estimated cost savings are achievable through optimization?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Quantify potential savings from each optimization strategy.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 59,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What is the Year 1 budget and 3-year total cost of ownership (TCO) projection?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate total Y1 budget from all cost categories.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 60,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What is the projected Year 2 and Year 3 run cost?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Project costs with growth assumptions and optimization targets.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 61,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What is the 3-year total cost of ownership (TCO)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum build cost + 3 years of run costs with inflation factors.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 62,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What budget approval process is required?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map budget approval to organization's financial governance."
+  },
+  {
+    "questionNumber": 63,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What contingency budget percentage should be applied?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend contingency based on project complexity and risk level.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 64,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What is the monthly burn rate during development phase?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate monthly development spend rate.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 65,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What is the monthly run cost after production deployment?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate steady-state monthly operational cost.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 66,
+    "subCategory": "Budget & Financial Planning",
+    "text": "How will budget variance be tracked and reported?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design budget tracking dashboard and variance reporting.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 67,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What cost allocation model will be used (per-department, per-use-case)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose cost allocation model based on organizational structure.",
+    "type": "RADIO",
+    "options": [
+      "By use case / project",
+      "By department / team",
+      "By cost center",
+      "Shared / pooled",
+      "Not yet allocated"
+    ]
+  },
+  {
+    "questionNumber": 68,
+    "subCategory": "Budget & Financial Planning",
+    "text": "What chargeback or showback mechanisms will be implemented?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design chargeback system for cross-departmental cost visibility.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 69,
+    "subCategory": "ROI & Value Tracking",
+    "text": "What is the projected annual return and payback period for this AI investment?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Calculate annual return from cost savings, revenue, and efficiency gains.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 70,
+    "subCategory": "ROI & Value Tracking",
+    "text": "What is the payback period for this investment?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate payback from cumulative costs vs. cumulative benefits.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 71,
+    "subCategory": "ROI & Value Tracking",
+    "text": "What is the net present value (NPV) of this investment over 3 years?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate NPV with appropriate discount rate.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 72,
+    "subCategory": "ROI & Value Tracking",
+    "text": "What internal rate of return (IRR) is expected?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate IRR from projected cash flows.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 73,
+    "subCategory": "ROI & Value Tracking",
+    "text": "How will value delivery be measured against cost?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design value tracking dashboard with cost-per-outcome metrics."
+  },
+  {
+    "questionNumber": 74,
+    "subCategory": "ROI & Value Tracking",
+    "text": "What leading indicators will predict ROI achievement?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify leading metrics that correlate with value delivery.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 75,
+    "subCategory": "ROI & Value Tracking",
+    "text": "What baseline measurements exist for ROI comparison?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Document current-state metrics for before/after comparison.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 76,
+    "subCategory": "ROI & Value Tracking",
+    "text": "How will intangible benefits (knowledge, capability, speed) be valued?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human judgment on intangible benefit valuation.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 77,
+    "subCategory": "Vendor & Procurement",
+    "text": "What vendor selection criteria apply to AI service providers?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Generate vendor evaluation scorecard from requirements.",
+    "type": "CHECKBOX",
+    "options": [
+      "Price / cost competitiveness",
+      "Performance / quality",
+      "Reliability / uptime SLA",
+      "Security / compliance",
+      "Vendor lock-in risk",
+      "Support quality",
+      "Scalability"
+    ]
+  },
+  {
+    "questionNumber": 78,
+    "subCategory": "Vendor & Procurement",
+    "text": "What procurement process is required for AI tools and services?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map to organization's procurement workflow and timelines.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 79,
+    "subCategory": "Vendor & Procurement",
+    "text": "What contract negotiation leverage exists (volume, multi-year, bundling)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify negotiation levers based on usage volume and commitment.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 80,
+    "subCategory": "Vendor & Procurement",
+    "text": "What payment terms and structures optimize cash flow?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Compare payment options (annual, monthly, usage-based) for cash flow impact.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 81,
+    "subCategory": "Vendor & Procurement",
+    "text": "What vendor consolidation opportunities reduce costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify consolidation opportunities across AI vendor portfolio.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 82,
+    "subCategory": "Vendor & Procurement",
+    "text": "What vendor lock-in risks exist and how are they mitigated financially?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Quantify switching costs and recommend lock-in mitigation.",
+    "type": "RADIO",
+    "options": [
+      "High (single vendor dependency)",
+      "Medium (some alternatives)",
+      "Low (multi-vendor strategy)",
+      "Minimal (open standards)",
+      "Not assessed"
+    ]
+  },
+  {
+    "questionNumber": 83,
+    "subCategory": "Vendor & Procurement",
+    "text": "What multi-cloud or multi-vendor strategy diversifies financial risk?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose multi-vendor strategy balancing cost and risk."
+  },
+  {
+    "questionNumber": 84,
+    "subCategory": "Cost Governance",
+    "text": "What FinOps practices, cost controls, and governance processes are established?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend FinOps framework for AI cost management."
+  },
+  {
+    "questionNumber": 85,
+    "subCategory": "Cost Governance",
+    "text": "What cost alerting thresholds will be set?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set budget alert thresholds at 50%, 75%, 90%, 100% of budget.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 86,
+    "subCategory": "Cost Governance",
+    "text": "What approval workflow governs spending above thresholds?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design spending approval workflow aligned with financial authority levels.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 87,
+    "subCategory": "Cost Governance",
+    "text": "How will cloud cost anomalies be detected?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set up anomaly detection for cloud spending spikes.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 88,
+    "subCategory": "Cost Governance",
+    "text": "What cost reporting cadence and audience applies?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Define reporting schedule and audience by cost impact level.",
+    "type": "RADIO",
+    "options": [
+      "Weekly",
+      "Bi-weekly",
+      "Monthly",
+      "Quarterly",
+      "Ad hoc / As needed"
+    ]
+  },
+  {
+    "questionNumber": 89,
+    "subCategory": "Cost Governance",
+    "text": "What tagging and labeling strategy enables cost attribution?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design resource tagging taxonomy for cost tracking.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 90,
+    "subCategory": "Cost Governance",
+    "text": "How will cost optimization recommendations be generated and tracked?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Set up optimization recommendation pipeline with tracking.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 91,
+    "subCategory": "Cost Governance",
+    "text": "What financial controls prevent runaway AI costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design hard limits and circuit breakers for AI spending.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 92,
+    "subCategory": "Scaling Cost Projections",
+    "text": "How will costs scale with 2x, 5x, 10x user growth?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Model cost at different growth scenarios."
+  },
+  {
+    "questionNumber": 93,
+    "subCategory": "Scaling Cost Projections",
+    "text": "What economies of scale are expected at higher volumes?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify volume discount thresholds and efficiency gains.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 94,
+    "subCategory": "Scaling Cost Projections",
+    "text": "What is the marginal cost per additional user or transaction?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate marginal cost from variable cost components.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 95,
+    "subCategory": "Scaling Cost Projections",
+    "text": "At what scale does self-hosting become more cost-effective than APIs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Model crossover point between API and self-hosted costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 96,
+    "subCategory": "Scaling Cost Projections",
+    "text": "What usage growth rate is assumed in financial projections?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Project growth rate from business goals and market analysis.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 97,
+    "subCategory": "Scaling Cost Projections",
+    "text": "How will seasonal or cyclical demand patterns affect costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Analyze demand patterns and model cost variability.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 98,
+    "subCategory": "Scaling Cost Projections",
+    "text": "What cost-per-outcome metric tracks efficiency at scale?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Define cost-per-outcome metrics for different scaling scenarios.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 99,
+    "subCategory": "Risk & Contingency",
+    "text": "What financial risks including cost overruns and budget variance scenarios are identified?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Model financial impact of key risk scenarios."
+  },
+  {
+    "questionNumber": 100,
+    "subCategory": "Risk & Contingency",
+    "text": "What is the financial impact if the project is delayed by 3 or 6 months?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate additional costs and delayed benefits from timeline extension.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 101,
+    "subCategory": "Risk & Contingency",
+    "text": "What is the cost of switching providers if needed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate migration costs including development, testing, and data transfer.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 102,
+    "subCategory": "Risk & Contingency",
+    "text": "What insurance or financial hedging protects against AI-related losses?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess insurance options for AI-specific risks.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 103,
+    "subCategory": "Risk & Contingency",
+    "text": "What sunk cost thresholds trigger project reassessment?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human judgment on reassessment trigger points.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 104,
+    "subCategory": "Risk & Contingency",
+    "text": "What exit costs apply if the project is cancelled?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate exit costs including contracts, decommissioning, and data migration.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 105,
+    "subCategory": "Team & Resource Costs",
+    "text": "What AI/ML engineering salary/rate budget is needed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Research market rates for required AI/ML roles."
+  },
+  {
+    "questionNumber": 106,
+    "subCategory": "Team & Resource Costs",
+    "text": "What data engineering resource costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate data engineering effort and costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 107,
+    "subCategory": "Team & Resource Costs",
+    "text": "What DevOps/MLOps resource costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate MLOps support effort and costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 108,
+    "subCategory": "Team & Resource Costs",
+    "text": "What product management resource costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate PM allocation and costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 109,
+    "subCategory": "Team & Resource Costs",
+    "text": "What UX research and design resource costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate design effort for AI interface development.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 110,
+    "subCategory": "Team & Resource Costs",
+    "text": "What QA and testing resource costs are needed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate testing effort from scope and quality requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 111,
+    "subCategory": "Team & Resource Costs",
+    "text": "What domain expert or SME time costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate SME engagement hours for training data and validation.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 112,
+    "subCategory": "Team & Resource Costs",
+    "text": "What recruiting or contractor sourcing costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate hiring costs from required positions and market conditions.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 113,
+    "subCategory": "Compliance & Legal Costs",
+    "text": "What legal review costs apply to AI contracts and agreements?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate legal review hours from contract complexity."
+  },
+  {
+    "questionNumber": 114,
+    "subCategory": "Compliance & Legal Costs",
+    "text": "What compliance audit costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Price compliance audits based on regulatory requirements."
+  },
+  {
+    "questionNumber": 115,
+    "subCategory": "Compliance & Legal Costs",
+    "text": "What regulatory filing or certification costs apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Look up filing fees and certification costs for applicable regulations."
+  },
+  {
+    "questionNumber": 116,
+    "subCategory": "Compliance & Legal Costs",
+    "text": "What data protection officer (DPO) or privacy counsel costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate DPO time allocation for AI data processing oversight."
+  },
+  {
+    "questionNumber": 117,
+    "subCategory": "Compliance & Legal Costs",
+    "text": "What ethical review board or advisory costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate ethics review costs from review frequency and complexity."
+  },
+  {
+    "questionNumber": 118,
+    "subCategory": "Compliance & Legal Costs",
+    "text": "What intellectual property protection costs apply (patents, trade secrets)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate IP protection costs from scope of innovations."
+  },
+  {
+    "questionNumber": 119,
+    "subCategory": "Training & Change Management Costs",
+    "text": "What end-user training development and delivery costs are expected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate training costs from user population and complexity."
+  },
+  {
+    "questionNumber": 120,
+    "subCategory": "Training & Change Management Costs",
+    "text": "What change management program costs apply?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate change management from scope and organizational impact."
+  },
+  {
+    "questionNumber": 121,
+    "subCategory": "Training & Change Management Costs",
+    "text": "What documentation and knowledge base creation costs are needed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate documentation effort from system complexity."
+  },
+  {
+    "questionNumber": 122,
+    "subCategory": "Training & Change Management Costs",
+    "text": "What ongoing training update and maintenance costs are projected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate annual training refresh costs."
+  },
+  {
+    "questionNumber": 123,
+    "subCategory": "Training & Change Management Costs",
+    "text": "What helpdesk or support ramp-up costs are expected during rollout?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate support costs during adoption period."
+  },
+  {
+    "questionNumber": 124,
+    "subCategory": "Environmental & Sustainability Costs",
+    "text": "What carbon offset costs are associated with AI compute?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate carbon footprint and offset costs from compute usage."
+  },
+  {
+    "questionNumber": 125,
+    "subCategory": "Environmental & Sustainability Costs",
+    "text": "What green energy premium costs apply to data center usage?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Assess green energy options and cost differentials for cloud providers."
+  },
+  {
+    "questionNumber": 126,
+    "subCategory": "Environmental & Sustainability Costs",
+    "text": "What sustainability reporting and compliance costs exist?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate effort for ESG reporting related to AI operations."
+  },
+  {
+    "questionNumber": 127,
+    "subCategory": "Financial Summary",
+    "text": "What are the estimated monthly recurring, one-time, and total annual costs?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum all monthly cost components (API + infrastructure + operations).",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 128,
+    "subCategory": "Financial Summary",
+    "text": "What is the total estimated one-time build cost?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Sum all one-time development and setup costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 129,
+    "subCategory": "Financial Summary",
+    "text": "What is the estimated annual total cost?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate annual cost from monthly recurring + amortized one-time costs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 130,
+    "subCategory": "Financial Summary",
+    "text": "What is the cost per unit of value delivered?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Calculate cost-per-outcome from total cost and value metrics."
+  },
+  {
+    "questionNumber": 131,
+    "subCategory": "Financial Summary",
+    "text": "What is the estimated break-even point?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate break-even from cumulative costs vs. cumulative benefits."
+  },
+  {
+    "questionNumber": 132,
+    "subCategory": "Financial Summary",
+    "text": "What is the estimated 3-year ROI?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate 3-year ROI from total costs and total benefits."
+  },
+  {
+    "questionNumber": 133,
+    "subCategory": "Financial Summary",
+    "text": "What is the cost comparison vs. the current (non-AI) solution?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Compare AI solution costs against current process costs."
+  },
+  {
+    "questionNumber": 134,
+    "subCategory": "Financial Summary",
+    "text": "What financial approval recommendations does the analysis support?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Summarize financial analysis with go/no-go recommendation.",
+    "type": "RADIO",
+    "options": [
+      "Strongly recommend proceeding",
+      "Recommend with conditions",
+      "Recommend further analysis",
+      "Do not recommend proceeding"
+    ]
+  },
+  {
+    "questionNumber": 135,
+    "subCategory": "Cost Benchmarking",
+    "text": "How do projected costs compare to industry benchmarks?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research industry cost benchmarks for similar AI implementations."
+  },
+  {
+    "questionNumber": 136,
+    "subCategory": "Cost Benchmarking",
+    "text": "What are peer organizations spending on similar AI initiatives?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research peer spending through industry reports and surveys."
+  },
+  {
+    "questionNumber": 137,
+    "subCategory": "Cost Benchmarking",
+    "text": "What cost-per-user or cost-per-transaction benchmarks are available?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Look up per-unit cost benchmarks for the AI use case type."
+  },
+  {
+    "questionNumber": 138,
+    "subCategory": "Cost Benchmarking",
+    "text": "How does the AI investment compare to typical IT project costs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Compare with organization's typical IT project investment levels."
+  },
+  {
+    "questionNumber": 139,
+    "subCategory": "Cost Benchmarking",
+    "text": "What analyst reports provide cost guidance for this type of AI implementation?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Research analyst reports (Gartner, Forrester) for AI cost benchmarks."
+  },
+  {
+    "questionNumber": 140,
+    "subCategory": "Cost Monitoring & Reporting",
+    "text": "What cost monitoring dashboard, tagging strategy, and anomaly detection are in place?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend FinOps dashboard based on cloud provider and requirements."
+  },
+  {
+    "questionNumber": 141,
+    "subCategory": "Cost Monitoring & Reporting",
+    "text": "What cost allocation tags and labels will be applied?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design tagging taxonomy for cost tracking and attribution.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 142,
+    "subCategory": "Cost Monitoring & Reporting",
+    "text": "What cost anomaly detection and alerting will be configured?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Configure anomaly detection thresholds and alert routing.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 143,
+    "subCategory": "Cost Monitoring & Reporting",
+    "text": "What regular cost review cadence and stakeholder audience applies?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set reporting cadence and audience from financial governance requirements.",
+    "type": "RADIO",
+    "options": [
+      "Weekly",
+      "Monthly",
+      "Quarterly",
+      "Annually",
+      "Triggered by threshold breach"
+    ]
+  },
+  {
+    "questionNumber": 144,
+    "subCategory": "Cost Monitoring & Reporting",
+    "text": "What cost optimization review process ensures ongoing efficiency?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design periodic optimization review with action tracking."
+  }
+]

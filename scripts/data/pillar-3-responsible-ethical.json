@@ -1,0 +1,496 @@
+[
+  {
+    "questionNumber": 1,
+    "subCategory": "Fairness & Bias",
+    "text": "What protected characteristics and bias detection methodology are used to assess fairness?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify protected characteristics relevant to the use case domain and jurisdiction.",
+    "type": "CHECKBOX",
+    "options": [
+      "Race/Ethnicity",
+      "Gender/Sex",
+      "Age",
+      "Disability",
+      "Religion",
+      "Sexual orientation",
+      "Socioeconomic status",
+      "Geographic location",
+      "Language/Nationality"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 2,
+    "subCategory": "Fairness & Bias",
+    "text": "What bias testing methodology will be applied (demographic parity, equalized odds, individual fairness)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Recommend fairness metrics based on use case type and regulatory context.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 3,
+    "subCategory": "Fairness & Bias",
+    "text": "How will training data bias be identified and mitigated?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose data auditing and debiasing techniques based on data characteristics."
+  },
+  {
+    "questionNumber": 4,
+    "subCategory": "Fairness & Bias",
+    "text": "What bias detection tools and disparate impact analysis processes are in place?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design bias monitoring pipeline with demographic slicing and drift detection."
+  },
+  {
+    "questionNumber": 5,
+    "subCategory": "Fairness & Bias",
+    "text": "How will disparate impact on different user groups be measured?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set up disparate impact metrics and threshold monitoring.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 6,
+    "subCategory": "Fairness & Bias",
+    "text": "What remediation process exists when bias is detected?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft bias remediation playbook with escalation and correction procedures.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 7,
+    "subCategory": "Fairness & Bias",
+    "text": "Has a representative set of users been consulted about fairness concerns?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human-led stakeholder engagement and consultation."
+  },
+  {
+    "questionNumber": 8,
+    "subCategory": "Fairness & Bias",
+    "text": "How will intersectional bias (multiple protected characteristics) be addressed?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design intersectional analysis methodology for compound disadvantage detection.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 9,
+    "subCategory": "Transparency & Explainability",
+    "text": "What level of explainability is required for AI decisions (technical, business, end-user)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Determine explainability needs based on audience and decision impact.",
+    "type": "RADIO",
+    "options": [
+      "Full explainability (white-box)",
+      "Partial explainability (SHAP/LIME)",
+      "Post-hoc explanations only",
+      "No explainability required",
+      "Under evaluation"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 10,
+    "subCategory": "Transparency & Explainability",
+    "text": "How will AI decision-making logic be communicated to affected individuals?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose explanation formats appropriate for end-user technical literacy.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 11,
+    "subCategory": "Transparency & Explainability",
+    "text": "What explainability methods will be implemented (SHAP, LIME, attention visualization, natural language)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Recommend explainability methods based on model type and audience needs."
+  },
+  {
+    "questionNumber": 12,
+    "subCategory": "Transparency & Explainability",
+    "text": "What AI disclosure requirements and transparency reporting processes are established?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft disclosure language and UX placement recommendations."
+  },
+  {
+    "questionNumber": 13,
+    "subCategory": "Transparency & Explainability",
+    "text": "What transparency report will be published about AI system performance?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design transparency report template with key metrics and demographics.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 14,
+    "subCategory": "Transparency & Explainability",
+    "text": "How will model limitations and known weaknesses be documented and communicated?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Create model card template with limitation documentation."
+  },
+  {
+    "questionNumber": 15,
+    "subCategory": "Accountability & Governance",
+    "text": "Who is accountable for AI system decisions and their consequences?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human assignment of accountability roles.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 16,
+    "subCategory": "Accountability & Governance",
+    "text": "What governance structure oversees this AI system's ethical implications?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map to existing governance bodies and their mandates.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 17,
+    "subCategory": "Accountability & Governance",
+    "text": "What appeals or contestation process exists for individuals affected by AI decisions?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design appeal process based on decision impact and regulatory requirements."
+  },
+  {
+    "questionNumber": 18,
+    "subCategory": "Accountability & Governance",
+    "text": "How will ethical concerns raised by employees or users be escalated?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose ethical concern escalation pathway and whistleblower protection."
+  },
+  {
+    "questionNumber": 19,
+    "subCategory": "Accountability & Governance",
+    "text": "What periodic ethical review cadence applies to this system?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Set review frequency based on risk level and regulatory requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 20,
+    "subCategory": "Accountability & Governance",
+    "text": "How will accountability be maintained across the AI supply chain (data providers, model providers, deployers)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map accountability across supply chain participants and contracts.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 21,
+    "subCategory": "Human Autonomy & Oversight",
+    "text": "How does this AI system impact human autonomy and decision-making authority?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human assessment of autonomy impacts."
+  },
+  {
+    "questionNumber": 22,
+    "subCategory": "Human Autonomy & Oversight",
+    "text": "What level of human oversight is appropriate (human-in-the-loop, on-the-loop, out-of-the-loop)?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human judgment on appropriate oversight level based on risk.",
+    "type": "RADIO",
+    "options": [
+      "Human-in-the-loop (approval required)",
+      "Human-on-the-loop (monitoring)",
+      "Human-over-the-loop (policy setting)",
+      "Fully autonomous"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 23,
+    "subCategory": "Human Autonomy & Oversight",
+    "text": "How will the system prevent over-reliance on AI recommendations?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose anti-automation-bias measures (confidence calibration, friction points)."
+  },
+  {
+    "questionNumber": 24,
+    "subCategory": "Human Autonomy & Oversight",
+    "text": "What safeguards prevent the AI from making decisions that should require human judgment?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Define decision boundaries with mandatory human review triggers."
+  },
+  {
+    "questionNumber": 25,
+    "subCategory": "Human Autonomy & Oversight",
+    "text": "How will users maintain meaningful control over AI-assisted processes?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design user control mechanisms (override, adjust, pause, stop)."
+  },
+  {
+    "questionNumber": 26,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "What personal data is collected and processed by the AI system?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Inventory personal data flows through the AI pipeline.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 27,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "Is informed consent obtained for AI processing of personal data?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Review consent mechanisms against data processing activities.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 28,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "How is data minimization practiced (only collecting necessary data)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Audit data collection against minimum necessary for the AI task.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 29,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "What data anonymization or pseudonymization techniques are applied?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Recommend anonymization techniques based on data types and re-identification risk.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 30,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "How are data subject rights (access, deletion, portability) supported?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map data subject rights processes for AI training and inference data.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 31,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "What safeguards prevent re-identification of anonymized data?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Assess re-identification risk and recommend additional protections.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 32,
+    "subCategory": "Privacy & Data Ethics",
+    "text": "How is purpose limitation enforced for data used in AI training and inference?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design purpose limitation controls and usage auditing.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 33,
+    "subCategory": "Social Impact",
+    "text": "What broader social impacts could this AI system create (positive and negative)?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human assessment of societal implications.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 34,
+    "subCategory": "Social Impact",
+    "text": "How might this AI system affect employment and labor markets?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Analyze workforce impact and propose transition support measures.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 35,
+    "subCategory": "Social Impact",
+    "text": "What is the environmental impact of training and running this AI system?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Calculate carbon footprint from compute requirements and energy sources."
+  },
+  {
+    "questionNumber": 36,
+    "subCategory": "Social Impact",
+    "text": "Does this AI system risk creating or reinforcing power imbalances?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human analysis of power dynamics and equity implications."
+  },
+  {
+    "questionNumber": 37,
+    "subCategory": "Social Impact",
+    "text": "How will the system's social impact be monitored over time?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose social impact monitoring framework with periodic assessments."
+  },
+  {
+    "questionNumber": 38,
+    "subCategory": "Safety & Reliability",
+    "text": "What safety-critical scenarios must the AI system handle correctly?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify safety-critical scenarios from domain analysis and failure mode assessment.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 39,
+    "subCategory": "Safety & Reliability",
+    "text": "What fail-safe mechanisms prevent harmful actions by the AI system?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design fail-safe architecture with multiple layers of protection."
+  },
+  {
+    "questionNumber": 40,
+    "subCategory": "Safety & Reliability",
+    "text": "How will the system handle adversarial attacks aimed at causing harm?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose adversarial robustness measures based on threat model."
+  },
+  {
+    "questionNumber": 41,
+    "subCategory": "Safety & Reliability",
+    "text": "What testing has been done for dangerous or harmful outputs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design red team testing protocol for harmful output scenarios."
+  },
+  {
+    "questionNumber": 42,
+    "subCategory": "Safety & Reliability",
+    "text": "How will reliability be ensured in high-stakes decision contexts?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose reliability engineering practices for critical AI decisions."
+  },
+  {
+    "questionNumber": 43,
+    "subCategory": "Inclusivity & Accessibility",
+    "text": "Has the AI system been tested for accessibility across diverse user populations?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design accessibility testing plan covering diverse user needs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 44,
+    "subCategory": "Inclusivity & Accessibility",
+    "text": "How does the system perform across different languages and cultural contexts?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Evaluate multilingual and multicultural performance gaps."
+  },
+  {
+    "questionNumber": 45,
+    "subCategory": "Inclusivity & Accessibility",
+    "text": "What accommodations exist for users with disabilities?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map accessibility requirements to WCAG standards and assistive technology support.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 46,
+    "subCategory": "Inclusivity & Accessibility",
+    "text": "How will digital literacy barriers be addressed for end users?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose UX simplification and training for low-literacy users."
+  },
+  {
+    "questionNumber": 47,
+    "subCategory": "Intellectual Property",
+    "text": "Are there IP concerns with using AI-generated content?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Analyze IP risks from training data provenance and generated content ownership.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 48,
+    "subCategory": "Intellectual Property",
+    "text": "How will the organization's IP be protected from leaking through AI interactions?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design data loss prevention measures for AI interfaces.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 49,
+    "subCategory": "Intellectual Property",
+    "text": "What licensing implications exist for AI model usage?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Review model licensing terms and compliance requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 50,
+    "subCategory": "Ethical AI Framework",
+    "text": "What ethical AI principles guide this implementation?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map to organization's AI ethics policy and industry frameworks (IEEE, OECD, EU).",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 51,
+    "subCategory": "Ethical AI Framework",
+    "text": "Has an Ethics Impact Assessment (EIA) been conducted?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Guide through EIA framework and flag areas needing deeper analysis.",
+    "type": "RADIO",
+    "options": [
+      "Completed",
+      "In progress",
+      "Planned",
+      "Not required",
+      "Not yet started"
+    ]
+  },
+  {
+    "questionNumber": 52,
+    "subCategory": "Ethical AI Framework",
+    "text": "How will ethical considerations evolve as the system learns and adapts?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human foresight on evolving ethical implications."
+  },
+  {
+    "questionNumber": 53,
+    "subCategory": "Ethical AI Framework",
+    "text": "What mechanisms exist for ongoing ethical monitoring and review?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose ethical monitoring dashboard and review cadence."
+  },
+  {
+    "questionNumber": 54,
+    "subCategory": "Ethical AI Framework",
+    "text": "How will conflicting ethical principles be resolved (e.g., accuracy vs. fairness)?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human judgment on ethical trade-off priorities."
+  },
+  {
+    "questionNumber": 55,
+    "subCategory": "Ethical AI Framework",
+    "text": "What external ethical review or advisory input has been sought?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human-driven engagement with external ethics advisors."
+  },
+  {
+    "questionNumber": 56,
+    "subCategory": "Consent & User Rights",
+    "text": "How are users informed about AI involvement and given opt-out mechanisms?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft AI disclosure notices meeting regulatory requirements.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 57,
+    "subCategory": "Consent & User Rights",
+    "text": "Can users opt out of AI-driven processes and receive human alternatives?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human decision on opt-out availability and human fallback.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 58,
+    "subCategory": "Consent & User Rights",
+    "text": "What rights do users have to understand and challenge AI decisions?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map user rights from regulatory requirements (GDPR Art. 22, EU AI Act)."
+  },
+  {
+    "questionNumber": 59,
+    "subCategory": "Consent & User Rights",
+    "text": "How will feedback from affected individuals be collected and acted upon?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design feedback collection and response workflow."
+  },
+  {
+    "questionNumber": 60,
+    "subCategory": "Consent & User Rights",
+    "text": "What data portability rights exist for user-generated AI interaction data?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Assess data portability requirements from applicable regulations.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 61,
+    "subCategory": "Consent & User Rights",
+    "text": "How will user consent be managed for AI model training on their data?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Design consent management system for training data usage."
+  }
+]

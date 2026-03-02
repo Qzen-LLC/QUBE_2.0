@@ -1,0 +1,7 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" rx="12" fill="#8f4fff"/>
+  <path d="M16 16h32v32H16z" stroke="white" stroke-width="2" fill="none"/>
+  <path d="M16 32h32M32 16v32" stroke="white" stroke-width="2"/>
+  <circle cx="32" cy="32" r="8" fill="white" opacity="0.9"/>
+  <text x="32" y="38" text-anchor="middle" fill="#8f4fff" font-family="Arial, sans-serif" font-size="8" font-weight="bold">Q</text>
+</svg>

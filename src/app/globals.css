@@ -1,0 +1,380 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Simplified Color System - Modern Minimalist */
+    --primary: 37 99 235; /* blue-600 */
+    --primary-foreground: 255 255 255;
+    
+    --secondary: 100 116 139; /* slate-500 */
+    --secondary-foreground: 255 255 255;
+    
+    --success: 22 163 74; /* green-600 */
+    --success-foreground: 255 255 255;
+    
+    --warning: 217 119 6; /* amber-600 */
+    --warning-foreground: 255 255 255;
+    
+    --destructive: 220 38 38; /* red-600 */
+    --destructive-foreground: 255 255 255;
+    
+    /* Semantic Colors - Clean & Minimal */
+    --background: 241 245 249; /* slate-100 */
+    --foreground: 15 23 42; /* slate-900 */
+    --card: 248 250 252; /* slate-50 */
+    --card-foreground: 15 23 42; /* slate-900 */
+    --popover: 248 250 252; /* slate-50 */
+    --popover-foreground: 15 23 42; /* slate-900 */
+    --muted: 226 232 240; /* slate-200 */
+    --muted-foreground: 100 116 139; /* slate-500 */
+    --accent: 226 232 240; /* slate-200 */
+    --accent-foreground: 15 23 42; /* slate-900 */
+    
+    /* Borders - Subtle & Clean */
+    --border: 203 213 225; /* slate-300 */
+    --input: 203 213 225; /* slate-300 */
+    --ring: 37 99 235; /* blue-600 */
+    --radius: 0.5rem; /* 8px - reduced from 12px */
+  }
+
+  .dark {
+    /* Dark Mode - Clean & Minimal */
+    --background: 2 6 23; /* slate-950 */
+    --foreground: 248 250 252; /* slate-50 */
+    --card: 15 23 42; /* slate-900 */
+    --card-foreground: 248 250 252; /* slate-50 */
+    --popover: 15 23 42; /* slate-900 */
+    --popover-foreground: 248 250 252; /* slate-50 */
+    --muted: 30 41 59; /* slate-800 */
+    --muted-foreground: 148 163 184; /* slate-400 */
+    --accent: 30 41 59; /* slate-800 */
+    --accent-foreground: 248 250 252; /* slate-50 */
+    
+    /* Dark borders */
+    --border: 30 41 59; /* slate-800 */
+    --input: 30 41 59; /* slate-800 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+    letter-spacing: 0.025em;
+  }
+  
+  /* Typography Hierarchy - Clean & Minimal */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+  }
+  
+  h1 {
+    @apply text-4xl font-bold;
+    letter-spacing: -0.05em;
+  }
+  
+  h2 {
+    @apply text-3xl font-semibold;
+    letter-spacing: -0.025em;
+  }
+  
+  h3 {
+    @apply text-2xl font-semibold;
+  }
+  
+  h4 {
+    @apply text-xl font-medium;
+  }
+  
+  h5 {
+    @apply text-lg font-medium;
+  }
+  
+  h6 {
+    @apply text-base font-medium;
+  }
+  
+  p {
+    @apply text-base leading-relaxed;
+  }
+  
+  small {
+    @apply text-sm text-muted-foreground;
+  }
+  
+  /* Global Transitions - Subtle & Smooth */
+  * {
+    transition: all 150ms ease-out;
+  }
+  
+  /* Focus States - Accessible & Clean */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2;
+  }
+  
+  /* Scrollbar Styling - Minimal */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+}
+
+@layer components {
+  /* Modern Minimalist Component Classes */
+  
+  /* Scoped typography for MAIN sidebar navigation only */
+  .main-sidebar-nav {
+    font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 13px !important;
+  }
+  .main-sidebar-nav .text-sm,
+  .main-sidebar-nav .text-xs {
+    font-size: 13px !important;
+  }
+  
+  /* Card Components - Clean & Minimal */
+  .card {
+    @apply bg-card border border-border rounded-xl shadow-sm;
+    transition: box-shadow 150ms ease-out, transform 150ms ease-out;
+  }
+  
+  .card:hover {
+    @apply shadow-md;
+    transform: translateY(-1px);
+  }
+  
+  .card-compact {
+    @apply bg-card border border-border rounded-lg shadow-sm p-4;
+  }
+  
+  /* Button Components - Simplified */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg font-medium transition-all duration-150;
+    letter-spacing: 0.025em;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm hover:shadow-md;
+    transform: scale(1);
+  }
+  
+  .btn-primary:hover {
+    transform: scale(1.01);
+  }
+  
+  .btn-outline {
+    @apply border border-border bg-background hover:bg-muted text-foreground;
+  }
+  
+  .btn-ghost {
+    @apply hover:bg-muted text-foreground;
+  }
+  
+  /* Form Components - Consistent */
+  .input {
+    @apply w-full rounded-lg border border-input bg-background px-3 py-2 text-sm;
+    height: 40px;
+    transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+  }
+  
+  .input:focus {
+    @apply border-primary ring-2 ring-primary/20;
+  }
+  
+  /* Loading States - Subtle */
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-primary border-t-transparent;
+    width: 20px;
+    height: 20px;
+  }
+  
+  /* Note: Use <Loader> component instead of .loading-spinner class for consistency */
+  
+  .skeleton {
+    @apply animate-pulse bg-muted rounded;
+  }
+  
+  /* Empty States - Clean */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-12 text-center;
+  }
+  
+  .empty-state-icon {
+    @apply w-16 h-16 text-muted-foreground mb-4;
+  }
+  
+  .empty-state-title {
+    @apply text-lg font-medium text-foreground mb-2;
+  }
+  
+  .empty-state-description {
+    @apply text-sm text-muted-foreground mb-6 max-w-sm;
+  }
+  
+  /* Error States - Minimal */
+  .error-state {
+    @apply flex items-start gap-3 p-4 border-l-4 border-destructive bg-destructive/5 rounded-r-lg;
+  }
+  
+  .error-icon {
+    @apply w-5 h-5 text-destructive flex-shrink-0 mt-0.5;
+  }
+  
+  .error-content {
+    @apply flex-1;
+  }
+  
+  .error-title {
+    @apply font-medium text-destructive mb-1;
+  }
+  
+  .error-message {
+    @apply text-sm text-muted-foreground;
+  }
+
+  /* Select and Option Styling - Ensure proper contrast */
+  select {
+    @apply bg-background text-foreground;
+  }
+
+  select option {
+    color: rgb(var(--foreground)) !important;
+    background-color: rgb(var(--background)) !important;
+  }
+
+  /* Ensure options are visible in both light and dark mode */
+  .dark select option {
+    color: rgb(var(--foreground)) !important;
+    background-color: rgb(var(--popover)) !important;
+  }
+
+  /* Disable dropdown menu animations - but keep positioning transforms */
+  [data-slot="dropdown-menu-content"],
+  [data-slot="dropdown-menu-sub-content"],
+  [data-radix-dropdown-menu-content],
+  [data-radix-dropdown-menu-sub-content],
+  [data-radix-popper-content-wrapper],
+  [role="menu"] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Disable Radix UI dropdown state-based animations */
+  [data-state="open"][data-slot="dropdown-menu-content"],
+  [data-state="closed"][data-slot="dropdown-menu-content"],
+  [data-state="open"][data-slot="dropdown-menu-sub-content"],
+  [data-state="closed"][data-slot="dropdown-menu-sub-content"],
+  [data-state="open"][role="menu"],
+  [data-state="closed"][role="menu"] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+
+  /* Disable all Radix UI menu animations */
+  [data-radix-menu-content],
+  [data-radix-menu-sub-content] {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar but keep scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+}
+
+/* Global override for all Radix UI dropdown animations - must be outside @layer */
+/* Note: We keep transform for positioning, only disable animation/transition */
+[data-radix-dropdown-menu-content],
+[data-radix-dropdown-menu-sub-content],
+[data-radix-menu-content],
+[data-radix-menu-sub-content],
+[data-radix-popper-content-wrapper],
+[role="menu"],
+div[data-slot="dropdown-menu-content"],
+div[data-slot="dropdown-menu-sub-content"] {
+  animation: none !important;
+  transition: none !important;
+  opacity: 1 !important;
+}
+
+/* Target any element with Radix UI animation classes */
+[class*="radix-dropdown"],
+[class*="radix-menu"],
+[class*="radix-popper"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+@layer utilities {
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(10px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
+  @keyframes scaleIn {
+    from { 
+      opacity: 0; 
+      transform: scale(0.95); 
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  }
+}

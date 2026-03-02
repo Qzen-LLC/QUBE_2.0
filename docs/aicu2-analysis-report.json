@@ -1,0 +1,669 @@
+{
+  "useCase": {
+    "id": "0dc26cef-91b9-4f33-903c-bf37b6822d57",
+    "aiucId": 2,
+    "title": "AI-Powered Customer Support Agent",
+    "problemStatement": "<p class=\"m-0\">Customer service teams face high volumes of repetitive queries, leading to increased resolution times and customer dissatisfaction</p>",
+    "proposedAISolution": "<p class=\"m-0\">Deploy an AI-powered conversational agent capable of handling FAQs, providing personalized responses, and escalating complex issues to human agents when needed.</p>",
+    "businessFunction": "Customer Support",
+    "stage": "business-case",
+    "priority": "MEDIUM",
+    "confidenceLevel": 7,
+    "operationalImpactScore": 8,
+    "productivityImpactScore": 8,
+    "revenueImpactScore": 8,
+    "implementationComplexity": 8,
+    "estimatedTimeline": "6 months",
+    "requiredResources": "<ul class=\"list-disc list-outside pl-6\"><li class=\"text-gray-700 dark:text-gray-300 my-0\"><p class=\"m-0\">Conversational AI platform (LLMs)</p></li><li class=\"text-gray-700 dark:text-gray-300 my-0\"><p class=\"m-0\">CRM system integration</p></li><li class=\"text-gray-700 dark:text-gray-300 my-0\"><p class=\"m-0\">Training dataset (chat logs, FAQs)</p></li><li class=\"text-gray-700 dark:text-gray-300 my-0\"><p class=\"m-0\">Customer service team for supervision and escalation</p></li><li class=\"text-gray-700 dark:text-gray-300 my-0\"><p class=\"m-0\">Gen AI Engg</p></li><li class=\"text-gray-700 dark:text-gray-300 my-0\"><p class=\"m-0\">System Architect</p></li></ul><p class=\"m-0\"></p>",
+    "user": {
+      "firstName": "Ramesh",
+      "lastName": "Kaluri",
+      "email": "kramesh06@gmail.com"
+    },
+    "organization": null,
+    "createdAt": "2025-09-06T22:42:04.637Z",
+    "updatedAt": "2025-09-06T22:42:18.923Z"
+  },
+  "assessments": {
+    "euAiAct": {
+      "id": "fd1b2ee1-0f2c-4ced-a735-207e10a845b0",
+      "status": "in_progress",
+      "progress": 0,
+      "answersCount": 0,
+      "controlsCount": 0,
+      "subcontrolsCount": 0,
+      "createdAt": "2025-09-07T03:44:44.914Z",
+      "updatedAt": "2025-09-07T03:44:44.914Z"
+    },
+    "assess": {
+      "useCaseId": "0dc26cef-91b9-4f33-903c-bf37b6822d57",
+      "stepsData": {
+        "metadata": {
+          "status": "in_progress",
+          "completedAt": null,
+          "lastUpdated": "2025-09-07T03:23:37.883Z"
+        },
+        "dataReadiness": {
+          "biasScore": 5,
+          "dataTypes": [
+            "Health/Medical Records"
+          ],
+          "dataVolume": "100 GB - 1 TB",
+          "growthRate": "< 10%",
+          "numRecords": "10,000 - 100,000",
+          "dataFreshness": "Weekly or less frequent",
+          "dataRetention": "3-7 years",
+          "contextSources": [],
+          "diversityScore": 5,
+          "primarySources": [
+            "Internal Databases"
+          ],
+          "versionControl": true,
+          "updateFrequency": "As Needed",
+          "dataCompleteness": 90,
+          "dataLocalization": "Internal Databases",
+          "dataQualityScore": 9,
+          "knowledgeSources": [
+            "Internal Documentation"
+          ],
+          "trainingDataSize": "",
+          "promptEngineering": [
+            "System Prompts Defined",
+            "Prompt Templates Created",
+            "Few-shot Examples Prepared"
+          ],
+          "trainingDataTypes": [],
+          "finetuningRequired": false,
+          "syntheticDataUsage": 0,
+          "crossBorderTransfer": false,
+          "dataStorageLocations": "Internal Databases",
+          "dataSubjectLocations": "Internal Databases",
+          "responseQualityScore": 5,
+          "dataAccuracyConfidence": 90,
+          "dataProcessingLocations": "Internal Databases",
+          "factVerificationProcess": "Manual Verification",
+          "instructionClarityScore": 5,
+          "knowledgeUpdateFrequency": ""
+        },
+        "ethicalImpact": {
+          "aiGovernance": {
+            "humanOversightLevel": "regular-monitoring",
+            "performanceMonitoring": []
+          },
+          "biasFairness": {
+            "temporalBias": false,
+            "selectionBias": false,
+            "geographicBias": false,
+            "historicalBias": false,
+            "demographicGaps": true,
+            "confirmationBias": true
+          },
+          "agentBehavior": {
+            "auditTrail": false,
+            "boundaries": [],
+            "transparencyLevel": "Always Disclose AI Nature",
+            "overrideCapability": false,
+            "decisionExplanation": false,
+            "behavioralBoundaries": [
+              "Cannot Make Financial Transactions",
+              "Cannot Make Irreversible Changes",
+              "Cannot Access Personal Data",
+              "Cannot Communicate Externally",
+              "Cannot Override Safety Limits",
+              "Must Log All Actions"
+            ],
+            "humanOversightTriggers": [
+              "High-stake Decisions"
+            ]
+          },
+          "decisionMaking": {
+            "decisionTypes": [],
+            "automationLevel": "assisted-decision"
+          },
+          "privacySecurity": {
+            "dataMinimization": false,
+            "consentManagement": true,
+            "dataAnonymization": false
+          },
+          "contentGeneration": {
+            "risks": [
+              "Misinformation/Disinformation"
+            ],
+            "promptSafety": [
+              "Prompt Injection Prevention",
+              "Jailbreak Protection"
+            ],
+            "contentFiltering": [],
+            "outputMonitoring": [],
+            "hallucinationTolerance": "Zero Tolerance",
+            "attributionRequirements": [
+              "AI Disclosure Required",
+              "Source Attribution Needed"
+            ]
+          },
+          "modelCharacteristics": {
+            "biasTesting": "no-testing",
+            "explainabilityLevel": "partial-explanations"
+          },
+          "ethicalConsiderations": {
+            "potentialHarmAreas": [
+              "privacy-violation",
+              "misinformation"
+            ],
+            "vulnerablePopulations": []
+          }
+        },
+        "budgetPlanning": {
+          "error": "",
+          "loading": false,
+          "baseOpCost": 500,
+          "baseApiCost": 2000,
+          "budgetRange": "$100K - $500K",
+          "vectorDbCost": 0,
+          "baseInfraCost": 100,
+          "safetyApiCost": 0,
+          "initialDevCost": 100000,
+          "backupModelCost": 0,
+          "inputTokenPrice": 0,
+          "peakTokenVolume": 0,
+          "valueGrowthRate": 0,
+          "baseMonthlyValue": 3000,
+          "gpuInferenceCost": 0,
+          "outputTokenPrice": 0,
+          "monthlyTokenVolume": 0,
+          "embeddingTokenPrice": 0,
+          "monitoringToolsCost": 0,
+          "finetuningTokenPrice": 0,
+          "optimizationStrategies": [],
+          "tokenOptimizationTarget": 0
+        },
+        "riskAssessment": {
+          "agentRisks": {
+            "Cascading Failures": 5,
+            "Resource Exhaustion": 5,
+            "Unauthorized Actions": 5,
+            "Multi-agent Conflicts": 1,
+            "Infinite Loops/Recursion": 5
+          },
+          "aiSpecific": {
+            "EU AI Act": true,
+            "Canada AIDA": false,
+            "UK AI Framework": false,
+            "China AI Regulations": false,
+            "US AI Bill of Rights": false,
+            "UAE AI/GenAI Controls": true,
+            "Singapore Model AI Governance": false
+          },
+          "modelRisks": {
+            "Adversarial Inputs": 4,
+            "Data Poisoning Risk": 4,
+            "Model Drift/Degradation": 4,
+            "Model Inversion Attacks": 4,
+            "Model Hallucination Impact": 5,
+            "Prompt Injection Vulnerability": 4
+          },
+          "aiExperience": "First AI Project",
+          "businessRisks": [
+            {
+              "risk": "User adoption resistance",
+              "impact": "Low",
+              "probability": "Critical"
+            },
+            {
+              "risk": "Regulatory changes",
+              "impact": "Low",
+              "probability": "Low"
+            },
+            {
+              "risk": "Competitive response",
+              "impact": "Medium",
+              "probability": "Critical"
+            }
+          ],
+          "riskTolerance": "Risk Averse",
+          "certifications": {
+            "SOC 2": false,
+            "FedRAMP": false,
+            "AICPA AI Auditing": false,
+            "IEEE AI Standards": false,
+            "ISO/IEC 23053 (AI)": false,
+            "ISO 27701 (Privacy)": false,
+            "ISO/IEC 23894 (AI Risk)": false,
+            "ISO 27001 (Information Security)": false,
+            "ISO/IEC 42001:2023 – AI Management System (AIMS)": true,
+            "ISO/IEC JTC 1/SC 42 – AI Standardization Committee": false,
+            "NIST AI Standards and Risk Management Framework (RMF)": false
+          },
+          "dataProtection": {
+            "GDPR (EU)": false,
+            "APPI (Japan)": false,
+            "LGPD (Brazil)": false,
+            "PIPEDA (Canada)": false,
+            "PDPA (Singapore)": false,
+            "POPI (South Africa)": false,
+            "CCPA/CPRA (California)": false,
+            "Privacy Act (Australia)": false,
+            "Other State Privacy Laws": false
+          },
+          "sectorSpecific": {
+            "CAN-SPAM (Email)": false,
+            "FERPA (Education)": false,
+            "HIPAA (Healthcare)": true,
+            "TCPA (Communications)": false,
+            "FCRA (Credit Reporting)": false,
+            "PCI-DSS (Payment Cards)": false,
+            "GLBA (Financial Privacy)": false,
+            "SOX (Financial Reporting)": false,
+            "COPPA (Children's Privacy)": false
+          },
+          "technicalRisks": [
+            {
+              "risk": "Model accuracy degradation",
+              "impact": "None",
+              "probability": "None"
+            },
+            {
+              "risk": "Data quality issues",
+              "impact": "None",
+              "probability": "None"
+            },
+            {
+              "risk": "Integration failures",
+              "impact": "None",
+              "probability": "None"
+            }
+          ],
+          "dependencyRisks": [
+            "Model Provider Outage",
+            "API Rate Limiting"
+          ],
+          "auditRequirements": "No Audit Required",
+          "complianceReporting": "None Required",
+          "operatingJurisdictions": {
+            "Europe": {
+              "Norway": false,
+              "Russia": false,
+              "Switzerland": false,
+              "European Union": true,
+              "United Kingdom": false
+            },
+            "Americas": {
+              "Brazil": false,
+              "Canada": false,
+              "Mexico": false,
+              "Argentina": false,
+              "United States (Federal)": true,
+              "US State-specific (list states)": false
+            },
+            "Asia-Pacific": {
+              "China": false,
+              "India": false,
+              "Japan": false,
+              "Australia": false,
+              "Singapore": true,
+              "South Korea": false
+            },
+            "Middle East & Africa": {
+              "UAE": true,
+              "Israel": false,
+              "Saudi Arabia": true,
+              "South Africa": false
+            }
+          }
+        },
+        "roadmapPosition": {
+          "metrics": "",
+          "priority": "low",
+          "timeline": "Q3 2025",
+          "dependencies": {
+            "hiring": true,
+            "security": false,
+            "dataPlatform": false
+          },
+          "projectStage": "Proof of Concept",
+          "evolutionPath": [
+            "Increase Autonomy Gradually"
+          ],
+          "targetAIMaturity": "Agentic AI",
+          "currentAIMaturity": "Basic Gen AI",
+          "timelineConstraints": [
+            "3-6 months"
+          ]
+        },
+        "businessFeasibility": {
+          "stakeholder": {
+            "it": false,
+            "exec": false,
+            "endUser": true
+          },
+          "genAIUseCase": "Customer Service",
+          "annualSavings": "2.4M",
+          "failureImpact": "Severe Business Impact",
+          "paybackPeriod": 8,
+          "efficiencyGain": 35,
+          "successMetrics": [
+            "Task Completion Rate",
+            "Time to Resolution"
+          ],
+          "userCategories": [
+            "Internal Employees"
+          ],
+          "concurrentUsers": "1,000 - 10,000",
+          "marketOpportunity": "medium",
+          "revenueImpactType": [
+            "Cost Reduction"
+          ],
+          "stakeholderGroups": [
+            "IT/Security",
+            "Business Users",
+            "Partners"
+          ],
+          "systemCriticality": "High (Business Critical)",
+          "interactionPattern": "Conversational",
+          "strategicAlignment": 8,
+          "userInteractionModes": [
+            "Chat Interface"
+          ],
+          "executiveSponsorLevel": "C-Suite",
+          "minAcceptableAccuracy": 95,
+          "availabilityRequirement": "99% (3.65 days downtime/year)",
+          "responseTimeRequirement": "5s - 30s",
+          "estimatedFinancialImpact": "$100K - $1M"
+        },
+        "technicalFeasibility": {
+          "apiSpecs": [
+            "Internal API only"
+          ],
+          "toolAuth": [
+            "OAuth"
+          ],
+          "modelSizes": [],
+          "modelTypes": [
+            "Large Language Model (LLM)"
+          ],
+          "tokenUsage": {
+            "peakHourly": 42,
+            "estimatedDaily": 1000,
+            "estimatedMonthly": 30000
+          },
+          "authMethods": [
+            "SSO/SAML"
+          ],
+          "memoryTypes": [
+            "Short-term conversation"
+          ],
+          "outputTypes": [
+            "Generated Content"
+          ],
+          "agentPattern": "Multi-agent collaborative",
+          "executionEnv": "Containerized",
+          "agentAutonomy": "Semi-autonomous (confirms)",
+          "cacheStrategy": "",
+          "contextWindow": "> 128K tokens",
+          "modelProvider": "Anthropic",
+          "avgInputTokens": 2000,
+          "cloudProviders": [
+            "AWS"
+          ],
+          "embeddingModel": "Sentence Transformers",
+          "fallbackModels": [],
+          "modelProviders": [
+            "Anthropic",
+            "OpenAI"
+          ],
+          "specificModels": [
+            "Claude 3 Sonnet"
+          ],
+          "toolCategories": [
+            "Database access",
+            "API calls",
+            "Document processing"
+          ],
+          "avgOutputTokens": 40000,
+          "batchProcessing": false,
+          "confidenceScore": "Percentage/Probability",
+          "functionCalling": true,
+          "monitoringTools": [],
+          "ragArchitecture": {
+            "chunkSize": 512,
+            "overlapSize": 50,
+            "retrievalTopK": 5,
+            "embeddingModel": "Sentence Transformers",
+            "vectorDatabase": "Chroma",
+            "chunkingStrategy": "Semantic chunking",
+            "retrievalStrategies": [
+              "Hybrid search"
+            ]
+          },
+          "responseFormats": [
+            "Streaming"
+          ],
+          "stateManagement": "Persistent",
+          "vectorDatabases": [
+            "Chroma"
+          ],
+          "chunkingStrategy": "Semantic chunking",
+          "deploymentModels": [
+            "Private Cloud"
+          ],
+          "memoryManagement": "Short-term conversation",
+          "streamingEnabled": true,
+          "toolIntegrations": [
+            "Database access",
+            "API calls",
+            "Document processing"
+          ],
+          "agentArchitecture": "Multi-agent collaborative",
+          "agentCapabilities": [
+            "Semi-autonomous (confirms)",
+            "Short-term conversation"
+          ],
+          "contextWindowSize": 128,
+          "integrationPoints": [
+            "Custom Applications"
+          ],
+          "computeRequirements": [
+            "CPU only"
+          ],
+          "encryptionStandards": [],
+          "knowledgeUpdateFreq": "On-demand",
+          "retrievalStrategies": [
+            "Hybrid search"
+          ],
+          "technicalComplexity": 0,
+          "toolApprovalProcess": "Pre-approved only",
+          "modelUpdateFrequency": "",
+          "orchestrationPattern": "Linear/Sequential",
+          "promptEngineeringReqs": [
+            "Few-shot examples"
+          ],
+          "expectedRequestsPerDay": 1000,
+          "multimodalCapabilities": [
+            "Text only"
+          ]
+        }
+      },
+      "createdAt": "2025-09-07T03:15:26.170Z",
+      "updatedAt": "2025-09-07T03:23:37.883Z"
+    },
+    "guardrails": {
+      "count": 14,
+      "guardrails": [
+        {
+          "id": "32b664ec-eee7-4233-a983-2edc2ba371d3",
+          "name": "Guardrails Configuration",
+          "status": "draft",
+          "approach": "balanced_practical",
+          "confidence": 0.85,
+          "rulesCount": 1,
+          "createdAt": "2025-09-07T03:35:52.119Z",
+          "updatedAt": "2025-09-07T03:35:52.119Z"
+        },
+        {
+          "id": "00e9dacd-c9b9-4db2-999a-bb58c7c78ea8",
+          "name": "Guardrails Configuration",
+          "status": "draft",
+          "approach": "balanced_practical",
+          "confidence": 0.8,
+          "rulesCount": 0,
+          "createdAt": "2025-09-07T03:51:31.587Z",
+          "updatedAt": "2025-09-07T03:51:31.587Z"
+        },
+        {
+          "id": "8dbf710e-6534-49c6-8e29-6e0fa72c40e2",
+          "name": "Guardrails Configuration",
+          "status": "draft",
+          "approach": "balanced_practical",
+          "confidence": 0.8,
+          "rulesCount": 4,
+          "createdAt": "2025-09-07T04:50:30.398Z",
+          "updatedAt": "2025-09-07T04:50:30.398Z"
+        },
+        {
+          "id": "1a396eed-aebc-494e-8416-d9bdf0c458ff",
+          "name": "Guardrails Configuration",
+          "status": "draft",
+          "approach": "balanced_practical",
+          "confidence": 0.8,
+          "rulesCount": 4,
+          "createdAt": "2025-09-07T04:51:23.053Z",
+          "updatedAt": "2025-09-07T04:51:23.053Z"
+        },
+        {
+          "id": "de1a7c06-7eb2-4002-a897-e471ac3c46ee",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.8,
+          "rulesCount": 4,
+          "createdAt": "2025-09-07T05:00:31.978Z",
+          "updatedAt": "2025-09-07T05:00:33.239Z"
+        },
+        {
+          "id": "4a386338-1669-43a5-9a35-e236b920af39",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.8,
+          "rulesCount": 4,
+          "createdAt": "2025-09-07T05:08:14.369Z",
+          "updatedAt": "2025-09-07T05:08:15.637Z"
+        },
+        {
+          "id": "d324ba11-f780-43d9-9317-6f17c5add0e7",
+          "name": "Guardrails Configuration",
+          "status": "draft",
+          "approach": "balanced_practical",
+          "confidence": 0.8833333333333333,
+          "rulesCount": 15,
+          "createdAt": "2025-09-08T03:23:30.991Z",
+          "updatedAt": "2025-09-08T03:23:30.991Z"
+        },
+        {
+          "id": "f7ba9837-0759-4ee7-b880-283085f9965f",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.825,
+          "rulesCount": 7,
+          "createdAt": "2025-09-08T03:47:04.685Z",
+          "updatedAt": "2025-09-08T03:47:06.243Z"
+        },
+        {
+          "id": "2021ca56-48f3-47dc-bdca-63652b862f50",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.855,
+          "rulesCount": 10,
+          "createdAt": "2025-09-08T04:01:55.546Z",
+          "updatedAt": "2025-09-08T04:01:57.272Z"
+        },
+        {
+          "id": "f342d54a-3208-4c18-aaaf-a5c941b01b29",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.8,
+          "rulesCount": 9,
+          "createdAt": "2025-09-08T04:56:04.821Z",
+          "updatedAt": "2025-09-08T04:56:06.669Z"
+        },
+        {
+          "id": "4c66af8b-78d4-4ebc-84b8-4ee362655354",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.8,
+          "rulesCount": 11,
+          "createdAt": "2025-09-08T05:07:24.326Z",
+          "updatedAt": "2025-09-08T05:07:25.833Z"
+        },
+        {
+          "id": "b31456cc-5d68-4a8c-8c41-6f5d0ac0074e",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.825,
+          "rulesCount": 18,
+          "createdAt": "2025-09-08T07:56:41.808Z",
+          "updatedAt": "2025-09-08T07:56:58.761Z"
+        },
+        {
+          "id": "42def9d5-ae2c-42cc-8305-6a8e9514eaa2",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.85,
+          "rulesCount": 24,
+          "createdAt": "2025-09-08T08:48:06.438Z",
+          "updatedAt": "2025-09-08T08:48:15.793Z"
+        },
+        {
+          "id": "3d1cb73b-b8e3-4e61-9920-7d0956c5004b",
+          "name": "AI Guardrails Configuration",
+          "status": "draft",
+          "approach": "multi-agent",
+          "confidence": 0.8583333333333334,
+          "rulesCount": 21,
+          "createdAt": "2025-09-08T12:55:06.166Z",
+          "updatedAt": "2025-09-09T00:49:42.475Z"
+        }
+      ]
+    },
+    "evaluations": {
+      "count": 1,
+      "evaluations": [
+        {
+          "id": "4f8c361a-e3d9-47ab-b5fb-8baf536f3b89",
+          "name": "Evaluation 9/8/2025",
+          "status": "completed",
+          "createdAt": "2025-09-08T14:53:31.416Z",
+          "updatedAt": "2025-09-08T15:04:24.749Z"
+        }
+      ]
+    },
+    "finops": {
+      "ROI": -48.65840958333832,
+      "netValue": -102355.7741852718,
+      "totalInvestment": 210355.7741852718,
+      "apiCostBase": 2000,
+      "devCostBase": 100000,
+      "infraCostBase": 100,
+      "opCostBase": 500,
+      "cumOpCost": 110355.7741852718,
+      "cumValue": 108000,
+      "valueBase": 3000,
+      "valueGrowthRate": 0,
+      "budgetRange": "$100K - $500K"
+    }
+  },
+  "summary": {
+    "totalAssessments": 2,
+    "completedAssessments": 0,
+    "inProgressAssessments": 1,
+    "riskCount": 0,
+    "guardrailCount": 14,
+    "evaluationCount": 1
+  }
+}

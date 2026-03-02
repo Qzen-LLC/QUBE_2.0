@@ -1,0 +1,522 @@
+[
+  {
+    "questionNumber": 1,
+    "subCategory": "Functional Requirements",
+    "text": "What are the primary business functions and user workflows this AI system must perform?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Review use case description and propose core functions based on industry patterns.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 2,
+    "subCategory": "Functional Requirements",
+    "text": "What specific inputs will the system accept (text, images, audio, structured data)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Analyze the proposed solution to infer expected input modalities.",
+    "type": "CHECKBOX",
+    "options": [
+      "Text",
+      "Images",
+      "Audio",
+      "Video",
+      "Structured data (CSV/JSON)",
+      "Documents (PDF/Word)"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 3,
+    "subCategory": "Functional Requirements",
+    "text": "What outputs must the system produce (decisions, recommendations, generated content, actions)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map desired outcomes to concrete output types based on use case goals.",
+    "type": "CHECKBOX",
+    "options": [
+      "Decisions/Classifications",
+      "Recommendations",
+      "Generated text content",
+      "Summaries",
+      "Code generation",
+      "Actions/Automations",
+      "Structured data output"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 4,
+    "subCategory": "Functional Requirements",
+    "text": "What are the key user workflows/journeys this system must support?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Generate user workflow diagrams based on stakeholder descriptions.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 5,
+    "subCategory": "Functional Requirements",
+    "text": "What decision boundaries should the AI system operate within?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human judgment on acceptable autonomy levels.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 6,
+    "subCategory": "Functional Requirements",
+    "text": "What are the fallback behaviors when the AI cannot provide a confident answer, including for ambiguous or conflicting inputs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose standard fallback patterns (escalation, default response, graceful degradation).",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 7,
+    "subCategory": "Functional Requirements",
+    "text": "How should the system handle ambiguous or conflicting inputs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Suggest disambiguation strategies based on domain context.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 8,
+    "subCategory": "Functional Requirements",
+    "text": "What languages and locales must be supported?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Auto-detect from organization geography and target market."
+  },
+  {
+    "questionNumber": 9,
+    "subCategory": "Functional Requirements",
+    "text": "What accessibility requirements apply (WCAG, screen readers, alternative inputs)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Pull standard accessibility requirements based on industry and region."
+  },
+  {
+    "questionNumber": 10,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What are the latency requirements for AI responses (real-time, near-real-time, batch)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend based on use case interaction type and industry benchmarks.",
+    "type": "RADIO",
+    "options": [
+      "Real-time (< 1 second)",
+      "Near-real-time (1-10 seconds)",
+      "Interactive (10-60 seconds)",
+      "Batch (minutes to hours)"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 11,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What is the expected throughput (requests per second/minute/hour)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate from user base size and expected usage patterns."
+  },
+  {
+    "questionNumber": 12,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What are the availability requirements (99.9%, 99.99% SLA)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Recommend SLA based on criticality classification.",
+    "type": "RADIO",
+    "options": [
+      "99.99% (mission-critical)",
+      "99.9% (business-critical)",
+      "99.5% (standard)",
+      "99% (best-effort)",
+      "No specific SLA required"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 13,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What are the scalability requirements (horizontal/vertical, auto-scaling triggers)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose scaling strategy based on traffic patterns and cloud platform."
+  },
+  {
+    "questionNumber": 14,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What disaster recovery and business continuity requirements apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Map to standard DR classifications (RPO/RTO) based on criticality.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 15,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What monitoring and observability requirements are needed?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate monitoring checklist based on system architecture type."
+  },
+  {
+    "questionNumber": 16,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What logging and audit trail requirements exist?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply regulatory logging requirements based on industry and data types."
+  },
+  {
+    "questionNumber": 17,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What data retention and archival policies apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Look up regulatory retention requirements for the relevant jurisdiction.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 18,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What security classification does this system require?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Classify based on data sensitivity and regulatory framework.",
+    "type": "RADIO",
+    "options": [
+      "Public / Unclassified",
+      "Internal / Confidential",
+      "Restricted / Sensitive",
+      "Top Secret / Highly Regulated"
+    ]
+  },
+  {
+    "questionNumber": 19,
+    "subCategory": "Non-Functional Requirements",
+    "text": "What compliance certifications are required (SOC2, ISO 27001, HIPAA)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Auto-determine from industry, region, and data types processed.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 20,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What type of generative AI capability is needed (text generation, summarization, Q&A, code generation, image generation)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Map from use case description to specific GenAI capabilities.",
+    "type": "CHECKBOX",
+    "options": [
+      "Text generation",
+      "Summarization",
+      "Q&A / Conversational",
+      "Code generation",
+      "Image generation",
+      "Audio/Speech",
+      "Translation",
+      "Classification/Analysis"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 21,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What is the expected context window size needed (short-form, long-form, multi-document)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Estimate context needs from input document sizes and conversation patterns.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 22,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What prompt engineering patterns are required (zero-shot, few-shot, chain-of-thought, ReAct)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend prompting strategies based on task complexity and accuracy needs."
+  },
+  {
+    "questionNumber": 23,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What fine-tuning or customization requirements exist?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Assess need for fine-tuning vs. RAG vs. prompt engineering based on domain specificity."
+  },
+  {
+    "questionNumber": 24,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What content safety and moderation requirements apply to generated outputs?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply content safety standards based on use case audience and regulatory context.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 25,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What hallucination detection and mitigation strategies are required?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend detection methods (RAG grounding, citation verification, confidence scoring).",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 26,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What grounding and citation requirements exist for generated content?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Define grounding strategy based on accuracy requirements and source availability."
+  },
+  {
+    "questionNumber": 27,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What multimodal capabilities are needed (text+image, text+audio, etc.)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Identify multimodal needs from input/output requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 28,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What streaming vs. batch response patterns are required?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Determine based on user-facing vs. backend processing use case.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 29,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What token usage limits and cost controls should be implemented?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose rate limits and budget caps based on expected usage and pricing.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 30,
+    "subCategory": "GenAI-Specific Requirements",
+    "text": "What output format requirements exist (JSON, Markdown, plain text, structured data)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Infer from downstream system integration needs."
+  },
+  {
+    "questionNumber": 31,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What level of autonomy should the AI agent have (advisory, semi-autonomous, fully autonomous)?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human judgment \u2014 present autonomy levels with risk implications.",
+    "type": "RADIO",
+    "options": [
+      "Advisory only (human decides)",
+      "Semi-autonomous (human approves)",
+      "Fully autonomous (human monitors)",
+      "Fully autonomous (no oversight)"
+    ],
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 32,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What tools and APIs should the agent be able to invoke?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Inventory available APIs and classify by risk level for agent access."
+  },
+  {
+    "questionNumber": 33,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What human-in-the-loop checkpoints are required?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human decision on where to insert approval gates.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 34,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What guardrails and safety boundaries must constrain agent behavior?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Generate guardrail recommendations based on autonomy level and domain."
+  },
+  {
+    "questionNumber": 35,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What memory and context persistence requirements exist for the agent?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend memory architecture based on conversation patterns and session duration.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 36,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What orchestration pattern is needed (single agent, multi-agent, hierarchical)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose architecture based on task complexity and parallelism needs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 37,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What error recovery and retry strategies should the agent employ?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply standard retry patterns (exponential backoff, circuit breaker, fallback).",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 38,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What execution time limits should apply to agent tasks?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend timeouts based on task type and user expectations.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 39,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "How should the agent handle conflicting goals or instructions?",
+    "aiAutomationTier": 3,
+    "aiAgentGuidance": "Requires human-defined priority rules and conflict resolution policies.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 40,
+    "subCategory": "Agentic AI-Specific Requirements",
+    "text": "What audit trail requirements exist for agent actions and decisions?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate audit logging specifications based on regulatory requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 41,
+    "subCategory": "Integration Requirements",
+    "text": "What existing systems must this AI system integrate with?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Discover integration points from IT landscape documentation.",
+    "quickAssessment": true
+  },
+  {
+    "questionNumber": 42,
+    "subCategory": "Integration Requirements",
+    "text": "What APIs (REST, GraphQL, gRPC) are required for integration?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend API standards based on existing tech stack and performance needs."
+  },
+  {
+    "questionNumber": 43,
+    "subCategory": "Integration Requirements",
+    "text": "What authentication and authorization mechanisms are needed for integrations?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply organization's standard auth patterns (OAuth, API keys, mTLS)."
+  },
+  {
+    "questionNumber": 44,
+    "subCategory": "Integration Requirements",
+    "text": "What data exchange formats and protocols are required?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Determine from downstream system specifications."
+  },
+  {
+    "questionNumber": 45,
+    "subCategory": "Integration Requirements",
+    "text": "What event-driven integration patterns are needed (webhooks, message queues, streaming)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend event patterns based on real-time vs. batch requirements."
+  },
+  {
+    "questionNumber": 46,
+    "subCategory": "User Experience Requirements",
+    "text": "What is the target user persona and their technical proficiency level?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Create user personas from stakeholder descriptions and department profiles."
+  },
+  {
+    "questionNumber": 47,
+    "subCategory": "User Experience Requirements",
+    "text": "What user interface modalities are required (web, mobile, API, chat, voice)?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend interfaces based on user personas and usage contexts."
+  },
+  {
+    "questionNumber": 48,
+    "subCategory": "User Experience Requirements",
+    "text": "What onboarding and training requirements exist for end users?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft onboarding plan based on system complexity and user proficiency."
+  },
+  {
+    "questionNumber": 49,
+    "subCategory": "User Experience Requirements",
+    "text": "How should AI confidence/uncertainty be communicated to users?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Propose UX patterns for confidence display (scores, indicators, explanations)."
+  },
+  {
+    "questionNumber": 50,
+    "subCategory": "User Experience Requirements",
+    "text": "What feedback mechanisms should users have to correct or rate AI outputs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend feedback patterns (thumbs up/down, corrections, detailed ratings)."
+  },
+  {
+    "questionNumber": 51,
+    "subCategory": "User Experience Requirements",
+    "text": "What is the expected user adoption curve and change management needs?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Model adoption curve based on similar AI deployments in the industry."
+  },
+  {
+    "questionNumber": 52,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What acceptance criteria and user acceptance testing (UAT) process define successful system performance?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft acceptance criteria from success metrics and business objectives."
+  },
+  {
+    "questionNumber": 53,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What testing types are required (unit, integration, UAT, adversarial, red team)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate testing matrix based on system complexity and risk level.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 54,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What golden dataset requirements exist for validation?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Define dataset specifications based on input/output types and edge cases."
+  },
+  {
+    "questionNumber": 55,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What performance benchmarks must the system meet before production?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Set benchmarks from industry standards and non-functional requirements."
+  },
+  {
+    "questionNumber": 56,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What bias and fairness testing requirements apply?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Apply fairness testing framework based on protected attributes and use case domain.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 57,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What security and adversarial testing is required (prompt injection, jailbreaking, data exfiltration)?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate security test plan based on OWASP Top 10 for LLMs.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 58,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What regression testing strategy is needed for model updates?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Design regression test suite based on critical functionality and edge cases.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 59,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What A/B testing or canary deployment requirements exist?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Recommend deployment strategy based on risk tolerance and user base size.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 60,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What user acceptance testing (UAT) process and criteria are required?",
+    "aiAutomationTier": 2,
+    "aiAgentGuidance": "Draft UAT plan with test scenarios from functional requirements.",
+    "isInactive": true
+  },
+  {
+    "questionNumber": 61,
+    "subCategory": "Testing & Validation Requirements",
+    "text": "What continuous evaluation and monitoring requirements apply post-deployment?",
+    "aiAutomationTier": 1,
+    "aiAgentGuidance": "Generate monitoring dashboard requirements from KPIs and SLAs."
+  }
+]

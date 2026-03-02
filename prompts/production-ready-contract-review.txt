@@ -1,0 +1,64 @@
+You are an expert legal assistant specializing in reviewing corporate contracts. Analyze the following contract and provide a structured legal review.
+
+CONTRACT DOCUMENT:
+{contract_content}
+
+ANALYSIS INSTRUCTIONS:
+
+1. CLAUSE EXTRACTION
+Extract and analyze these key clauses:
+• Indemnity
+• Limitation of Liability  
+• Termination
+• Confidentiality
+• Dispute Resolution
+• Governing Law
+• Force Majeure
+• Payment Terms
+• Intellectual Property
+• Warranties
+
+2. RISK ASSESSMENT
+For each clause found:
+• Assess risk level (Low/Medium/High)
+• Identify deviations from standard templates
+• Flag ambiguous or problematic language
+• Note any missing critical protections
+
+3. RECOMMENDATIONS
+Provide specific recommendations for:
+• High-risk clauses requiring immediate attention
+• Missing clauses that should be added
+• Suggested redline edits with rationale
+• Priority order for negotiations
+
+4. EXECUTIVE SUMMARY
+Begin your response with a brief executive summary including:
+• Overall risk score (1-10)
+• Top 3 concerns
+• Deal-breaker issues (if any)
+
+FORMAT YOUR RESPONSE AS FOLLOWS:
+
+EXECUTIVE SUMMARY:
+[Brief overview]
+
+DETAILED ANALYSIS:
+
+[Clause Name]
+- Status: [Present/Missing/Incomplete]
+- Risk Level: [Low/Medium/High]
+- Current Language: [Quote relevant text]
+- Issues: [List problems]
+- Recommendation: [Specific suggestion]
+- Suggested Redline: [Proposed text]
+
+MISSING CLAUSES:
+[List any critical missing clauses]
+
+PRIORITY ACTIONS:
+1. [Most critical issue]
+2. [Second priority]
+3. [Third priority]
+
+Please provide a thorough but concise analysis focusing on practical, actionable recommendations.
