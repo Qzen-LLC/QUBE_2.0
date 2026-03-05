@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { AlertTriangle, FileText, RotateCcw, ArrowLeft } from "lucide-react";
+import { AlertTriangle, RotateCcw, ArrowLeft, Play, Pencil } from "lucide-react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArchitectOutputDashboard } from "@/components/architect/ArchitectOutputDashboard";
 import { PipelineProgressTracker } from "@/components/architect/PipelineProgressTracker";
+import { PillarWizard, type WizardFormData } from "@/components/architect/PillarWizard";
 import { useArchitectSession } from "@/hooks/useArchitectSession";
 import { useArchitectPipeline, type PipelineStep } from "@/hooks/useArchitectPipeline";
 
@@ -33,6 +34,12 @@ export default function UseCaseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [useCase, setUseCase] = useState<UseCase | null>(null);
+  const [editing, setEditing] = useState(false);
+
+  const handleEditRegenerate = useCallback(async (formData: WizardFormData) => {
+    setEditing(false);
+    await pipeline.generate(formData);
+  }, [pipeline]);
 
   useEffect(() => {
     if (!useCaseId) return;
@@ -67,6 +74,29 @@ export default function UseCaseDetailPage() {
     );
   }
 
+  // Edit mode — show PillarWizard pre-populated with saved inputs
+  if (editing) {
+    const savedInputs = (architectSession?.pillarInputs as Record<string, unknown>) ?? {};
+    return (
+      <div className="min-h-screen flex justify-center items-start bg-gray-50 dark:bg-gray-900 p-0 sm:p-4">
+        <div className="w-full max-w-4xl sm:mt-6 sm:mb-6">
+          <div className="mb-4">
+            <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+              <ArrowLeft className="h-4 w-4 mr-1" /> Cancel Editing
+            </Button>
+          </div>
+          <PillarWizard
+            onGenerate={handleEditRegenerate}
+            onScorePillars={pipeline.scorePillars}
+            loading={pipeline.isRunning}
+            initialData={savedInputs as Partial<WizardFormData>}
+            startStep={1}
+          />
+        </div>
+      </div>
+    );
+  }
+
   // Pipeline running
   if (pipeline.isRunning) {
     return (
@@ -84,6 +114,12 @@ export default function UseCaseDetailPage() {
   if (pipeline.step === "completed" && pipeline.output) {
     return (
       <div className="space-y-4">
+        <div className="flex justify-end px-4">
+          <Button variant="outline" onClick={() => setEditing(true)}>
+            <Pencil className="h-4 w-4 mr-2" />
+            Edit Inputs & Regenerate
+          </Button>
+        </div>
         <ArchitectOutputDashboard
           output={pipeline.output}
           useCaseId={useCaseId}
@@ -126,6 +162,12 @@ export default function UseCaseDetailPage() {
     if (sessionStatus === "completed" && architectSession.architectureOutput) {
       return (
         <div className="space-y-4">
+          <div className="flex justify-end px-4">
+            <Button variant="outline" onClick={() => setEditing(true)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit Inputs & Regenerate
+            </Button>
+          </div>
           <ArchitectOutputDashboard
             output={architectSession.architectureOutput as Record<string, unknown>}
             useCaseId={useCaseId}
@@ -233,17 +275,26 @@ export default function UseCaseDetailPage() {
           <p className="text-sm text-muted-foreground">
             No architect assessment has been run for this use case yet.
           </p>
-          <div className="flex flex-col gap-2">
-            <Button
-              variant="outline"
-              onClick={() => router.push(`/view-usecase/${useCaseId}`)}
-              className="w-full"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              View Legacy Data
-            </Button>
-            <BackButton />
-          </div>
+          <Button
+            onClick={() => {
+              pipeline.generate({
+                name: useCase?.title || "Untitled",
+                technical: {
+                  description: useCase?.problemStatement || "",
+                },
+                business: {},
+                responsible: {},
+                legal: {},
+                dataReadiness: {},
+              }).catch(() => {/* error handled via pipeline.error state */});
+            }}
+            className="w-full"
+            disabled={pipeline.isRunning}
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Run Assessment
+          </Button>
+          <BackButton />
         </CardContent>
       </Card>
     </div>

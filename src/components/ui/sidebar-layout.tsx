@@ -75,6 +75,12 @@ const navigationItems: NavigationItem[] = [
     section: 'Assurance'
   },
   {
+    title: 'Threat Modeling',
+    href: '/dashboard/threats',
+    icon: AlertTriangle,
+    description: 'STRIDE Threat Analysis'
+  },
+  {
     title: 'FinOps Dashboard',
     href: '/dashboard/finops-dashboard',
     icon: DollarSign,

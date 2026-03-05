@@ -1,0 +1,96 @@
+import { NextResponse } from 'next/server';
+import { withAuth } from '@/lib/auth-gateway';
+import { prismaClient } from '@/utils/db';
+
+export const GET = withAuth(async (request, { auth }) => {
+  try {
+    const { searchParams } = new URL(request.url);
+    const organizationId = searchParams.get('organizationId');
+
+    // Get user data from database
+    const userRecord = await prismaClient.user.findUnique({
+      where: { clerkId: auth.userId! },
+      include: {
+        organization: true
+      }
+    });
+
+    if (!userRecord) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Build where clause based on role
+    let whereClause: any = {};
+
+    if (userRecord.role === 'QZEN_ADMIN') {
+      // QZEN_ADMIN can see all use cases
+      if (organizationId) {
+        whereClause.organizationId = organizationId;
+      }
+    } else if (userRecord.role === 'ORG_ADMIN' || userRecord.role === 'ORG_USER') {
+      // ORG_ADMIN and ORG_USER can only see use cases in their organization
+      whereClause.organizationId = userRecord.organizationId;
+
+      if (organizationId && organizationId !== userRecord.organizationId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+      }
+    } else {
+      // USER role can only see their own use cases
+      whereClause.userId = userRecord.id;
+    }
+
+    // Fetch use cases with their threats
+    const useCases = await prismaClient.useCase.findMany({
+      where: whereClause,
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+          }
+        },
+        organization: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        threats: {
+          orderBy: [
+            { status: 'asc' },
+            { severityScore: 'desc' },
+            { createdAt: 'desc' }
+          ]
+        }
+      },
+      orderBy: { updatedAt: 'desc' }
+    });
+
+    // Fetch all organizations for QZEN_ADMIN
+    let organizations = [];
+    if (userRecord.role === 'QZEN_ADMIN') {
+      organizations = await prismaClient.organization.findMany({
+        select: {
+          id: true,
+          name: true
+        },
+        orderBy: { name: 'asc' }
+      });
+    }
+
+    return NextResponse.json({
+      useCases,
+      organizations,
+      userRole: userRecord.role,
+      userOrganizationId: userRecord.organizationId
+    });
+  } catch (error) {
+    console.error('Error fetching use cases with threats:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch use cases with threats', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}, { requireUser: true });

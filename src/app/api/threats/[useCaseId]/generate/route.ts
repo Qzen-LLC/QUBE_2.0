@@ -66,6 +66,14 @@ export const POST = withAuth(async (
     });
   }
 
+  // Delete previous LLM-generated threats (preserve manual ones)
+  await prismaClient.threat.deleteMany({
+    where: {
+      useCaseId,
+      sourceType: 'llm-assessment',
+    },
+  });
+
   // Persist threats
   const currentUser = await prismaClient.user.findFirst({
     where: { clerkId: auth.userId! },

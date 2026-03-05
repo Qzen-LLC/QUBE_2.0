@@ -102,6 +102,7 @@ export type ResponsiblePillar = z.infer<typeof ResponsiblePillarSchema>;
 // ── Pillar 4: Legal & Regulatory ───────────────────────
 export const LegalPillarSchema = z.object({
   regulations: z.array(z.string()).default([]),
+  governanceFrameworks: z.array(z.string()).default([]),
   dataClassification: DataClassification.default("internal"),
   piiPresent: z.boolean().default(false),
   phiPresent: z.boolean().default(false),

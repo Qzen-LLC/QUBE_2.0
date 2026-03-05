@@ -28,7 +28,15 @@ function NewUseCaseContent() {
           title: formData.name,
           problemStatement: (formData.technical as Record<string, unknown>).description || '',
           aiType: (formData.technical as Record<string, unknown>).useCaseCategory || 'Gen AI',
-          regulatoryFrameworks: (formData.legal as Record<string, unknown>).regulations || [],
+          regulatoryFrameworks: [
+            ...((formData.legal as Record<string, unknown>).regulations as string[] || []),
+            ...((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
+              (f: string) => f === 'EU AI Act' || f === 'UAE AI/GenAI Controls'
+            ),
+          ],
+          industryStandards: ((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
+            (f: string) => f === 'ISO/IEC 42001' || f === 'ISO 27001'
+          ),
           stage: 'discovery',
           priority: 'MEDIUM',
           proposedAISolution: '',
@@ -37,7 +45,7 @@ function NewUseCaseContent() {
       });
       if (!ucRes.ok) throw new Error('Failed to create use case');
       const ucData = await ucRes.json();
-      const useCaseId = ucData.id;
+      const useCaseId = ucData.useCase?.id ?? ucData.id;
       setCreatedUseCaseId(useCaseId);
 
       // Step 2: Switch to generating phase

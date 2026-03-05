@@ -18,6 +18,7 @@ const OVERSIGHTS = ["none", "escalation_only", "review_before_action", "always_i
 const CLASSIFICATIONS = ["public", "internal", "confidential", "restricted"];
 const MATURITIES = ["none", "ad_hoc", "managed", "automated", "optimized"];
 const REGULATIONS = ["GDPR", "HIPAA", "SOC2", "CCPA", "PCI-DSS", "FERPA", "FedRAMP", "ISO27001"];
+const GOVERNANCE_FRAMEWORKS = ["EU AI Act", "ISO/IEC 42001", "ISO 27001", "UAE AI/GenAI Controls"];
 
 export interface WizardFormData {
   name: string;
@@ -54,6 +55,7 @@ const DEFAULT_FORM: WizardFormData = {
   },
   legal: {
     regulations: [],
+    governanceFrameworks: [],
     dataClassification: "internal",
     piiPresent: false,
     phiPresent: false,
@@ -153,6 +155,8 @@ interface PillarWizardProps {
   onScorePillars: (formData: WizardFormData) => Promise<Record<string, unknown>>;
   loading: boolean;
   initialData?: Partial<WizardFormData>;
+  /** Start at a specific step (0=Archetype, 1=Technical, etc.). Defaults to 0. */
+  startStep?: number;
 }
 
 export function PillarWizard({
@@ -160,8 +164,9 @@ export function PillarWizard({
   onScorePillars,
   loading,
   initialData,
+  startStep = 0,
 }: PillarWizardProps) {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(startStep);
   const [formData, setFormData] = useState<WizardFormData>(() => ({
     ...DEFAULT_FORM,
     ...initialData,
@@ -214,7 +219,7 @@ export function PillarWizard({
 
   const NavButtons = ({ hideNext }: { hideNext?: boolean }) => (
     <div className="flex justify-between pt-4">
-      <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))}>
+      <Button variant="outline" onClick={() => setStep(Math.max(startStep, step - 1))} disabled={step <= startStep}>
         Back
       </Button>
       {!hideNext && (
@@ -367,6 +372,7 @@ export function PillarWizard({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <SectionCard title="Compliance">
             <MultiSelectField label="Applicable Regulations" selected={(l.regulations as string[]) ?? []} options={REGULATIONS} onChange={(v) => updateField("legal", "regulations", v)} />
+            <MultiSelectField label="Governance Frameworks" selected={(l.governanceFrameworks as string[]) ?? []} options={GOVERNANCE_FRAMEWORKS} onChange={(v) => updateField("legal", "governanceFrameworks", v)} />
             <SelectField label="Data Classification" value={l.dataClassification} onChange={(v) => updateField("legal", "dataClassification", v)} options={CLASSIFICATIONS} />
             <div className="flex items-center justify-between"><Label className="dark:text-gray-300">PII Present</Label><Switch checked={!!l.piiPresent} onCheckedChange={(v) => updateField("legal", "piiPresent", v)} /></div>
             <div className="flex items-center justify-between"><Label className="dark:text-gray-300">PHI Present</Label><Switch checked={!!l.phiPresent} onCheckedChange={(v) => updateField("legal", "phiPresent", v)} /></div>

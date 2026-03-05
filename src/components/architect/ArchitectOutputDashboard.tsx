@@ -62,7 +62,7 @@ export function ArchitectOutputDashboard({
   const guardrails = output.guardrails as Record<string, unknown>;
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -77,7 +77,7 @@ export function ArchitectOutputDashboard({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-gray-50 dark:bg-gray-900 p-1 rounded-lg overflow-x-auto">
+      <div className="flex gap-1 bg-gray-100 dark:bg-gray-900 p-1 rounded-xl overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
@@ -118,29 +118,29 @@ function SummaryTab({ output }: { output: Record<string, unknown> }) {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-5 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <p className="text-xs text-gray-500 uppercase tracking-wider">Monthly Run Rate</p>
           <p className="text-2xl font-bold dark:text-white mt-1">{fmt(finops.summaryMonthlyMid as number)}</p>
           <p className="text-xs text-gray-500">{fmt(finops.summaryMonthlyLow as number)} &mdash; {fmt(finops.summaryMonthlyHigh as number)}</p>
         </Card>
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-5 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <p className="text-xs text-gray-500 uppercase tracking-wider">Risk Posture</p>
           <p className="text-2xl font-bold dark:text-white mt-1 capitalize">{risk.riskPosture as string}</p>
           <p className="text-xs text-gray-500">{risk.criticalRisks as number} critical / {risk.totalRisks as number} total</p>
         </Card>
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-5 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <p className="text-xs text-gray-500 uppercase tracking-wider">Threat Posture</p>
           <p className="text-2xl font-bold dark:text-white mt-1 capitalize">{threat.threatPosture as string}</p>
           <p className="text-xs text-gray-500">{threat.criticalThreats as number} critical / {threat.totalThreats as number} total</p>
         </Card>
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-5 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <p className="text-xs text-gray-500 uppercase tracking-wider">Guardrail Coverage</p>
           <p className="text-2xl font-bold dark:text-white mt-1">{guardrails.coverageScore as number}%</p>
           <p className="text-xs text-gray-500">{(guardrails.guardrails as unknown[])?.length ?? 0} guardrails defined</p>
         </Card>
       </div>
 
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <h3 className="text-lg font-semibold dark:text-white mb-3">Executive Summary</h3>
         <div className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">
           {(output.executiveSummary ?? output.executive_summary) as string}
@@ -156,7 +156,7 @@ function FinOpsTab({ data }: { data: Record<string, unknown> }) {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <h3 className="text-lg font-semibold dark:text-white mb-4">Monthly Cost Breakdown</h3>
         <div className="space-y-3">
           {lineItems?.map((item, i) => (
@@ -184,13 +184,13 @@ function FinOpsTab({ data }: { data: Record<string, unknown> }) {
       </Card>
 
       {data.narrative && (
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <h3 className="text-lg font-semibold dark:text-white mb-3">FinOps Narrative</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{data.narrative as string}</p>
         </Card>
       )}
 
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <h3 className="text-lg font-semibold dark:text-white mb-3">Assumptions</h3>
         <ul className="space-y-1">
           {assumptions.map((a, i) => (
@@ -207,7 +207,7 @@ function RiskTab({ data }: { data: Record<string, unknown> }) {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold dark:text-white">Risk Register</h3>
           <Badge text={(data.riskPosture ?? data.risk_posture) as string} color={(data.riskPosture ?? data.risk_posture) as string} />
@@ -237,7 +237,7 @@ function RiskTab({ data }: { data: Record<string, unknown> }) {
       </Card>
 
       {data.narrative && (
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <h3 className="text-lg font-semibold dark:text-white mb-3">Risk Assessment Narrative</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{data.narrative as string}</p>
         </Card>
@@ -252,7 +252,7 @@ function ThreatTab({ data }: { data: Record<string, unknown> }) {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold dark:text-white">STRIDE Threat Model</h3>
           <Badge text={(data.threatPosture ?? data.threat_posture) as string} color={(data.threatPosture ?? data.threat_posture) as string} />
@@ -293,7 +293,7 @@ function ThreatTab({ data }: { data: Record<string, unknown> }) {
       </Card>
 
       {data.narrative && (
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <h3 className="text-lg font-semibold dark:text-white mb-3">Threat Assessment Narrative</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{data.narrative as string}</p>
         </Card>
@@ -309,7 +309,7 @@ function GuardrailsTab({ data }: { data: Record<string, unknown> }) {
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold dark:text-white">Guardrail Framework</h3>
           <span className="text-sm text-blue-600 dark:text-blue-400 font-semibold">{(data.coverageScore ?? data.coverage_score) as number}% coverage</span>
@@ -345,7 +345,7 @@ function GuardrailsTab({ data }: { data: Record<string, unknown> }) {
       </Card>
 
       {/* Eval Metrics */}
-      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+      <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
         <h3 className="text-lg font-semibold dark:text-white mb-4">Evaluation Metrics</h3>
         <div className="space-y-3">
           {evalMetricsItems.map((m, i) => (
@@ -364,7 +364,7 @@ function GuardrailsTab({ data }: { data: Record<string, unknown> }) {
       </Card>
 
       {data.narrative && (
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+        <Card className="p-6 rounded-xl dark:bg-gray-900 dark:border-gray-800">
           <h3 className="text-lg font-semibold dark:text-white mb-3">Guardrails & Eval Strategy</h3>
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{data.narrative as string}</p>
         </Card>
