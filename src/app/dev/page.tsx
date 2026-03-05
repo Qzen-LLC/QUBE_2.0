@@ -111,9 +111,6 @@ export default function DevPage() {
         <div>
           <h2 className="text-lg font-semibold mb-2">Quick Links</h2>
           <div className="space-y-2">
-            <a href="/admin" className="block text-blue-600 hover:underline">
-              → Admin Dashboard
-            </a>
             <a href="/dashboard" className="block text-blue-600 hover:underline">
               → Main Dashboard
             </a>

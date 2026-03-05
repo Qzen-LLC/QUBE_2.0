@@ -72,6 +72,8 @@ model UseCase {
   risks                            Risk[]
   threats                          Threat[]
   uaeAiAssessments                 UaeAiAssessment?
+  architectSession                 ArchitectSession?
+  productionConfiguration          ProductionConfiguration?
   organization                     Organization?       @relation(fields: [organizationId], references: [id])
   user                             User?               @relation(fields: [userId], references: [id])
 
@@ -2219,4 +2221,40 @@ enum MaturityLevel {
   LEVEL_3_DEFINED
   LEVEL_4_MANAGED
   LEVEL_5_OPTIMIZING
+}
+
+// ── Architect Pipeline Models ──────────────────────────
+
+model ArchitectSession {
+  id                 String   @id @default(uuid())
+  useCaseId          String   @unique
+  archetypeId        String?
+  pillarInputs       Json
+  pillarScores       Json?
+  enrichedContext    Json?
+  finopsOutput       Json?
+  architectureOutput Json?
+  executiveSummary   String?
+  status             String   @default("draft")
+  pipelineStep       String?
+  confidence         Float?
+  modelUsed          String?
+  totalDuration      Int?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  useCase            UseCase  @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+}
+
+model ProductionConfiguration {
+  id                      String   @id @default(uuid())
+  useCaseId               String?  @unique
+  awsRegion               String?
+  awsCostExplorerEnabled  Boolean  @default(false)
+  langfuseEnabled         Boolean  @default(false)
+  langfuseHost            String?
+  langsmithEnabled        Boolean  @default(false)
+  langsmithProject        String?
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  useCase                 UseCase? @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
 }

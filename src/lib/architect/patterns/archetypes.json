@@ -1,0 +1,213 @@
+{
+  "archetypes": [
+    {
+      "id": "enterprise_rag",
+      "name": "Enterprise RAG Bot",
+      "description": "Retrieval-augmented generation over a corporate knowledge base",
+      "category": "rag",
+      "components": [
+        { "type": "llm", "default_provider": "anthropic", "default_model": "claude-sonnet-4-5", "alternatives": ["gpt-4o", "gemini-1.5-pro"] },
+        { "type": "embedding_model", "default_provider": "openai", "default_model": "text-embedding-3-small", "alternatives": ["cohere-embed-v3", "titan-embed-v2"] },
+        { "type": "vector_store", "default_provider": "pinecone", "default_model": "serverless", "alternatives": ["pgvector", "opensearch", "weaviate"] },
+        { "type": "orchestrator", "default_provider": "custom", "default_model": "langchain", "alternatives": ["llamaindex", "semantic-kernel"] }
+      ],
+      "cost_drivers": ["token_volume", "embedding_ops", "vector_storage", "compute"],
+      "default_pillar_values": {
+        "technical": {
+          "context_window_needs": "medium",
+          "orchestration_complexity": "simple",
+          "tool_use_required": false
+        },
+        "responsible": {
+          "decision_impact": "advisory",
+          "explainability_required": true,
+          "human_oversight": "escalation_only"
+        },
+        "data_readiness": {
+          "data_freshness": "weekly"
+        }
+      },
+      "risk_profile": {
+        "hallucination": "high",
+        "data_leakage": "medium",
+        "vendor_lock_in": "medium",
+        "model_degradation": "low"
+      },
+      "threat_vectors": ["prompt_injection", "data_poisoning", "context_overflow", "pii_leakage", "citation_forgery"],
+      "recommended_guardrails": ["input_validation", "output_grounding", "citation_enforcement", "pii_redaction", "token_limit"]
+    },
+    {
+      "id": "agentic_workflow",
+      "name": "Agentic Workflow System",
+      "description": "Multi-step agent with tool use and autonomous decision-making",
+      "category": "agent",
+      "components": [
+        { "type": "llm", "default_provider": "anthropic", "default_model": "claude-sonnet-4-5", "alternatives": ["gpt-4o", "gemini-1.5-pro"] },
+        { "type": "orchestrator", "default_provider": "custom", "default_model": "langgraph", "alternatives": ["crewai", "autogen", "custom"] },
+        { "type": "tool_registry", "default_provider": "custom", "default_model": "mcp_server", "alternatives": ["langchain_tools", "custom_api"] },
+        { "type": "state_store", "default_provider": "redis", "default_model": "redis-cluster", "alternatives": ["dynamodb", "postgresql"] }
+      ],
+      "cost_drivers": ["token_volume_high", "tool_call_overhead", "multi_turn_context", "compute", "state_management"],
+      "default_pillar_values": {
+        "technical": {
+          "context_window_needs": "large",
+          "orchestration_complexity": "complex",
+          "tool_use_required": true
+        },
+        "responsible": {
+          "decision_impact": "decision_support",
+          "explainability_required": true,
+          "human_oversight": "review_before_action"
+        },
+        "data_readiness": {
+          "pipeline_maturity": "managed"
+        }
+      },
+      "risk_profile": {
+        "hallucination": "high",
+        "tool_abuse": "critical",
+        "recursive_loops": "high",
+        "vendor_lock_in": "low",
+        "cost_explosion": "high"
+      },
+      "threat_vectors": ["prompt_injection", "tool_abuse", "privilege_escalation", "recursive_loops", "state_tampering", "pii_leakage"],
+      "recommended_guardrails": ["input_validation", "tool_authorization", "action_scope_limits", "recursion_caps", "human_approval_gates", "cost_circuit_breaker"]
+    },
+    {
+      "id": "internal_copilot",
+      "name": "Internal Knowledge Copilot",
+      "description": "Conversational assistant for internal teams with organizational knowledge",
+      "category": "copilot",
+      "components": [
+        { "type": "llm", "default_provider": "anthropic", "default_model": "claude-sonnet-4-5", "alternatives": ["gpt-4o", "gemini-1.5-flash"] },
+        { "type": "embedding_model", "default_provider": "openai", "default_model": "text-embedding-3-small", "alternatives": ["cohere-embed-v3"] },
+        { "type": "vector_store", "default_provider": "pgvector", "default_model": "postgresql", "alternatives": ["pinecone", "qdrant"] },
+        { "type": "conversation_store", "default_provider": "postgresql", "default_model": "postgresql", "alternatives": ["redis", "dynamodb"] }
+      ],
+      "cost_drivers": ["token_volume", "embedding_ops", "vector_storage", "conversation_history"],
+      "default_pillar_values": {
+        "technical": {
+          "context_window_needs": "medium",
+          "orchestration_complexity": "moderate",
+          "tool_use_required": false
+        },
+        "business": {
+          "is_customer_facing": false
+        },
+        "responsible": {
+          "decision_impact": "advisory",
+          "human_oversight": "none"
+        }
+      },
+      "risk_profile": {
+        "hallucination": "medium",
+        "data_leakage": "low",
+        "vendor_lock_in": "medium",
+        "adoption_resistance": "medium"
+      },
+      "threat_vectors": ["prompt_injection", "data_leakage_internal", "context_overflow"],
+      "recommended_guardrails": ["input_validation", "output_grounding", "access_control", "topic_filtering"]
+    },
+    {
+      "id": "document_processor",
+      "name": "Document Processing Agent",
+      "description": "Automated extraction, classification, and processing of documents",
+      "category": "agent",
+      "components": [
+        { "type": "llm", "default_provider": "anthropic", "default_model": "claude-sonnet-4-5", "alternatives": ["gpt-4o"] },
+        { "type": "ocr", "default_provider": "aws", "default_model": "textract", "alternatives": ["google-documentai", "azure-form-recognizer"] },
+        { "type": "orchestrator", "default_provider": "custom", "default_model": "step_functions", "alternatives": ["temporal", "airflow"] },
+        { "type": "storage", "default_provider": "aws", "default_model": "s3", "alternatives": ["gcs", "azure-blob"] }
+      ],
+      "cost_drivers": ["token_volume", "ocr_pages", "storage", "compute", "document_volume"],
+      "default_pillar_values": {
+        "technical": {
+          "context_window_needs": "large",
+          "orchestration_complexity": "moderate",
+          "tool_use_required": true,
+          "multi_modal": true
+        },
+        "responsible": {
+          "decision_impact": "decision_support",
+          "explainability_required": true,
+          "human_oversight": "review_before_action"
+        }
+      },
+      "risk_profile": {
+        "hallucination": "high",
+        "data_leakage": "high",
+        "extraction_accuracy": "critical",
+        "vendor_lock_in": "medium"
+      },
+      "threat_vectors": ["prompt_injection", "document_poisoning", "pii_leakage", "ocr_manipulation"],
+      "recommended_guardrails": ["input_validation", "extraction_verification", "pii_redaction", "human_review_queue", "audit_trail"]
+    },
+    {
+      "id": "code_assistant",
+      "name": "Code Generation Assistant",
+      "description": "AI-powered coding assistant for development teams",
+      "category": "code_generation",
+      "components": [
+        { "type": "llm", "default_provider": "anthropic", "default_model": "claude-sonnet-4-5", "alternatives": ["gpt-4o", "codestral"] },
+        { "type": "code_index", "default_provider": "custom", "default_model": "tree-sitter", "alternatives": ["sourcegraph", "github-search"] },
+        { "type": "sandbox", "default_provider": "custom", "default_model": "docker", "alternatives": ["firecracker", "wasm"] }
+      ],
+      "cost_drivers": ["token_volume_high", "code_indexing", "sandbox_compute"],
+      "default_pillar_values": {
+        "technical": {
+          "context_window_needs": "large",
+          "orchestration_complexity": "moderate",
+          "tool_use_required": true
+        },
+        "business": {
+          "is_customer_facing": false
+        },
+        "responsible": {
+          "decision_impact": "advisory",
+          "human_oversight": "none"
+        },
+        "legal": {
+          "ip_copyright_concerns": "open_source_license_compliance"
+        }
+      },
+      "risk_profile": {
+        "hallucination": "medium",
+        "security_vulnerabilities": "high",
+        "ip_exposure": "medium",
+        "vendor_lock_in": "low"
+      },
+      "threat_vectors": ["prompt_injection", "code_injection", "dependency_confusion", "ip_leakage", "insecure_code_generation"],
+      "recommended_guardrails": ["input_validation", "security_scanning", "license_checking", "sandbox_execution", "code_review_gate"]
+    },
+    {
+      "id": "content_generator",
+      "name": "Content Generation Platform",
+      "description": "Automated marketing, documentation, or creative content generation",
+      "category": "content_generation",
+      "components": [
+        { "type": "llm", "default_provider": "anthropic", "default_model": "claude-sonnet-4-5", "alternatives": ["gpt-4o", "gemini-1.5-pro"] },
+        { "type": "content_store", "default_provider": "postgresql", "default_model": "postgresql", "alternatives": ["mongodb", "contentful"] },
+        { "type": "brand_voice_model", "default_provider": "custom", "default_model": "fine_tuned_prompt", "alternatives": ["rag_style_guide"] }
+      ],
+      "cost_drivers": ["token_volume", "content_volume", "review_cycles"],
+      "default_pillar_values": {
+        "technical": {
+          "context_window_needs": "medium",
+          "orchestration_complexity": "simple"
+        },
+        "responsible": {
+          "decision_impact": "informational",
+          "human_oversight": "review_before_action"
+        }
+      },
+      "risk_profile": {
+        "hallucination": "medium",
+        "brand_damage": "high",
+        "ip_exposure": "medium",
+        "factual_accuracy": "high"
+      },
+      "threat_vectors": ["prompt_injection", "brand_manipulation", "misinformation", "copyright_infringement"],
+      "recommended_guardrails": ["input_validation", "brand_voice_check", "fact_checking", "plagiarism_detection", "human_review"]
+    }
+  ]
+}

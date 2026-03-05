@@ -60,18 +60,9 @@ export default function ConfigureModelsPage() {
   const [apiKey, setApiKey] = useState('')
   const { userData } = useUserData()
 
-  // Only load all organizations for QZEN_ADMIN
+  // Load organization from user data
   useEffect(() => {
-    if (userData?.role === 'QZEN_ADMIN') {
-      const loadOrgs = async () => {
-        try {
-          const res = await fetch('/api/admin/organizations')
-          const data = await res.json()
-          if (res.ok) setOrganizations(data.organizations || [])
-        } catch {}
-      }
-      loadOrgs()
-    } else if (userData?.organization) {
+    if (userData?.organization) {
       // For ORG_ADMIN, use their organization from userData
       setOrganizations([{
         id: userData.organization.id,

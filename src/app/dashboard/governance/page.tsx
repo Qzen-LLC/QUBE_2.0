@@ -525,7 +525,7 @@ export default function GovernancePage() {
                             size="sm"
                             className="whitespace-nowrap"
                           >
-                            <Link href={`/dashboard/${item.useCaseId}/assess`}>
+                            <Link href={`/dashboard/${item.useCaseId}`}>
                               View assessment
                             </Link>
                           </Button>

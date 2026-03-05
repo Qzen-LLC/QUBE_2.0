@@ -781,7 +781,7 @@ export default function RiskManagementPage() {
                           </p>
                           <Button
                             onClick={() =>
-                              router.push(`/dashboard/${useCase.id}/assess?step=10`)
+                              router.push(`/dashboard/${useCase.id}`)
                             }
                             size="sm"
                             className="h-7 text-[11px] px-3"

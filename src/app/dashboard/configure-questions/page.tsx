@@ -1068,10 +1068,10 @@ export default function ConfigureQuestionsPage() {
               Please select an organization to configure questions for.
             </p>
             <Button
-              onClick={() => router.push("/admin")}
+              onClick={() => router.push("/dashboard")}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
             >
-              Go to Admin Dashboard
+              Go to Dashboard
             </Button>
           </CardContent>
         </Card>

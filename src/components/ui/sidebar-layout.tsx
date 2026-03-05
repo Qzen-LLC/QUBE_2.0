@@ -23,7 +23,8 @@ import {
   Eye,
   Building2,
   MoreVertical,
-  AlertTriangle
+  AlertTriangle,
+  Activity
 } from 'lucide-react';
 import { Button } from './button';
 import { useUserData } from '@/contexts/UserContext';
@@ -38,28 +39,55 @@ interface NavigationItem {
   isAdmin?: boolean;
   children?: NavigationItem[];
   isCollapsible?: boolean;
+  section?: string;
 }
 
 const navigationItems: NavigationItem[] = [
-  // Admin Dashboard for QZEN_ADMIN
-  // This will be conditionally added below
+  // Top-level (no section)
   {
     title: 'Executive Dashboard',
     href: '/dashboard/executive',
     icon: LayoutDashboard,
     description: 'Executive Overview'
   },
+
+  // INVENTORY
   {
     title: 'Use Cases',
     href: '/dashboard',
     icon: Home,
-    description: 'AI Use Cases'
+    description: 'AI Use Cases',
+    section: 'Inventory'
   },
+  {
+    title: 'Production',
+    href: '/dashboard/production',
+    icon: Activity,
+    description: 'Production Monitoring'
+  },
+
+  // ASSURANCE
   {
     title: 'Risk Management',
     href: '/dashboard/risks',
     icon: ShieldCheck,
-    description: 'Risk Assessment'
+    description: 'Risk Assessment',
+    section: 'Assurance'
+  },
+  {
+    title: 'FinOps Dashboard',
+    href: '/dashboard/finops-dashboard',
+    icon: DollarSign,
+    description: 'Financial Operations'
+  },
+
+  // GOVERNANCE
+  {
+    title: 'Governance',
+    href: '/dashboard/governance',
+    icon: Shield,
+    description: 'Compliance & Governance',
+    section: 'Governance'
   },
   {
     title: 'Vendor Assessment',
@@ -68,23 +96,11 @@ const navigationItems: NavigationItem[] = [
     description: 'Vendor Evaluation'
   },
   {
-    title: 'FinOps Dashboard',
-    href: '/dashboard/finops-dashboard',
-    icon: DollarSign,
-    description: 'Financial Operations'
-  },
-  {
     title: 'Policy Center',
     href: '/dashboard/policy-center',
     icon: FileText,
     description: 'Policy Management'
   },
-  {
-    title: 'Governance',
-    href: '/dashboard/governance',
-    icon: Shield,
-    description: 'Compliance & Governance'
-  }
 ];
 
 interface SidebarLayoutProps {
@@ -207,25 +223,8 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
     children: organizationSetupItems
   };
   
-  // Build sidebar items, add Admin Dashboard for QZEN_ADMIN and Manage Users for ORG_ADMIN
+  // Build sidebar items
   const sidebarItems: NavigationItem[] = [
-    ...(userData?.role === 'QZEN_ADMIN'
-      ? [{
-          title: 'Admin Dashboard',
-          href: '/admin',
-          icon: LayoutDashboard,
-          description: 'Platform Admin'
-        }]
-      : []),
-    ...(userData?.role === 'ORG_ADMIN'
-      ? [{
-          title: 'Manage Users',
-          href: '/dashboard/users',
-          icon: Users,
-          description: 'User Management',
-          isAdmin: true // Add flag for styling
-        }]
-      : []),
     ...(userData?.role === 'ORG_ADMIN'
       ? [organizationSetupItem]
       : []),
@@ -306,13 +305,26 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
             const Icon = item.icon;
             const isCollapsible = item.isCollapsible && item.children;
             const isExpanded = isCollapsible && (item.title === 'Organization Setup' ? isOrgSetupExpanded : expandedMenu === item.title);
-            
+
+            const sectionHeader = item.section ? (
+              !isCollapsed ? (
+                <div className="pt-4 pb-1 px-3" key={`section-${item.section}`}>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                    {item.section}
+                  </span>
+                </div>
+              ) : (
+                <div className="my-1.5 mx-2 border-t border-border" key={`section-${item.section}`} />
+              )
+            ) : null;
+
             if (isCollapsible) {
               if (isCollapsed) {
                 // When collapsed, show just the icon
                 return (
+                  <React.Fragment key={item.title}>
+                  {sectionHeader}
                   <button
-                    key={item.title}
                     onClick={() => {
                       setIsCollapsed(false);
                       // Small delay to ensure sidebar expands first, then open menu
@@ -329,12 +341,15 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
                   >
                     <Icon className={`w-5 h-5 flex-shrink-0 ${isOrgSetupActive ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`} />
                   </button>
+                  </React.Fragment>
                 );
               }
-              
+
               // When expanded, show full menu item with chevron
               return (
-                <div key={item.title}>
+                <React.Fragment key={item.title}>
+                  {sectionHeader}
+                  <div>
                   <button
                     onClick={() => toggleMenu(item.title)}
                     className={`
@@ -350,14 +365,17 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
                       <span className="text-sm font-medium leading-tight">{item.title}</span>
                     </div>
                   </button>
-                </div>
+                  </div>
+                </React.Fragment>
               );
             }
-            
+
             if (!item.href) return null;
-            
+
             return (
-              <Link key={item.href} href={item.href}>
+              <React.Fragment key={item.href}>
+              {sectionHeader}
+              <Link href={item.href}>
                 <div className={`
                   ${isCollapsed ? 'flex flex-col items-center justify-center p-2' : 'flex items-center gap-2 px-3 py-2'} 
                   rounded-lg transition-all duration-200 group
@@ -379,6 +397,7 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
                   )}
                 </div>
               </Link>
+              </React.Fragment>
             );
           })}
         </nav>

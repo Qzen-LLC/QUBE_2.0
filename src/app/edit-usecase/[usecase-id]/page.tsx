@@ -86,11 +86,8 @@ const EditUseCaseContent = () => {
         if (res.ok) {
           const data = await res.json();
           if (data.organizationId) {
-            const orgRes = await fetch(`/api/admin/organizations/${data.organizationId}`);
-            if (orgRes.ok) {
-              const orgData = await orgRes.json();
-              setOrganizationMembers(orgData.organization?.users || []);
-            }
+            // Organization members are not available without admin API
+            setOrganizationMembers([]);
           }
         }
       } catch (_error) {

@@ -373,7 +373,7 @@ export default function RiskManagementPage() {
                   </p>
                 </div>
                 <Button
-                  onClick={() => router.push(`/dashboard/${useCaseId}/assess?step=10`)}
+                  onClick={() => router.push(`/dashboard/${useCaseId}`)}
                   className="mt-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                   size="lg"
                 >

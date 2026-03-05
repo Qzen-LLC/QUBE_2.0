@@ -27,7 +27,6 @@ const SIDEBAR_ROUTES = [
   '/new-usecase',
   '/edit-usecase',
   '/view-usecase',
-  '/admin',
   '/dev',
   '/invite',
 ];
