@@ -6,13 +6,11 @@
  * while properly capturing all Gen AI and Agentic AI fields.
  */
 
-import { ComprehensiveAssessment } from '@/lib/agents/types';
-
 /**
- * Maps UI component fields to the ComprehensiveAssessment type structure
+ * Maps UI component fields to the assessment type structure
  * Used when saving assessment data to the database
  */
-export function mapUIToTypeDefinition(uiData: any): Partial<ComprehensiveAssessment> {
+export function mapUIToTypeDefinition(uiData: any): Record<string, any> {
   const mapped: any = {
     ...uiData,
   };

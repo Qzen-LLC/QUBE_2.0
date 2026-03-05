@@ -19,18 +19,9 @@ export const GET = withAuth(async (request, { auth }) => {
     // Removed Redis cache check and cacheKey logic
 
     // Build where clause based on user role
+    // Include all use cases that have FinOps data, regardless of stage
     let whereClause: any = {
-      stage: {
-        in: [
-          'proof-of-value',
-          'backlog',
-          'in-progress',
-          'solution-validation',
-          'pilot',
-          'deployment',
-          'operational',
-        ],
-      },
+      finopsData: { isNot: null },
     };
 
     // Apply role-based filtering
@@ -67,6 +58,7 @@ export const GET = withAuth(async (request, { auth }) => {
             totalInvestment: true,
             valueBase: true,
             valueGrowthRate: true,
+            breakEvenMonth: true,
             budgetRange: true,
             source: true,
             lastAggregatedAt: true,
@@ -89,6 +81,7 @@ export const GET = withAuth(async (request, { auth }) => {
       totalInvestment: uc.finopsData?.totalInvestment ?? 0,
       valueBase: uc.finopsData?.valueBase ?? 0,
       valueGrowthRate: uc.finopsData?.valueGrowthRate ?? 0,
+      breakEvenMonth: uc.finopsData?.breakEvenMonth ?? null,
       budgetRange: uc.finopsData?.budgetRange ?? '',
       source: uc.finopsData?.source ?? 'manual',
       lastAggregatedAt: uc.finopsData?.lastAggregatedAt ?? null,

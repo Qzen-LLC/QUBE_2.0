@@ -943,82 +943,6 @@ model Lock {
   @@index([scope])
 }
 
-model GoldenEntry {
-  id               String         @id @default(uuid())
-  datasetId        String
-  category         String
-  inputSpec        Json
-  expectedOutputs  Json
-  metadata         Json
-  quality          Json?
-  version          Int            @default(1)
-  previousVersions Json?
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
-  dataset          GoldenDataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
-  reviews          GoldenReview[]
-
-  @@index([datasetId])
-  @@index([category])
-  @@index([createdAt])
-}
-
-model GoldenReview {
-  id          String      @id @default(uuid())
-  entryId     String
-  reviewer    String
-  scores      Json
-  decision    String
-  comments    String?
-  suggestions Json?
-  timestamp   DateTime    @default(now())
-  entry       GoldenEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
-
-  @@index([entryId])
-  @@index([reviewer])
-  @@index([timestamp])
-}
-
-model Evaluation {
-  id            String             @id @default(uuid())
-  useCaseId     String
-  name          String
-  description   String?
-  configuration Json
-  status        String             @default("pending")
-  startedAt     DateTime?
-  completedAt   DateTime?
-  summary       Json?
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  results       EvaluationResult[]
-
-  @@index([useCaseId])
-  @@index([status])
-  @@index([createdAt])
-}
-
-model EvaluationResult {
-  id             String     @id @default(uuid())
-  evaluationId   String
-  category       String
-  testType       String
-  input          Json
-  expectedOutput Json?
-  actualOutput   Json?
-  metrics        Json
-  passed         Boolean
-  severity       String?
-  details        Json?
-  timestamp      DateTime   @default(now())
-  evaluation     Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
-
-  @@index([evaluationId])
-  @@index([category])
-  @@index([passed])
-  @@index([timestamp])
-}
-
 model Guardrail {
   id              String           @id @default(uuid())
   useCaseId       String
@@ -1042,7 +966,6 @@ model Guardrail {
   rejectionReason String?
   version         Int              @default(1)
   useCase         UseCase          @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
-  auditLogs       GuardrailAudit[]
   rules           GuardrailRule[]
 
   @@index([useCaseId])
@@ -1074,7 +997,6 @@ model GuardrailRule {
   rejectedBy      String?
   rejectionReason String?
   status          GuardrailRuleStatus @default(PENDING)
-  comments        GuardrailComment[]
   guardrail       Guardrail           @relation(fields: [guardrailId], references: [id], onDelete: Cascade)
 
   @@index([guardrailId])
@@ -1082,118 +1004,6 @@ model GuardrailRule {
   @@index([severity])
   @@index([status])
   @@index([createdAt])
-}
-
-model GuardrailComment {
-  id        String        @id @default(uuid())
-  ruleId    String
-  userId    String
-  userName  String
-  content   String
-  createdAt DateTime      @default(now())
-  rule      GuardrailRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
-
-  @@index([ruleId])
-  @@index([createdAt])
-}
-
-model GuardrailAudit {
-  id          String    @id @default(uuid())
-  guardrailId String
-  ruleId      String?
-  action      String
-  userId      String
-  userName    String
-  changes     Json?
-  timestamp   DateTime  @default(now())
-  guardrail   Guardrail @relation(fields: [guardrailId], references: [id], onDelete: Cascade)
-
-  @@index([guardrailId])
-  @@index([timestamp])
-}
-
-model GuardrailJob {
-  id          String    @id @default(uuid())
-  useCaseId   String
-  status      String    @default("pending")
-  progress    Int       @default(0)
-  currentStep String?
-  result      Json?
-  error       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  completedAt DateTime?
-
-  @@index([useCaseId])
-  @@index([status])
-  @@index([createdAt])
-}
-
-model EvaluationJob {
-  id                 String    @id @default(uuid())
-  useCaseId          String
-  guardrailsId       String?
-  generationStrategy String    @default("comprehensive")
-  testIntensity      String    @default("standard")
-  status             String    @default("pending")
-  progress           Int       @default(0)
-  currentStep        String?
-  result             Json?
-  error              String?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  completedAt        DateTime?
-
-  @@index([useCaseId])
-  @@index([status])
-  @@index([createdAt])
-}
-
-model ObservabilitySession {
-  id             String    @id @default(dbgenerated("gen_random_uuid()"))
-  sessionId      String    @unique
-  useCaseId      String?
-  useCaseTitle   String?
-  sessionType    String
-  status         String    @default("running")
-  startTime      DateTime  @default(now())
-  endTime        DateTime?
-  duration       Int?
-  totalLLMCalls  Int       @default(0)
-  totalTokens    Int       @default(0)
-  totalCost      Float     @default(0)
-  agentsInvolved String[]
-  langsmithUrl   String?
-  langsmithRunId String?
-  metadata       Json?
-  errors         Json?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @default(now()) @updatedAt
-
-  @@index([useCaseId])
-  @@index([sessionType])
-  @@index([status])
-  @@index([startTime])
-}
-
-model GoldenDataset {
-  id               String        @id
-  useCaseId        String
-  version          String        @default("1.0.0")
-  name             String
-  description      String
-  metadata         Json
-  statistics       Json?
-  qualityMetrics   Json?
-  validationStatus Json?
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  publishedAt      DateTime?
-  entries          GoldenEntry[]
-
-  @@index([createdAt])
-  @@index([publishedAt])
-  @@index([useCaseId])
 }
 
 model QuestionTemplate {
