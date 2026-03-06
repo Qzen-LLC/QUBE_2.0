@@ -1,6 +1,7 @@
 import type { FinOpsOutput } from "../models/outputs";
 import type { ReconciliationOutput } from "../models/production";
 import { computeVariance, type CostVarianceLine } from "../models/production";
+import { fetchCostsViaMCP, isMCPAvailable } from "./mcp-cost-explorer-client";
 
 let CostExplorerClient: unknown = null;
 try {
@@ -11,12 +12,19 @@ try {
   // AWS SDK not available
 }
 
-interface ReconcileOptions {
+export interface ReconcileOptions {
   finopsOutput: FinOpsOutput;
   useCaseId: string;
   periodDays?: number;
   awsRegion?: string;
   awsCostExplorerEnabled?: boolean;
+  mcpEnabled?: boolean;
+  costAllocationTag?: { key: string; value: string };
+  historicalRecords?: Array<{
+    totalProjected: number;
+    totalActual: number;
+    reconciledAt: string | Date;
+  }>;
 }
 
 function generateSimulatedCosts(
@@ -55,14 +63,43 @@ function buildTrendData(
   return trend;
 }
 
+function buildTrendFromHistory(
+  historicalRecords: Array<{
+    totalProjected: number;
+    totalActual: number;
+    reconciledAt: string | Date;
+  }>
+): Record<string, unknown>[] {
+  return historicalRecords
+    .sort(
+      (a, b) =>
+        new Date(a.reconciledAt).getTime() - new Date(b.reconciledAt).getTime()
+    )
+    .map((record) => {
+      const d = new Date(record.reconciledAt);
+      return {
+        month: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`,
+        projected: Math.round(record.totalProjected * 100) / 100,
+        actual: Math.round(record.totalActual * 100) / 100,
+      };
+    });
+}
+
 function buildNarrative(
   projected: number,
   actual: number,
   variancePct: number,
-  anomalies: Record<string, unknown>[]
+  anomalies: Record<string, unknown>[],
+  source: string
 ): string {
   const direction = variancePct > 0 ? "over" : "under";
   let narrative = `Total monthly spend is $${actual.toLocaleString(undefined, { maximumFractionDigits: 0 })} against a projected $${projected.toLocaleString(undefined, { maximumFractionDigits: 0 })}, representing a ${Math.abs(variancePct).toFixed(1)}% ${direction}-budget variance.`;
+
+  if (source.includes(":tagged")) {
+    narrative += ` Costs filtered by cost allocation tag. (Source: ${source})`;
+  } else {
+    narrative += ` Costs reflect entire account (no tag filter). (Source: ${source})`;
+  }
 
   if (anomalies.length > 0) {
     narrative += `\n\n${anomalies.length} anomalies detected:\n`;
@@ -79,7 +116,8 @@ function buildNarrative(
 async function fetchActualCostsFromAWS(
   start: string,
   end: string,
-  region: string
+  region: string,
+  tagFilter?: { key: string; value: string }
 ): Promise<Record<string, number>> {
   if (!CostExplorerClient) {
     throw new Error("AWS SDK not available");
@@ -95,12 +133,19 @@ async function fetchActualCostsFromAWS(
   });
 
   const { GetCostAndUsageCommand } = require("@aws-sdk/client-cost-explorer");
-  const command = new GetCostAndUsageCommand({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const params: any = {
     TimePeriod: { Start: start, End: end },
     Granularity: "MONTHLY",
     Metrics: ["UnblendedCost"],
     GroupBy: [{ Type: "DIMENSION", Key: "SERVICE" }],
-  });
+  };
+  if (tagFilter) {
+    params.Filter = {
+      Tags: { Key: tagFilter.key, Values: [tagFilter.value], MatchOptions: ["EQUALS"] },
+    };
+  }
+  const command = new GetCostAndUsageCommand(params);
 
   const response = await client.send(command);
   const costs: Record<string, number> = {};
@@ -127,6 +172,9 @@ export async function reconcileFinOps(
     periodDays = 30,
     awsRegion = "us-east-1",
     awsCostExplorerEnabled = false,
+    mcpEnabled = !!process.env.MCP_COST_EXPLORER_URL,
+    costAllocationTag,
+    historicalRecords,
   } = options;
 
   const endDate = new Date();
@@ -137,14 +185,35 @@ export async function reconcileFinOps(
   const periodEnd = endDate.toISOString().split("T")[0];
 
   let actualCosts: Record<string, number>;
+  let source: string = "simulated";
 
-  if (awsCostExplorerEnabled && CostExplorerClient) {
+  // Priority: MCP → AWS SDK → Simulated
+  if (mcpEnabled) {
+    try {
+      const mcpAvailable = await isMCPAvailable();
+      if (mcpAvailable) {
+        const mcpResult = await fetchCostsViaMCP({
+          startDate: periodStart,
+          endDate: periodEnd,
+          tagFilter: costAllocationTag,
+        });
+        actualCosts = mcpResult.costs;
+        source = mcpResult.source;
+      } else {
+        actualCosts = generateSimulatedCosts(finopsOutput);
+      }
+    } catch {
+      actualCosts = generateSimulatedCosts(finopsOutput);
+    }
+  } else if (awsCostExplorerEnabled && CostExplorerClient) {
     try {
       actualCosts = await fetchActualCostsFromAWS(
         periodStart,
         periodEnd,
-        awsRegion
+        awsRegion,
+        costAllocationTag
       );
+      source = costAllocationTag ? "aws_sdk:tagged" : "aws_sdk:global";
     } catch {
       actualCosts = generateSimulatedCosts(finopsOutput);
     }
@@ -190,12 +259,18 @@ export async function reconcileFinOps(
       message: `${v.category} is ${Math.abs(v.variancePercent).toFixed(1)}% ${v.variancePercent > 0 ? "over" : "under"} budget`,
     }));
 
-  const trendData = buildTrendData(totalProjected, totalActual, 6);
+  // Use historical records for trend data if available, otherwise generate simulated
+  const trendData =
+    historicalRecords && historicalRecords.length > 0
+      ? buildTrendFromHistory(historicalRecords)
+      : buildTrendData(totalProjected, totalActual, 6);
+
   const narrative = buildNarrative(
     totalProjected,
     totalActual,
     totalVariancePct,
-    anomalies
+    anomalies,
+    source
   );
 
   return {
@@ -210,6 +285,7 @@ export async function reconcileFinOps(
     anomalies,
     trendData,
     narrative,
+    source,
     reconciledAt: new Date().toISOString(),
   };
 }

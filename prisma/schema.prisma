@@ -74,6 +74,7 @@ model UseCase {
   uaeAiAssessments                 UaeAiAssessment?
   architectSession                 ArchitectSession?
   productionConfiguration          ProductionConfiguration?
+  costReconciliations              CostReconciliation[]
   organization                     Organization?       @relation(fields: [organizationId], references: [id])
   user                             User?               @relation(fields: [userId], references: [id])
 
@@ -107,6 +108,29 @@ model FinOps {
   source           String?   @default("manual")
   lastAggregatedAt DateTime?
   useCase          UseCase @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+}
+
+model CostReconciliation {
+  id                    String   @id @default(uuid())
+  useCaseId             String
+  periodStart           String
+  periodEnd             String
+  totalProjected        Float
+  totalActual           Float
+  totalVarianceAmount   Float
+  totalVariancePercent  Float
+  varianceLines         Json
+  anomalies             Json
+  trendData             Json
+  narrative             String
+  source                String   @default("simulated")
+  reconciledAt          DateTime @default(now())
+  createdAt             DateTime @default(now())
+  useCase               UseCase  @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+
+  @@index([useCaseId])
+  @@index([useCaseId, periodStart])
+  @@index([reconciledAt])
 }
 
 model Approval {
@@ -2060,6 +2084,8 @@ model ProductionConfiguration {
   useCaseId               String?  @unique
   awsRegion               String?
   awsCostExplorerEnabled  Boolean  @default(false)
+  costAllocationTagKey    String?
+  costAllocationTagValue  String?
   langfuseEnabled         Boolean  @default(false)
   langfuseHost            String?
   langsmithEnabled        Boolean  @default(false)

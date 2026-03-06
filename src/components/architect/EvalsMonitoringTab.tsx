@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -24,22 +24,60 @@ export function EvalsMonitoringTab({
   const [registrationResult, setRegistrationResult] = useState<Record<string, unknown> | null>(null);
   const [evalStatus, setEvalStatus] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const projectId = useCaseId || "default";
+
+  // Check if already registered on mount
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/architect/evals/check?projectId=${encodeURIComponent(projectId)}`);
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (cancelled) return;
+        if (data.registered) {
+          setRegistered(true);
+          setRegistrationResult({
+            platform: data.platform,
+            datasetId: data.datasetId,
+            datasetName: data.datasetName,
+            datasetUrl: data.datasetUrl,
+            registeredCount: (guardrailsOutput?.evalMetrics as unknown[] | undefined)?.length ?? 0,
+          });
+          // Also re-register in-memory so status endpoint works
+          // (handles server restarts)
+          await fetch("/api/architect/evals/export", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ projectId, guardrailsOutput }),
+          });
+          // Fetch current status
+          const statusRes = await fetch(`/api/architect/evals/status?projectId=${encodeURIComponent(projectId)}`);
+          if (statusRes.ok && !cancelled) setEvalStatus(await statusRes.json());
+        }
+      } catch {
+        // Ignore — will show register button
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [projectId, guardrailsOutput]);
 
   const handleRegister = useCallback(async () => {
     if (!guardrailsOutput) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/production/evals/register", {
+      const res = await fetch("/api/architect/evals/export", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
           guardrailsOutput,
-          platform: "langfuse",
         }),
       });
       if (!res.ok) throw new Error("Registration failed");
@@ -47,7 +85,7 @@ export function EvalsMonitoringTab({
       setRegistrationResult(result);
       setRegistered(true);
       // Fetch status
-      const statusRes = await fetch(`/api/production/evals/status/${projectId}`);
+      const statusRes = await fetch(`/api/architect/evals/status?projectId=${encodeURIComponent(projectId)}`);
       if (statusRes.ok) setEvalStatus(await statusRes.json());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
@@ -57,7 +95,7 @@ export function EvalsMonitoringTab({
 
   const fetchStatus = useCallback(async () => {
     try {
-      const res = await fetch(`/api/production/evals/status/${projectId}`);
+      const res = await fetch(`/api/architect/evals/status?projectId=${encodeURIComponent(projectId)}`);
       if (res.ok) setEvalStatus(await res.json());
     } catch (e) {
       setError(e instanceof Error ? e.message : "Unknown error");
@@ -72,9 +110,22 @@ export function EvalsMonitoringTab({
     );
   }
 
+  if (checking) {
+    return (
+      <Card className="p-6 dark:bg-gray-900">
+        <p className="text-gray-500 text-sm">Checking registration status...</p>
+      </Card>
+    );
+  }
+
   const guardrails = guardrailsOutput.guardrails as unknown[] | undefined;
   const evalMetrics = guardrailsOutput.evalMetrics as unknown[] | undefined;
   const guardrailResults = (evalStatus?.guardrailResults ?? evalStatus?.guardrail_results) as Record<string, unknown>[] | undefined;
+  const platform = (registrationResult?.platform ?? evalStatus?.platform) as string | undefined;
+  const datasetUrl = registrationResult?.datasetUrl as string | undefined;
+  const allWaiting = guardrailResults?.length
+    ? guardrailResults.every((r) => ((r.sampleCount ?? r.sample_count) as number) === 0)
+    : false;
 
   return (
     <div className="space-y-6">
@@ -108,15 +159,54 @@ export function EvalsMonitoringTab({
         <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-semibold dark:text-white">Registration Status</h3>
-            <span className="text-xs px-2 py-1 rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
-              {registrationResult.registeredCount ?? registrationResult.registered_count} registered
-            </span>
+            <div className="flex items-center gap-2">
+              {platform && (
+                <span className="text-xs px-2 py-1 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800">
+                  via {platform}
+                </span>
+              )}
+              <span className="text-xs px-2 py-1 rounded-full bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
+                {registrationResult.registeredCount ?? registrationResult.registered_count} registered
+              </span>
+            </div>
+          </div>
+          {datasetUrl && (
+            <a
+              href={datasetUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1"
+            >
+              View in LangSmith
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          )}
+        </Card>
+      )}
+
+      {/* Waiting for experiments info card */}
+      {registered && allWaiting && (
+        <Card className="p-4 dark:bg-gray-900 border-blue-200 dark:border-blue-800/50">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 text-blue-500">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h4 className="text-sm font-medium text-blue-700 dark:text-blue-400">Dataset registered — waiting for experiments</h4>
+              <p className="text-xs text-gray-500 mt-1">
+                Your eval metrics have been exported as a LangSmith dataset. Run experiments against this dataset in LangSmith, then click &quot;Refresh Status&quot; to see results.
+              </p>
+            </div>
           </div>
         </Card>
       )}
 
       {/* Live Eval Status */}
-      {evalStatus && guardrailResults && (
+      {evalStatus && guardrailResults && !allWaiting && (
         <>
           {/* Health KPIs */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -206,11 +296,13 @@ export function EvalsMonitoringTab({
               })}
             </div>
           </Card>
-
-          <div className="flex justify-end">
-            <Button variant="outline" onClick={fetchStatus}>Refresh Status</Button>
-          </div>
         </>
+      )}
+
+      {registered && (
+        <div className="flex justify-end">
+          <Button variant="outline" onClick={fetchStatus}>Refresh Status</Button>
+        </div>
       )}
     </div>
   );

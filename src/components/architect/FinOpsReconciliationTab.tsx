@@ -32,6 +32,22 @@ export function FinOpsReconciliationTab({
   const [data, setData] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tagKey, setTagKey] = useState("");
+  const [tagValue, setTagValue] = useState("");
+  const [tagSaving, setTagSaving] = useState(false);
+  const [tagOpen, setTagOpen] = useState(false);
+  const [tagSaved, setTagSaved] = useState(false);
+
+  // Load existing tag config
+  useEffect(() => {
+    fetch(`/api/production/setup?useCaseId=${useCaseId}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((cfg) => {
+        if (cfg?.costAllocationTagKey) setTagKey(cfg.costAllocationTagKey);
+        if (cfg?.costAllocationTagValue) setTagValue(cfg.costAllocationTagValue);
+      })
+      .catch(() => {});
+  }, [useCaseId]);
 
   const runReconciliation = useCallback(async () => {
     if (!finopsOutput) return;
@@ -110,6 +126,22 @@ export function FinOpsReconciliationTab({
           </p>
         </Card>
       </div>
+
+      {/* Cost Attribution Badge */}
+      {data.source && (
+        <div className="flex items-center gap-2">
+          {(data.source as string).includes(":tagged") ? (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+              Tag-filtered
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
+              Full account
+            </span>
+          )}
+          <span className="text-xs text-gray-400">Source: {data.source as string}</span>
+        </div>
+      )}
 
       {/* Anomaly Alerts */}
       {anomalies.length > 0 && (
@@ -202,6 +234,73 @@ export function FinOpsReconciliationTab({
           <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">{data.narrative as string}</p>
         </Card>
       )}
+
+      {/* Cost Allocation Tag Configuration */}
+      <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+        <button
+          onClick={() => setTagOpen(!tagOpen)}
+          className="flex items-center gap-2 text-sm font-semibold dark:text-white w-full text-left"
+        >
+          <span className={`transition-transform ${tagOpen ? "rotate-90" : ""}`}>&#9654;</span>
+          Configure Cost Allocation Tag
+          {tagKey && tagValue && (
+            <span className="text-xs font-normal text-gray-500 ml-2">
+              ({tagKey} = {tagValue})
+            </span>
+          )}
+        </button>
+        {tagOpen && (
+          <div className="mt-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Tag Key</label>
+                <input
+                  type="text"
+                  value={tagKey}
+                  onChange={(e) => { setTagKey(e.target.value); setTagSaved(false); }}
+                  placeholder="e.g. QubeUseCase"
+                  className="w-full px-3 py-2 text-sm border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Tag Value</label>
+                <input
+                  type="text"
+                  value={tagValue}
+                  onChange={(e) => { setTagValue(e.target.value); setTagSaved(false); }}
+                  placeholder="e.g. AIUC-1"
+                  className="w-full px-3 py-2 text-sm border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                disabled={tagSaving}
+                onClick={async () => {
+                  setTagSaving(true);
+                  try {
+                    await fetch("/api/production/setup", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        useCaseId,
+                        costAllocationTagKey: tagKey || null,
+                        costAllocationTagValue: tagValue || null,
+                      }),
+                    });
+                    setTagSaved(true);
+                  } catch {}
+                  setTagSaving(false);
+                }}
+              >
+                {tagSaving ? "Saving..." : "Save Tag"}
+              </Button>
+              {tagSaved && <span className="text-xs text-green-600 dark:text-green-400">Saved! Re-run reconciliation to apply.</span>}
+            </div>
+          </div>
+        )}
+      </Card>
 
       <div className="flex justify-end">
         <Button variant="outline" onClick={runReconciliation} disabled={loading}>

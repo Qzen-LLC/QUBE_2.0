@@ -11,7 +11,7 @@ export { generateRisks } from "./engine/risk";
 export { generateThreats } from "./engine/threat";
 export { generateGuardrails } from "./engine/guardrails";
 export { reconcileFinOps } from "./engine/finops-reconciliation";
-export { registerGuardrails, getEvalStatus } from "./engine/evals-monitoring";
+export { registerGuardrails, getEvalStatus, detectPlatform } from "./engine/evals-monitoring";
 
 // LLM Client
 export { callLLM, callLLMJson } from "./engine/llm-client";

@@ -49,6 +49,7 @@ export const ReconciliationOutputSchema = z.object({
   anomalies: z.array(z.record(z.unknown())).default([]),
   trendData: z.array(z.record(z.unknown())).default([]),
   narrative: z.string().default(""),
+  source: z.string().default("simulated"),
   reconciledAt: z.string().default(() => new Date().toISOString()),
 });
 export type ReconciliationOutput = z.infer<typeof ReconciliationOutputSchema>;
@@ -80,6 +81,9 @@ export const EvalsMonitoringOutputSchema = z.object({
   failingGuardrails: z.array(z.string()).default([]),
   lastSync: z.string().default(() => new Date().toISOString()),
   alerts: z.array(z.record(z.unknown())).default([]),
+  datasetId: z.string().nullish(),
+  datasetName: z.string().nullish(),
+  datasetUrl: z.string().nullish(),
 });
 export type EvalsMonitoringOutput = z.infer<typeof EvalsMonitoringOutputSchema>;
 
@@ -88,7 +92,7 @@ export type EvalsMonitoringOutput = z.infer<typeof EvalsMonitoringOutputSchema>;
 export const AWSConfigSchema = z.object({
   region: z.string().default("us-east-1"),
   costExplorerEnabled: z.boolean().default(false),
-  costAllocationTags: z.array(z.string()).default([]),
+  costAllocationTag: z.object({ key: z.string(), value: z.string() }).optional(),
 });
 export type AWSConfig = z.infer<typeof AWSConfigSchema>;
 
