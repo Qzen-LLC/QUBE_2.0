@@ -39,6 +39,10 @@ export const POST = withAuth(async (request: Request) => {
         langfuseHost: config.langfuseHost,
         langsmithEnabled: config.langsmithEnabled ?? false,
         langsmithProject: config.langsmithProject,
+        mlflowEnabled: config.mlflowEnabled ?? false,
+        mlflowTrackingUrl: config.mlflowTrackingUrl ?? null,
+        mlflowAuthUsername: config.mlflowAuthUsername ?? null,
+        mlflowAuthPassword: config.mlflowAuthPassword ?? null,
       },
       update: {
         awsRegion: config.awsRegion,
@@ -49,6 +53,10 @@ export const POST = withAuth(async (request: Request) => {
         langfuseHost: config.langfuseHost,
         langsmithEnabled: config.langsmithEnabled,
         langsmithProject: config.langsmithProject,
+        mlflowEnabled: config.mlflowEnabled,
+        mlflowTrackingUrl: config.mlflowTrackingUrl,
+        mlflowAuthUsername: config.mlflowAuthUsername,
+        mlflowAuthPassword: config.mlflowAuthPassword,
       },
     });
 

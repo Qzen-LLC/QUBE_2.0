@@ -106,8 +106,8 @@ export const POST = withAuth(async (request: Request) => {
       },
     });
 
-    // Stage 3: Guardrails (depends on threats)
-    const guardrailsOutput = await generateGuardrails(context, threatOutput);
+    // Stage 3: Guardrails (depends on threats + risks)
+    const guardrailsOutput = await generateGuardrails(context, threatOutput, riskOutput);
 
     // Stage 4: Executive Summary
     const topCostDriver =

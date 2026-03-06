@@ -2,6 +2,7 @@ import { callLLMJson } from "./llm-client";
 import type { EnrichedContext } from "../models/context";
 import type {
   ThreatOutput,
+  RiskOutput,
   GuardrailsOutput,
   GuardrailItem,
   EvalMetric,
@@ -10,7 +11,8 @@ import { GUARDRAILS_GENERATION_PROMPT } from "../prompts/generation";
 
 export async function generateGuardrails(
   ctx: EnrichedContext,
-  threats: ThreatOutput
+  threats: ThreatOutput,
+  risks: RiskOutput
 ): Promise<GuardrailsOutput> {
   const threatsSummary = threats.threats.map((t) => ({
     id: t.id,
@@ -19,10 +21,19 @@ export async function generateGuardrails(
     severity: t.severity,
   }));
 
+  const risksSummary = risks.risks.map((r) => ({
+    id: r.id,
+    category: r.category,
+    name: r.name,
+    severity: r.severity,
+    mitigation: r.mitigation,
+  }));
+
   const prompt = GUARDRAILS_GENERATION_PROMPT.replace(
     "{context_json}",
     JSON.stringify(ctx, null, 2)
-  ).replace("{threats_json}", JSON.stringify(threatsSummary, null, 2));
+  ).replace("{threats_json}", JSON.stringify(threatsSummary, null, 2))
+  .replace("{risks_json}", JSON.stringify(risksSummary, null, 2));
 
   const result = await callLLMJson<Record<string, unknown>>(prompt, {
     maxTokens: 4096,
@@ -38,6 +49,7 @@ export async function generateGuardrails(
     implementationGuidance: (g.implementation_guidance as string) ?? "",
     priority: (g.priority as string) ?? "should_have",
     sourceThreatIds: (g.source_threat_ids as string[]) ?? [],
+    sourceRiskIds: (g.source_risk_ids as string[]) ?? [],
     sourcePillar: (g.source_pillar as string) ?? "technical",
   }));
 

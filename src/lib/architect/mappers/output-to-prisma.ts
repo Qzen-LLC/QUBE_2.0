@@ -80,6 +80,7 @@ export function mapRisks(
       r.probability.charAt(0).toUpperCase() + r.probability.slice(1),
     mitigationPlan: r.mitigation,
     sourceType: "architect-pipeline",
+    sourceId: r.id,
     createdBy: "system",
     createdByName: "Architect Pipeline",
     createdByEmail: "system@qube.ai",
@@ -127,6 +128,7 @@ export function mapGuardrails(
       implementation: {
         guidance: g.implementationGuidance,
         sourceThreatIds: g.sourceThreatIds,
+        sourceRiskIds: g.sourceRiskIds,
         sourcePillar: g.sourcePillar,
       },
     })

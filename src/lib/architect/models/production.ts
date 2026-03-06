@@ -108,10 +108,73 @@ export const LangSmithConfigSchema = z.object({
 });
 export type LangSmithConfig = z.infer<typeof LangSmithConfigSchema>;
 
+export const MLflowConfigSchema = z.object({
+  trackingUrl: z.string().default(""),
+  enabled: z.boolean().default(false),
+  authUsername: z.string().nullish(),
+  authPassword: z.string().nullish(),
+});
+export type MLflowConfig = z.infer<typeof MLflowConfigSchema>;
+
 export const ProductionConfigSchema = z.object({
   aws: AWSConfigSchema.default({}),
   langfuse: LangfuseConfigSchema.default({}),
   langsmith: LangSmithConfigSchema.default({}),
+  mlflow: MLflowConfigSchema.default({}),
   configured: z.boolean().default(false),
 });
 export type ProductionConfig = z.infer<typeof ProductionConfigSchema>;
+
+// ── MLflow Discovery Models ─────────────────────────
+
+export const MLflowModelVersionSchema = z.object({
+  name: z.string(),
+  version: z.string(),
+  stage: z.string().default("None"),
+  description: z.string().nullish(),
+  source: z.string().nullish(),
+  tags: z.record(z.string()).default({}),
+  creationTimestamp: z.number().nullish(),
+});
+export type MLflowModelVersion = z.infer<typeof MLflowModelVersionSchema>;
+
+export const MLflowRegisteredModelSchema = z.object({
+  name: z.string(),
+  description: z.string().nullish(),
+  tags: z.record(z.string()).default({}),
+  aliases: z.record(z.string()).default({}),
+  creationTimestamp: z.number().nullish(),
+  lastUpdatedTimestamp: z.number().nullish(),
+  latestVersions: z.array(MLflowModelVersionSchema).default([]),
+});
+export type MLflowRegisteredModel = z.infer<typeof MLflowRegisteredModelSchema>;
+
+export const GovernanceStatus = z.enum(["governed", "ungoverned", "review_needed"]);
+export type GovernanceStatus = z.infer<typeof GovernanceStatus>;
+
+export const MLflowDiscoveryResultSchema = z.object({
+  modelName: z.string(),
+  description: z.string().nullish(),
+  latestVersion: z.string().nullish(),
+  stage: z.string().nullish(),
+  tags: z.record(z.string()).default({}),
+  aliases: z.record(z.string()).default({}),
+  source: z.string().nullish(),
+  mlflowCreatedAt: z.string().nullish(),
+  mlflowUpdatedAt: z.string().nullish(),
+  matchedUseCaseId: z.string().nullish(),
+  matchConfidence: z.number().nullish(),
+  matchMethod: z.string().nullish(),
+  governanceStatus: GovernanceStatus.default("ungoverned"),
+});
+export type MLflowDiscoveryResult = z.infer<typeof MLflowDiscoveryResultSchema>;
+
+export const MLflowSyncOutputSchema = z.object({
+  totalModels: z.number().default(0),
+  governedCount: z.number().default(0),
+  ungovernedCount: z.number().default(0),
+  reviewNeededCount: z.number().default(0),
+  models: z.array(MLflowDiscoveryResultSchema).default([]),
+  syncedAt: z.string().default(() => new Date().toISOString()),
+});
+export type MLflowSyncOutput = z.infer<typeof MLflowSyncOutputSchema>;

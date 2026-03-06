@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FinOpsReconciliationTab } from "./FinOpsReconciliationTab";
 import { EvalsMonitoringTab } from "./EvalsMonitoringTab";
+import { ControlFrameworkTab } from "./ControlFrameworkTab";
 
 function fmt(n: number | null | undefined): string {
   if (n == null) return "\u2014";
@@ -39,6 +40,7 @@ const TABS = [
   { id: "guardrails", label: "Guardrails & Evals" },
   { id: "reconciliation", label: "Cost Reconciliation" },
   { id: "live_evals", label: "Live Evals" },
+  { id: "control_framework", label: "Control Framework" },
 ];
 
 interface ArchitectOutputDashboardProps {
@@ -104,6 +106,9 @@ export function ArchitectOutputDashboard({
       )}
       {tab === "live_evals" && (
         <EvalsMonitoringTab guardrailsOutput={guardrails} useCaseId={useCaseId} />
+      )}
+      {tab === "control_framework" && (
+        <ControlFrameworkTab useCaseId={useCaseId} />
       )}
     </div>
   );
@@ -305,7 +310,7 @@ function ThreatTab({ data }: { data: Record<string, unknown> }) {
 function GuardrailsTab({ data }: { data: Record<string, unknown> }) {
   const guardrailItems = (data.guardrails as Record<string, unknown>[]) ?? [];
   const evalMetricsItems = (data.evalMetrics ?? data.eval_metrics) as Record<string, unknown>[] ?? [];
-  const layers = ["input", "retrieval", "generation", "agent_tool", "observability"];
+  const layers = ["input", "retrieval", "generation", "agent_tool", "agent_reasoning", "agent_autonomy", "agent_cascade", "observability"];
 
   return (
     <div className="space-y-6">

@@ -93,6 +93,7 @@ export const GuardrailItemSchema = z.object({
   implementationGuidance: z.string(),
   priority: z.string(),
   sourceThreatIds: z.array(z.string()).default([]),
+  sourceRiskIds: z.array(z.string()).default([]),
   sourcePillar: z.string(),
 });
 export type GuardrailItem = z.infer<typeof GuardrailItemSchema>;

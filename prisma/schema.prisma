@@ -75,6 +75,7 @@ model UseCase {
   architectSession                 ArchitectSession?
   productionConfiguration          ProductionConfiguration?
   costReconciliations              CostReconciliation[]
+  mlflowModels                     MlflowDiscoveredModel[]
   organization                     Organization?       @relation(fields: [organizationId], references: [id])
   user                             User?               @relation(fields: [userId], references: [id])
 
@@ -786,9 +787,11 @@ model Risk {
   closedByName     String?
   closedByEmail    String?
   closureReason    String?
-  sourceId         String?
-  sourceMetadata   Json?
-  sourceType       String?
+  sourceId             String?
+  sourceMetadata       Json?
+  sourceType           String?
+  evalDerivedSeverity  String?
+  evalLastUpdated      DateTime?
   relatedIncidents IncidentRiskMapping[]
   useCase          UseCase               @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
   mitreTechniques  MitreTechnique[]      @relation("RiskMitreTechniques")
@@ -2090,7 +2093,37 @@ model ProductionConfiguration {
   langfuseHost            String?
   langsmithEnabled        Boolean  @default(false)
   langsmithProject        String?
+  mlflowEnabled           Boolean  @default(false)
+  mlflowTrackingUrl       String?
+  mlflowAuthUsername      String?
+  mlflowAuthPassword      String?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
   useCase                 UseCase? @relation(fields: [useCaseId], references: [id], onDelete: Cascade)
+}
+
+model MlflowDiscoveredModel {
+  id                String    @id @default(uuid())
+  modelName         String
+  description       String?
+  latestVersion     String?
+  stage             String?
+  tags              Json      @default("{}")
+  aliases           Json      @default("{}")
+  source            String?
+  mlflowCreatedAt   DateTime?
+  mlflowUpdatedAt   DateTime?
+  matchedUseCaseId  String?
+  matchConfidence   Float?
+  matchMethod       String?
+  governanceStatus  String    @default("ungoverned")
+  syncedAt          DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  matchedUseCase    UseCase?  @relation(fields: [matchedUseCaseId], references: [id], onDelete: SetNull)
+
+  @@unique([modelName, stage])
+  @@index([governanceStatus])
+  @@index([matchedUseCaseId])
 }
