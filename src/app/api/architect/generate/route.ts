@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-gateway";
 import { prismaClient } from "@/utils/db";
+import { verifyUseCaseAccess } from "@/lib/org-scope";
 import {
   UseCaseInputSchema,
   interpret,
@@ -19,13 +20,17 @@ import type { ArchitectureOutput } from "@/lib/architect";
 
 export const maxDuration = 120;
 
-export const POST = withAuth(async (request: Request) => {
+export const POST = withAuth(async (request: Request, { auth }) => {
   const startTime = Date.now();
   let useCaseId: string | null = null;
 
   try {
     const body = await request.json();
     useCaseId = body.useCaseId;
+
+    if (useCaseId && !(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
     // Coerce wizard form data to satisfy Zod required fields
     const rawInput = body.input ?? {};

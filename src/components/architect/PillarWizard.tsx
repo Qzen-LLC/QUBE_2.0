@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -151,12 +151,16 @@ function SectionCard({ title, children }: { title: string; children: React.React
 }
 
 interface PillarWizardProps {
-  onGenerate: (formData: WizardFormData) => void;
+  onGenerate: (formData: WizardFormData, draftId?: string) => void;
   onScorePillars: (formData: WizardFormData) => Promise<Record<string, unknown>>;
   loading: boolean;
   initialData?: Partial<WizardFormData>;
   /** Start at a specific step (0=Archetype, 1=Technical, etc.). Defaults to 0. */
   startStep?: number;
+  /** Existing draft use case ID for DB persistence. */
+  draftId?: string;
+  /** Callback when a new draft is created or ID changes. */
+  onDraftIdChange?: (id: string) => void;
 }
 
 export function PillarWizard({
@@ -165,18 +169,140 @@ export function PillarWizard({
   loading,
   initialData,
   startStep = 0,
+  draftId: initialDraftId,
+  onDraftIdChange,
 }: PillarWizardProps) {
-  const [step, setStep] = useState(startStep);
-  const [formData, setFormData] = useState<WizardFormData>(() => ({
-    ...DEFAULT_FORM,
-    ...initialData,
-    technical: { ...DEFAULT_FORM.technical, ...initialData?.technical },
-    business: { ...DEFAULT_FORM.business, ...initialData?.business },
-    responsible: { ...DEFAULT_FORM.responsible, ...initialData?.responsible },
-    legal: { ...DEFAULT_FORM.legal, ...initialData?.legal },
-    dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...initialData?.dataReadiness },
-  }));
-  const [pillarScores, setPillarScores] = useState<Record<string, unknown> | null>(null);
+  const DRAFT_KEY = "qube-wizard-draft";
+  const DRAFT_STEP_KEY = "qube-wizard-step";
+
+  const [step, setStep] = useState(() => {
+    if (typeof window === "undefined") return startStep;
+    const saved = localStorage.getItem(DRAFT_STEP_KEY);
+    return saved ? Math.min(Number(saved), startStep || 6) : startStep;
+  });
+  const [formData, setFormData] = useState<WizardFormData>(() => {
+    // Try to restore from localStorage
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved) as WizardFormData;
+          return {
+            ...DEFAULT_FORM,
+            ...parsed,
+            ...initialData,
+            technical: { ...DEFAULT_FORM.technical, ...parsed.technical, ...initialData?.technical },
+            business: { ...DEFAULT_FORM.business, ...parsed.business, ...initialData?.business },
+            responsible: { ...DEFAULT_FORM.responsible, ...parsed.responsible, ...initialData?.responsible },
+            legal: { ...DEFAULT_FORM.legal, ...parsed.legal, ...initialData?.legal },
+            dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...parsed.dataReadiness, ...initialData?.dataReadiness },
+          };
+        } catch { /* ignore corrupted data */ }
+      }
+    }
+    return {
+      ...DEFAULT_FORM,
+      ...initialData,
+      technical: { ...DEFAULT_FORM.technical, ...initialData?.technical },
+      business: { ...DEFAULT_FORM.business, ...initialData?.business },
+      responsible: { ...DEFAULT_FORM.responsible, ...initialData?.responsible },
+      legal: { ...DEFAULT_FORM.legal, ...initialData?.legal },
+      dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...initialData?.dataReadiness },
+    };
+  });
+  const [hasDraft, setHasDraft] = useState(() => typeof window !== "undefined" && !!localStorage.getItem(DRAFT_KEY));
+  const [pillarScores, setPillarScores] = useState<Record<string, unknown> | null>(() => {
+    // Restore pillar scores from localStorage or initialData
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed._pillarScores) return parsed._pillarScores;
+        } catch { /* ignore */ }
+      }
+    }
+    // Check initialData (from DB draft)
+    const id = initialData as Record<string, unknown> | undefined;
+    if (id?._pillarScores) return id._pillarScores as Record<string, unknown>;
+    return null;
+  });
+  const [currentDraftId, setCurrentDraftId] = useState<string | undefined>(initialDraftId);
+  const [scoring, setScoring] = useState(false);
+  const [savingStatus, setSavingStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => { isMountedRef.current = false; };
+  }, []);
+
+  // Debounced auto-save to DB (2s after last change)
+  useEffect(() => {
+    // Save to localStorage immediately (include pillar scores)
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...formData, _pillarScores: pillarScores }));
+    localStorage.setItem(DRAFT_STEP_KEY, String(step));
+    setHasDraft(true);
+
+    // Debounce DB save — only if the user has entered a name
+    if (!formData.name) return;
+
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(async () => {
+      try {
+        setSavingStatus("saving");
+        const res = await fetch("/api/usecase-draft", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: currentDraftId,
+            name: formData.name,
+            wizardData: { ...formData, currentStep: step, _pillarScores: pillarScores },
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (!currentDraftId && data.draft?.id) {
+            setCurrentDraftId(data.draft.id);
+            onDraftIdChange?.(data.draft.id);
+          }
+          if (isMountedRef.current) setSavingStatus("saved");
+          // Reset to idle after 2s
+          setTimeout(() => { if (isMountedRef.current) setSavingStatus("idle"); }, 2000);
+        } else {
+          const errBody = await res.json().catch(() => ({}));
+          console.error("Draft save failed:", res.status, errBody);
+          if (isMountedRef.current) setSavingStatus("error");
+        }
+      } catch (err) {
+        console.error("Draft save error:", err);
+        if (isMountedRef.current) setSavingStatus("error");
+      }
+    }, 2000);
+
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, [formData, step, currentDraftId, onDraftIdChange, pillarScores]);
+
+  const clearDraft = useCallback(() => {
+    localStorage.removeItem(DRAFT_KEY);
+    localStorage.removeItem(DRAFT_STEP_KEY);
+    setFormData({
+      ...DEFAULT_FORM,
+      ...initialData,
+      technical: { ...DEFAULT_FORM.technical, ...initialData?.technical },
+      business: { ...DEFAULT_FORM.business, ...initialData?.business },
+      responsible: { ...DEFAULT_FORM.responsible, ...initialData?.responsible },
+      legal: { ...DEFAULT_FORM.legal, ...initialData?.legal },
+      dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...initialData?.dataReadiness },
+    });
+    setStep(0);
+    setPillarScores(null);
+    setHasDraft(false);
+    setCurrentDraftId(undefined);
+    setSavingStatus("idle");
+  }, [initialData]);
 
   const updateField = useCallback(
     (pillar: string | null, field: string, value: unknown) => {
@@ -212,25 +338,71 @@ export function PillarWizard({
     []
   );
 
+  const [scoringError, setScoringError] = useState<string | null>(null);
+
   const handleScorePillars = useCallback(async () => {
-    const scores = await onScorePillars(formData);
-    setPillarScores(scores);
+    setScoring(true);
+    setScoringError(null);
+    try {
+      const scores = await onScorePillars(formData);
+      setPillarScores(scores);
+    } catch (err) {
+      setScoringError(err instanceof Error ? err.message : "Scoring failed");
+    } finally {
+      setScoring(false);
+    }
   }, [formData, onScorePillars]);
 
   const NavButtons = ({ hideNext }: { hideNext?: boolean }) => (
-    <div className="flex justify-between pt-4">
-      <Button variant="outline" onClick={() => setStep(Math.max(startStep, step - 1))} disabled={step <= startStep}>
+    <div className="flex justify-between items-center pt-4">
+      <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step <= 0}>
         Back
       </Button>
-      {!hideNext && (
-        <Button onClick={() => setStep(step + 1)}>Continue</Button>
-      )}
+      <div className="flex items-center gap-3">
+        {saveStatusText && (
+          <span className={`text-xs ${savingStatus === "error" ? "text-red-500" : "text-gray-400"}`}>
+            {saveStatusText}
+          </span>
+        )}
+        {!hideNext && (
+          <Button onClick={() => setStep(step + 1)}>Continue</Button>
+        )}
+      </div>
     </div>
   );
 
+  // Save status indicator text
+  const saveStatusText = savingStatus === "saving" ? "Saving..." :
+    savingStatus === "saved" ? "Saved to cloud" :
+    savingStatus === "error" ? "Save failed" : null;
+
+  // Draft banner
+  const DraftBanner = hasDraft && formData.name ? (
+    <div className="mb-4 flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
+      <div className="flex items-center gap-3">
+        <p className="text-sm text-blue-700 dark:text-blue-300">
+          Draft: <strong>{formData.name}</strong>
+        </p>
+        {saveStatusText && (
+          <span className={`text-xs ${savingStatus === "error" ? "text-red-500" : "text-gray-500 dark:text-gray-400"}`}>
+            {saveStatusText}
+          </span>
+        )}
+      </div>
+      <Button variant="ghost" size="sm" onClick={clearDraft} className="text-blue-600 dark:text-blue-400 hover:text-blue-800">
+        Clear draft
+      </Button>
+    </div>
+  ) : null;
+
   // Step 0: Archetype
   if (step === 0) {
-    return <ArchetypeSelector onSelect={handleArchetypeSelect} onSkip={() => setStep(1)} />;
+    return (
+      <div>
+        {DraftBanner}
+        <ArchetypeSelector onSelect={handleArchetypeSelect} onSkip={() => setStep(1)} />
+      </div>
+    );
   }
 
   // Step 1: Technical
@@ -437,11 +609,11 @@ export function PillarWizard({
   // Step 6: Review
   if (step === 6) {
     const summaryPillars = [
-      { name: "Technical", key: "technical", color: "blue" },
-      { name: "Business", key: "business", color: "emerald" },
-      { name: "Responsible", key: "responsible", color: "violet" },
-      { name: "Legal", key: "legal", color: "amber" },
-      { name: "Data", key: "dataReadiness", color: "cyan" },
+      { name: "Technical", key: "technical", color: "blue", step: 1 },
+      { name: "Business", key: "business", color: "emerald", step: 2 },
+      { name: "Responsible", key: "responsible", color: "violet", step: 3 },
+      { name: "Legal", key: "legal", color: "amber", step: 4 },
+      { name: "Data", key: "dataReadiness", color: "cyan", step: 5 },
     ];
 
     return (
@@ -460,9 +632,14 @@ export function PillarWizard({
               (v) => v !== "" && v !== null && v !== false && !(Array.isArray(v) && v.length === 0)
             ).length;
             return (
-              <Card key={p.key} className="p-4 dark:bg-gray-900 dark:border-gray-800">
+              <Card
+                key={p.key}
+                className="p-4 dark:bg-gray-900 dark:border-gray-800 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 hover:shadow-sm transition-all"
+                onClick={() => setStep(p.step)}
+              >
                 <div className="text-sm font-semibold text-gray-700 dark:text-gray-200">{p.name}</div>
                 <div className="text-xs text-gray-500 mt-1">{filled} fields provided</div>
+                <div className="text-[10px] text-blue-500 dark:text-blue-400 mt-1">Click to edit</div>
               </Card>
             );
           })}
@@ -473,17 +650,31 @@ export function PillarWizard({
           variant="outline"
           className="w-full"
           onClick={handleScorePillars}
-          disabled={loading}
+          disabled={loading || scoring}
         >
-          {loading ? "Scoring pillars..." : "Score Pillars (Preview Readiness)"}
+          {scoring ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Scoring pillars...
+            </span>
+          ) : "Score Pillars (Preview Readiness)"}
         </Button>
+
+        {scoringError && (
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-300 text-sm">
+            {scoringError}
+          </div>
+        )}
 
         {pillarScores && <PillarScorecard scores={pillarScores} />}
 
         {/* Generate Button */}
         <Button
           className="w-full py-6 text-lg bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white"
-          onClick={() => onGenerate(formData)}
+          onClick={() => { const id = currentDraftId; clearDraft(); onGenerate(formData, id); }}
           disabled={loading}
         >
           {loading

@@ -1,6 +1,7 @@
 import { prismaClient } from '@/utils/db';
 import { withAuth } from '@/lib/auth-gateway';
 import { buildStepsDataFromAnswers } from '@/lib/mappers/answers-to-steps';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 
 export const GET = withAuth(async (req: Request, { auth }) => {
@@ -25,6 +26,10 @@ export const GET = withAuth(async (req: Request, { auth }) => {
     
     if (!useCaseId) {
       return new Response(JSON.stringify({ error: 'Missing useCaseId' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return new Response(JSON.stringify({ error: 'Access denied' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
 
     // Check permissions based on role

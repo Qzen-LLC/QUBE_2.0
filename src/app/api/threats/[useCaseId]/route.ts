@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
 import { prismaClient } from '@/utils/db';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 /**
  * GET /api/threats/[useCaseId]
@@ -8,9 +9,13 @@ import { prismaClient } from '@/utils/db';
  */
 export const GET = withAuth(async (
   request: Request,
-  { params }: { params: Promise<{ useCaseId: string }> }
+  { params, auth }: { params: Promise<{ useCaseId: string }>; auth: any }
 ) => {
   const { useCaseId } = await params;
+
+  if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+  }
 
   const threats = await prismaClient.threat.findMany({
     where: { useCaseId },
@@ -29,6 +34,11 @@ export const POST = withAuth(async (
   { params, auth }: { params: Promise<{ useCaseId: string }>; auth: any }
 ) => {
   const { useCaseId } = await params;
+
+  if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+  }
+
   const body = await request.json();
 
   const currentUser = await prismaClient.user.findFirst({

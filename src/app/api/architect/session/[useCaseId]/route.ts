@@ -1,15 +1,20 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-gateway";
 import { prismaClient } from "@/utils/db";
+import { verifyUseCaseAccess } from "@/lib/org-scope";
 
 // GET /api/architect/session/[useCaseId] — Get wizard progress
 export const GET = withAuth(
   async (
     _request: Request,
-    { params }: { params: Promise<{ useCaseId: string }> }
+    { params, auth }: { params: Promise<{ useCaseId: string }>; auth: any }
   ) => {
     try {
       const { useCaseId } = await params;
+
+      if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
 
       const session = await prismaClient.architectSession.findUnique({
         where: { useCaseId },
@@ -34,10 +39,15 @@ export const GET = withAuth(
 export const PUT = withAuth(
   async (
     request: Request,
-    { params }: { params: Promise<{ useCaseId: string }> }
+    { params, auth }: { params: Promise<{ useCaseId: string }>; auth: any }
   ) => {
     try {
       const { useCaseId } = await params;
+
+      if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+        return NextResponse.json({ error: "Access denied" }, { status: 403 });
+      }
+
       const body = await request.json();
 
       const session = await prismaClient.architectSession.upsert({

@@ -18,6 +18,7 @@ const NO_SIDEBAR_ROUTES = [
   '/',
   '/sign-in',
   '/sign-up',
+  '/onboarding',
   '/user-profile'
 ];
 

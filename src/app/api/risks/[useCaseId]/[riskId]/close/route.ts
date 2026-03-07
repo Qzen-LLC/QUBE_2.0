@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 import { prismaClient } from '@/utils/db';
 
@@ -10,7 +11,11 @@ export const POST = withAuth(async (
 ) => {
   try {
     const { useCaseId, riskId } = await params;
-    
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
+
     const userRecord = await prismaClient.user.findUnique({
       where: { clerkId: auth.userId! },
     });

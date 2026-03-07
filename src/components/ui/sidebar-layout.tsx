@@ -24,10 +24,12 @@ import {
   Building2,
   MoreVertical,
   AlertTriangle,
-  Activity
+  Activity,
+  LogOut
 } from 'lucide-react';
 import { Button } from './button';
 import { useUserData } from '@/contexts/UserContext';
+import { useAuthClient } from '@/hooks/useAuthClient';
 import Image from 'next/image';
 import ThemeToggle from './theme-toggle';
 
@@ -120,6 +122,7 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
   const [expandedMenu, setExpandedMenu] = useState<string | null>(null);
   const pathname = usePathname();
   const { userData } = useUserData();
+  const { signOut } = useAuthClient();
 
   // Prevent hydration mismatch by only rendering after mount
   useEffect(() => {
@@ -231,7 +234,7 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
   
   // Build sidebar items
   const sidebarItems: NavigationItem[] = [
-    ...(userData?.role === 'ORG_ADMIN'
+    ...(userData?.role === 'ORG_ADMIN' || userData?.role === 'QZEN_ADMIN'
       ? [organizationSetupItem]
       : []),
     ...navigationItems
@@ -283,14 +286,14 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-md bg-card shrink-0">
                 <Image src="/QUBE_Logo_File.png" alt="Logo" width={32} height={32} className="object-contain" />
               </div>
-              <span className="text-base font-semibold text-foreground leading-tight">QUBE</span>
-              {(userData?.role === 'ORG_ADMIN' || userData?.role === 'ORG_USER') && userData?.organization?.name && (
-                <div className="px-2.5">
-                  <span className="text-[10px] text-muted-foreground leading-tight font-medium truncate block">
+              <div className="flex flex-col min-w-0">
+                <span className="text-base font-semibold text-foreground leading-tight">QUBE</span>
+                {userData?.organization?.name && (
+                  <span className="text-[10px] text-muted-foreground leading-tight font-medium truncate">
                     {userData.organization.name}
                   </span>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -399,39 +402,32 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
           })}
         </nav>
 
-        {/* Settings and Help Buttons */}
+        {/* Settings, Help, and Sign Out */}
         <div className="p-2 border-t border-border space-y-1">
-          <button
-            onClick={() => {
-              // TODO: Add settings functionality
-              console.log('Settings button clicked');
-            }}
-            className={`
-              w-full ${isCollapsed ? 'flex flex-col items-center justify-center p-2' : 'flex items-center gap-2 px-2.5 py-1.5'} 
+          <Link href="/dashboard/settings/members">
+            <div className={`
+              w-full ${isCollapsed ? 'flex flex-col items-center justify-center p-2' : 'flex items-center gap-2 px-2.5 py-1.5'}
               rounded-lg transition-all duration-200 group
-              text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm
+              ${pathname.startsWith('/dashboard/settings') ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm'}
+            `}>
+              <Settings className={`w-4 h-4 flex-shrink-0 ${pathname.startsWith('/dashboard/settings') ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`} />
+              {!isCollapsed && (
+                <span className="text-xs font-normal leading-tight">Settings</span>
+              )}
+            </div>
+          </Link>
+
+          <button
+            onClick={() => signOut({ redirectUrl: '/sign-in' })}
+            className={`
+              w-full ${isCollapsed ? 'flex flex-col items-center justify-center p-2' : 'flex items-center gap-2 px-2.5 py-1.5'}
+              rounded-lg transition-all duration-200 group
+              text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:shadow-sm
             `}
           >
-            <Settings className={`w-4 h-4 flex-shrink-0 text-muted-foreground group-hover:text-foreground`} />
+            <LogOut className={`w-4 h-4 flex-shrink-0 text-muted-foreground group-hover:text-destructive`} />
             {!isCollapsed && (
-              <span className="text-xs font-normal leading-tight">Settings</span>
-            )}
-          </button>
-          
-          <button
-            onClick={() => {
-              // TODO: Add help functionality
-              console.log('Help button clicked');
-            }}
-            className={`
-              w-full ${isCollapsed ? 'flex flex-col items-center justify-center p-2' : 'flex items-center gap-2 px-2.5 py-1.5'} 
-              rounded-lg transition-all duration-200 group
-              text-muted-foreground hover:bg-muted hover:text-foreground hover:shadow-sm
-            `}
-          >
-            <HelpCircle className={`w-4 h-4 flex-shrink-0 text-muted-foreground group-hover:text-foreground`} />
-            {!isCollapsed && (
-              <span className="text-xs font-normal leading-tight">Help</span>
+              <span className="text-xs font-normal leading-tight">Sign out</span>
             )}
           </button>
         </div>
@@ -467,7 +463,7 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
       </div>
 
       {/* Secondary Side Panel for Organization Setup */}
-      {isOrgSetupExpanded && !isCollapsed && userData?.role === 'ORG_ADMIN' && (
+      {isOrgSetupExpanded && !isCollapsed && (userData?.role === 'ORG_ADMIN' || userData?.role === 'QZEN_ADMIN') && (
         <div className="w-64 bg-card border-r border-border shadow-sm transition-all duration-300 ease-in-out flex flex-col">
           <div className="border-b border-border p-2 flex items-center justify-end">
             <Button

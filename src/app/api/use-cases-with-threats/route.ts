@@ -1,42 +1,27 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
 import { prismaClient } from '@/utils/db';
+import { getOrgScope } from '@/lib/org-scope';
 
 export const GET = withAuth(async (request, { auth }) => {
   try {
     const { searchParams } = new URL(request.url);
     const organizationId = searchParams.get('organizationId');
 
-    // Get user data from database
-    const userRecord = await prismaClient.user.findUnique({
-      where: { clerkId: auth.userId! },
-      include: {
-        organization: true
-      }
-    });
+    // Get org-scoped filtering based on user role
+    const scope = await getOrgScope(auth);
 
-    if (!userRecord) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    // Build where clause from scope, with optional organizationId filter for admins
+    const whereClause: any = { ...scope.whereClause };
 
-    // Build where clause based on role
-    let whereClause: any = {};
-
-    if (userRecord.role === 'QZEN_ADMIN') {
-      // QZEN_ADMIN can see all use cases
-      if (organizationId) {
+    if (organizationId) {
+      if (scope.isAdmin) {
+        // QZEN_ADMIN can filter by any organization
         whereClause.organizationId = organizationId;
-      }
-    } else if (userRecord.role === 'ORG_ADMIN' || userRecord.role === 'ORG_USER') {
-      // ORG_ADMIN and ORG_USER can only see use cases in their organization
-      whereClause.organizationId = userRecord.organizationId;
-
-      if (organizationId && organizationId !== userRecord.organizationId) {
+      } else if (scope.organizationId && organizationId !== scope.organizationId) {
+        // Non-admin trying to access a different org
         return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
       }
-    } else {
-      // USER role can only see their own use cases
-      whereClause.userId = userRecord.id;
     }
 
     // Fetch use cases with their threats
@@ -70,7 +55,7 @@ export const GET = withAuth(async (request, { auth }) => {
 
     // Fetch all organizations for QZEN_ADMIN
     let organizations = [];
-    if (userRecord.role === 'QZEN_ADMIN') {
+    if (scope.isAdmin) {
       organizations = await prismaClient.organization.findMany({
         select: {
           id: true,
@@ -83,8 +68,8 @@ export const GET = withAuth(async (request, { auth }) => {
     return NextResponse.json({
       useCases,
       organizations,
-      userRole: userRecord.role,
-      userOrganizationId: userRecord.organizationId
+      userRole: scope.isAdmin ? 'QZEN_ADMIN' : (scope.organizationId ? 'ORG_USER' : 'USER'),
+      userOrganizationId: scope.organizationId
     });
   } catch (error) {
     console.error('Error fetching use cases with threats:', error);

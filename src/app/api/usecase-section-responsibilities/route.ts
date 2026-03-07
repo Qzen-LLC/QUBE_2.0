@@ -1,6 +1,7 @@
 import { prismaClient } from '@/utils/db';
 import { NextResponse } from "next/server";
 import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 // GET: Fetch section responsibilities for a use case
 export const GET = withAuth(async (req: Request, { auth }) => {
@@ -19,6 +20,10 @@ export const GET = withAuth(async (req: Request, { auth }) => {
 
         if (!useCaseId) {
             return NextResponse.json({ error: 'useCaseId is required' }, { status: 400 });
+        }
+
+        if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+            return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
 
         // Check permissions
@@ -79,6 +84,10 @@ export const POST = withAuth(async (req: Request, { auth }) => {
 
         if (!useCaseId || !section) {
             return NextResponse.json({ error: 'useCaseId and section are required' }, { status: 400 });
+        }
+
+        if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+            return NextResponse.json({ error: 'Access denied' }, { status: 403 });
         }
 
         // Validate section enum

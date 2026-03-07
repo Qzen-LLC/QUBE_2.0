@@ -1,6 +1,7 @@
 import { withAuth } from '@/lib/auth-gateway';
 import { prismaClient } from '@/utils/db';
 import { NextResponse } from 'next/server';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 // Health check endpoint to verify route is accessible
 export const GET = withAuth(async (request: Request, { auth }) => {
@@ -19,6 +20,10 @@ export const POST = withAuth(async (request: Request, { auth }) => {
     const { ruleId, approved, reason, guardrailId, useCaseId } = body;
 
     console.log('[APPROVE] Received approval request:', { ruleId, approved, reason, guardrailId, useCaseId });
+
+    if (useCaseId && !(await verifyUseCaseAccess(auth, useCaseId))) {
+      return new Response(JSON.stringify({ error: 'Access denied' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
+    }
 
     if (!ruleId || approved === undefined) {
       return new Response(JSON.stringify({ error: 'Missing required parameters' }), { status: 400, headers: { 'Content-Type': 'application/json' } });

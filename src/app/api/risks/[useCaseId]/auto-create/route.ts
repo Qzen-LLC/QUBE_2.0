@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 import { prismaClient } from '@/utils/db';
 import { calculateRiskScores, type StepsData } from '@/lib/risk-calculations';
@@ -240,6 +241,10 @@ export const POST = withAuth(async (
   try {
     // Await params as required by Next.js 15
     const { useCaseId } = await params;
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
     const userRecord = await prismaClient.user.findUnique({
       where: { clerkId: auth.userId! },

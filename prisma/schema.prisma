@@ -59,6 +59,8 @@ model UseCase {
   // New overview fields
   aiType                             String?
   executiveSponsor                   String?
+  // Wizard draft data (JSON blob of pillar form data for incomplete use cases)
+  wizardDraft                        Json?
   answers                          Answer[]
   Approval                         Approval?
   assessmentExpansion              AssessmentExpansion?
@@ -657,6 +659,7 @@ model User {
   id                                              String                @id @default(uuid())
   clerkId                                         String                @unique
   email                                           String                @unique
+  passwordHash                                    String?
   firstName                                       String?
   lastName                                        String?
   role                                            UserRole              @default(USER)
@@ -672,6 +675,7 @@ model User {
   PromptTemplate_PromptTemplate_userIdToUser      PromptTemplate[]      @relation("PromptTemplate_userIdToUser")
   PromptTestRun                                   PromptTestRun[]
   PromptVersion                                   PromptVersion[]
+  sessions                                        Session[]
   useCases                                        UseCase[]
   organization                                    Organization?         @relation(fields: [organizationId], references: [id])
   vendors                                         Vendor[]
@@ -679,6 +683,21 @@ model User {
   @@index([email])
   @@index([organizationId])
   @@index([role])
+}
+
+model Session {
+  id          String    @id @default(uuid())
+  userId      String
+  tokenFamily String    @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenFamily])
+  @@index([expiresAt])
 }
 
 model AiModel {

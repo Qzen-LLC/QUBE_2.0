@@ -1,5 +1,6 @@
 import { withAuth } from '@/lib/auth-gateway';
 import { prismaClient } from '@/utils/db';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 
 export const GET = withAuth(async (request: Request, { auth }) => {
@@ -11,6 +12,10 @@ export const GET = withAuth(async (request: Request, { auth }) => {
 
     if (!useCaseId) {
       return new Response(JSON.stringify({ error: 'Missing useCaseId parameter' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return new Response(JSON.stringify({ error: 'Access denied' }), { status: 403, headers: { 'Content-Type': 'application/json' } });
     }
 
     // Get the latest guardrail for this use case

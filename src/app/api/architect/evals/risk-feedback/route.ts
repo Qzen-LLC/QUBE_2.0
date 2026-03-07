@@ -1,17 +1,22 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-gateway";
 import { prismaClient } from "@/utils/db";
+import { verifyUseCaseAccess } from "@/lib/org-scope";
 import { getEvalStatus } from "@/lib/architect";
 import { computeRiskAdjustmentsFromEvals } from "@/lib/architect/engine/risk-feedback";
 import type { GuardrailsOutput, ArchitectureOutput } from "@/lib/architect/models/outputs";
 
-export const POST = withAuth(async (request: Request) => {
+export const POST = withAuth(async (request: Request, { auth }) => {
   try {
     const { searchParams } = new URL(request.url);
     const useCaseId = searchParams.get("useCaseId");
 
     if (!useCaseId) {
       return NextResponse.json({ error: "Missing useCaseId" }, { status: 400 });
+    }
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     // Load architect session for guardrails output

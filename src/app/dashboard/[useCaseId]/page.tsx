@@ -113,19 +113,11 @@ export default function UseCaseDetailPage() {
   // Pipeline completed
   if (pipeline.step === "completed" && pipeline.output) {
     return (
-      <div className="space-y-4">
-        <div className="flex justify-end px-4">
-          <Button variant="outline" onClick={() => setEditing(true)}>
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit Inputs & Regenerate
-          </Button>
-        </div>
-        <ArchitectOutputDashboard
-          output={pipeline.output}
-          useCaseId={useCaseId}
-          onBack={() => pipeline.reset()}
-        />
-      </div>
+      <ArchitectOutputDashboard
+        output={pipeline.output}
+        useCaseId={useCaseId}
+        onBack={() => pipeline.reset()}
+      />
     );
   }
 
@@ -162,12 +154,6 @@ export default function UseCaseDetailPage() {
     if (sessionStatus === "completed" && architectSession.architectureOutput) {
       return (
         <div className="space-y-4">
-          <div className="flex justify-end px-4">
-            <Button variant="outline" onClick={() => setEditing(true)}>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Inputs & Regenerate
-            </Button>
-          </div>
           <ArchitectOutputDashboard
             output={architectSession.architectureOutput as Record<string, unknown>}
             useCaseId={useCaseId}

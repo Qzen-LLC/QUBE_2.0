@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prismaClient, retryDatabaseOperation } from '@/utils/db';
 import { withAuth } from '@/lib/auth-gateway';
 import { buildStepsDataFromAnswers } from '@/lib/mappers/answers-to-steps';
+import { getOrgScope } from '@/lib/org-scope';
 
 
 export const GET = withAuth(async (request, { auth }) => {
@@ -9,19 +10,12 @@ export const GET = withAuth(async (request, { auth }) => {
     // Check for cache-busting parameter
     const { searchParams } = new URL(request.url);
     const cacheBust = searchParams.get('t');
-    
-    // auth context is provided by withAuth wrapper
-    const clerkId = auth.userId!;
-    const userRecord = await prismaClient.user.findUnique({
-      where: { clerkId },
-    });
-    if (!userRecord) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-    
-    // Only include use cases for this user if USER role
+
+    // Get org-scoped filtering based on user role
+    const scope = await getOrgScope(auth);
+
     let useCases;
-    
+
     // Helper function to get include object with or without risks
     const getIncludeObject = async () => {
       try {
@@ -82,121 +76,38 @@ export const GET = withAuth(async (request, { auth }) => {
     };
     
     try {
-      if (userRecord.role === 'QZEN_ADMIN') {
-        useCases = await retryDatabaseOperation(() =>
-          prismaClient.useCase.findMany({
-            include: includeWithAnswers,
-          })
-        );
-      } else if (userRecord.role === 'ORG_ADMIN' || userRecord.role === 'ORG_USER') {
-        useCases = await retryDatabaseOperation(() =>
-          prismaClient.useCase.findMany({
-            where: { organizationId: userRecord.organizationId },
-            include: includeWithAnswers,
-          })
-        );
-      } else {
-        // USER or fallback: only their own use cases
-        useCases = await retryDatabaseOperation(() =>
-          prismaClient.useCase.findMany({
-            where: { userId: userRecord.id },
-            include: includeWithAnswers,
-          })
-        );
-      }
+      useCases = await retryDatabaseOperation(() =>
+        prismaClient.useCase.findMany({
+          where: { ...scope.whereClause },
+          include: includeWithAnswers,
+        })
+      );
     } catch (error) {
       // Fallback if framework tables don't exist yet
       console.log('Framework tables not found, falling back to basic data');
-      if (userRecord.role === 'QZEN_ADMIN') {
-        useCases = await retryDatabaseOperation(() =>
-          prismaClient.useCase.findMany({
-            include: {
-              answers: {
-            include: {
-              question: true,
-              questionTemplate: true,
-            }
-          },
-              answers: {
-                include: {
-                  question: {
-                    select: {
-                      text: true,
-                      type: true,
-                    }
-                  },
-                  questionTemplate: {
-                    select: {
-                      text: true,
-                      type: true,
-                    }
+      useCases = await retryDatabaseOperation(() =>
+        prismaClient.useCase.findMany({
+          where: { ...scope.whereClause },
+          include: {
+            answers: {
+              include: {
+                question: {
+                  select: {
+                    text: true,
+                    type: true,
+                  }
+                },
+                questionTemplate: {
+                  select: {
+                    text: true,
+                    type: true,
                   }
                 }
               }
-            },
-          })
-        );
-      } else if (userRecord.role === 'ORG_ADMIN' || userRecord.role === 'ORG_USER') {
-        useCases = await retryDatabaseOperation(() =>
-          prismaClient.useCase.findMany({
-            where: { organizationId: userRecord.organizationId },
-            include: {
-              answers: {
-            include: {
-              question: true,
-              questionTemplate: true,
             }
           },
-              answers: {
-                include: {
-                  question: {
-                    select: {
-                      text: true,
-                      type: true,
-                    }
-                  },
-                  questionTemplate: {
-                    select: {
-                      text: true,
-                      type: true,
-                    }
-                  }
-                }
-              }
-            },
-          })
-        );
-      } else {
-        useCases = await retryDatabaseOperation(() =>
-          prismaClient.useCase.findMany({
-            where: { userId: userRecord.id },
-            include: {
-              answers: {
-            include: {
-              question: true,
-              questionTemplate: true,
-            }
-          },
-              answers: {
-                include: {
-                  question: {
-                    select: {
-                      text: true,
-                      type: true,
-                    }
-                  },
-                  questionTemplate: {
-                    select: {
-                      text: true,
-                      type: true,
-                    }
-                  }
-                }
-              }
-            },
-          })
-        );
-      }
+        })
+      );
       // Add empty arrays for framework assessments
       useCases = useCases.map(uc => ({
         ...uc,

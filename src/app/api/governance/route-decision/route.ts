@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { routeDecision, createDecisionRecord, DecisionContext } from '@/lib/governance/decision-router';
 import { notifyDecisionRouting, notifyEscalation } from '@/lib/governance/notification-service';
+import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 /**
  * POST /api/governance/route-decision
  * Routes a decision to the appropriate approver based on decision authority rules
  */
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request: Request, { auth }) => {
   try {
     const body = await request.json();
 
@@ -17,6 +19,10 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields: decisionType, organizationId, requestedBy' },
         { status: 400 }
       );
+    }
+
+    if (body.useCaseId && !(await verifyUseCaseAccess(auth, body.useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     // Build decision context
@@ -82,7 +88,7 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * GET /api/governance/route-decision?decisionType=...&organizationId=...

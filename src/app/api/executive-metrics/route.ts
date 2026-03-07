@@ -1,6 +1,7 @@
 import { withAuth } from '@/lib/auth-gateway';
 
 import { prismaClient } from '@/utils/db';
+import { getOrgScope } from '@/lib/org-scope';
 
 
 
@@ -9,24 +10,10 @@ export const GET = withAuth(async (_req: Request, { auth }) => {
 
 
   try {
-    const userRecord = await prismaClient.user.findUnique({
-      where: { clerkId: auth.userId! },
-    });
+    // Get org-scoped filtering based on user role
+    const scope = await getOrgScope(auth);
 
-
-    if (!userRecord) return new Response(JSON.stringify({ error: 'User not found' }), { status: 404, headers: { 'Content-Type': 'application/json' } });
-
-
-
-
-
-    // Build base query based on role
-    const baseWhere =
-      userRecord.role === 'QZEN_ADMIN'
-        ? {}
-        : userRecord.role === 'ORG_ADMIN' || userRecord.role === 'ORG_USER'
-        ? { organizationId: userRecord.organizationId }
-        : { userId: userRecord.id };
+    const baseWhere = scope.whereClause;
 
 
     const dbStart = Date.now();

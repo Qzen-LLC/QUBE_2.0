@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/auth-gateway";
 import { prismaClient } from "@/utils/db";
+import { verifyUseCaseAccess } from "@/lib/org-scope";
 
-export const GET = withAuth(async (request: Request) => {
+export const GET = withAuth(async (request: Request, { auth }) => {
   try {
     const { searchParams } = new URL(request.url);
     const useCaseId = searchParams.get("useCaseId");
@@ -13,6 +14,10 @@ export const GET = withAuth(async (request: Request) => {
         { error: "Missing useCaseId query parameter" },
         { status: 400 }
       );
+    }
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     const records = await prismaClient.costReconciliation.findMany({

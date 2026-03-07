@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 import { prismaClient } from '@/utils/db';
 
@@ -11,6 +12,10 @@ export const PUT = withAuth(async (
   try {
     // Await params as required by Next.js 15
     const { useCaseId, riskId } = await params;
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
     const userRecord = await prismaClient.user.findUnique({
       where: { clerkId: auth.userId! },
@@ -63,6 +68,10 @@ export const DELETE = withAuth(async (
   try {
     // Await params as required by Next.js 15
     const { useCaseId, riskId } = await params;
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+    }
 
     // auth context is provided by withAuth wrapper
     const userRecord = await prismaClient.user.findUnique({

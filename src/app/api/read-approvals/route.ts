@@ -1,6 +1,7 @@
 import { prismaClient } from '@/utils/db';
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 
 export const GET = withAuth(async (request: Request, { auth }) => {
@@ -20,6 +21,10 @@ export const GET = withAuth(async (request: Request, { auth }) => {
 
     if (!useCaseId) {
       return NextResponse.json({ error: 'Missing useCaseId' }, { status: 400 });
+    }
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     // Check permissions based on role

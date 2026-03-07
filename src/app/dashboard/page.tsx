@@ -18,6 +18,7 @@ import { useUseCases, useDeleteUseCase, type MappedUseCase } from '@/hooks/useUs
 const PAGE_SIZE = 10;
 
 const stages: Record<string, { label: string; className: string }> = {
+  draft: { label: 'Draft', className: 'bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800' },
   discovery: { label: 'Discovery', className: 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700' },
   'proof-of-value': { label: 'Proof of Value', className: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800' },
   backlog: { label: 'Backlog', className: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700' },
@@ -399,7 +400,7 @@ const Dashboard = () => {
                   <tr
                     key={uc.id}
                     className="group hover:bg-muted/40 cursor-pointer transition-colors"
-                    onClick={() => router.push(`/dashboard/${uc.id}`)}
+                    onClick={() => router.push(uc.stage === 'draft' ? `/new-usecase?draft=${uc.id}` : `/dashboard/${uc.id}`)}
                   >
                     <td className="px-5 py-3.5 font-mono text-sm text-muted-foreground whitespace-nowrap">
                       {formatAiucId(uc.aiucId, uc.id)}

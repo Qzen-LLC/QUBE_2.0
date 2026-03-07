@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/utils/db';
+import { withAuth } from '@/lib/auth-gateway';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request: Request, { auth }) => {
   try {
     const { searchParams } = new URL(request.url);
     const useCaseId = searchParams.get('useCaseId');
@@ -12,6 +14,10 @@ export async function GET(request: NextRequest) {
         { error: 'useCaseId is required' },
         { status: 400 }
       );
+    }
+
+    if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 });
     }
 
     // Fetch question templates sorted by stage and orderIndex
@@ -156,4 +162,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});

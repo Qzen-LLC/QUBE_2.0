@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
 import { prismaClient } from '@/utils/db';
+import { verifyUseCaseAccess } from '@/lib/org-scope';
 
 /**
  * PUT /api/threats/[useCaseId]/[threatId]
@@ -8,9 +9,14 @@ import { prismaClient } from '@/utils/db';
  */
 export const PUT = withAuth(async (
   request: Request,
-  { params }: { params: Promise<{ useCaseId: string; threatId: string }> }
+  { params, auth }: { params: Promise<{ useCaseId: string; threatId: string }>; auth: any }
 ) => {
   const { useCaseId, threatId } = await params;
+
+  if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+  }
+
   const body = await request.json();
 
   const existing = await prismaClient.threat.findFirst({
@@ -46,9 +52,13 @@ export const PUT = withAuth(async (
  */
 export const DELETE = withAuth(async (
   request: Request,
-  { params }: { params: Promise<{ useCaseId: string; threatId: string }> }
+  { params, auth }: { params: Promise<{ useCaseId: string; threatId: string }>; auth: any }
 ) => {
   const { useCaseId, threatId } = await params;
+
+  if (!(await verifyUseCaseAccess(auth, useCaseId))) {
+    return NextResponse.json({ error: 'Access denied' }, { status: 403 });
+  }
 
   const existing = await prismaClient.threat.findFirst({
     where: { id: threatId, useCaseId },
