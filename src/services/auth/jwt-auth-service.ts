@@ -9,10 +9,8 @@ const JWT_SECRET = () => {
   return new TextEncoder().encode(secret);
 };
 
-const ACCESS_TOKEN_EXPIRY = "15m";
-const REFRESH_TOKEN_EXPIRY = "7d";
+const ACCESS_TOKEN_EXPIRY = "24h";
 const ACCESS_COOKIE = "qube-access-token";
-const REFRESH_COOKIE = "qube-refresh-token";
 
 interface AccessTokenPayload {
   sub: string; // clerkId (user identifier)
@@ -31,14 +29,6 @@ export async function createAccessToken(user: { clerkId: string; role: string; o
     .sign(JWT_SECRET());
 }
 
-export async function createRefreshToken(sessionId: string, tokenFamily: string): Promise<string> {
-  return new SignJWT({ sid: sessionId, fam: tokenFamily } as unknown as Record<string, unknown>)
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(REFRESH_TOKEN_EXPIRY)
-    .sign(JWT_SECRET());
-}
-
 export async function verifyAccessToken(token: string): Promise<AccessTokenPayload> {
   const { payload } = await jwtVerify(token, JWT_SECRET());
   return {
@@ -46,11 +36,6 @@ export async function verifyAccessToken(token: string): Promise<AccessTokenPaylo
     role: payload.role as string,
     orgId: (payload.orgId as string) || null,
   };
-}
-
-export async function verifyRefreshToken(token: string): Promise<{ sid: string; fam: string }> {
-  const { payload } = await jwtVerify(token, JWT_SECRET());
-  return { sid: payload.sid as string, fam: payload.fam as string };
 }
 
 // --- Cookie helpers ---
@@ -67,15 +52,11 @@ function parseCookies(req: Request): Record<string, string> {
 
 const isProduction = () => process.env.NODE_ENV === "production";
 
-export function setAuthCookies(headers: Headers, accessToken: string, refreshToken: string) {
+export function setAuthCookies(headers: Headers, accessToken: string) {
   const secure = isProduction() ? "; Secure" : "";
   headers.append(
     "Set-Cookie",
-    `${ACCESS_COOKIE}=${accessToken}; HttpOnly; SameSite=Strict; Path=/${secure}; Max-Age=900`
-  );
-  headers.append(
-    "Set-Cookie",
-    `${REFRESH_COOKIE}=${refreshToken}; HttpOnly; SameSite=Strict; Path=/api/auth${secure}; Max-Age=604800`
+    `${ACCESS_COOKIE}=${accessToken}; HttpOnly; SameSite=Strict; Path=/${secure}; Max-Age=86400`
   );
 }
 
@@ -84,10 +65,6 @@ export function clearAuthCookies(headers: Headers) {
   headers.append(
     "Set-Cookie",
     `${ACCESS_COOKIE}=; HttpOnly; SameSite=Strict; Path=/${secure}; Max-Age=0`
-  );
-  headers.append(
-    "Set-Cookie",
-    `${REFRESH_COOKIE}=; HttpOnly; SameSite=Strict; Path=/api/auth${secure}; Max-Age=0`
   );
 }
 

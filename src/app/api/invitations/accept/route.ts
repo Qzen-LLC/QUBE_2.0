@@ -1,10 +1,8 @@
 import { NextResponse } from 'next/server';
 import { withAuth } from '@/lib/auth-gateway';
 import { prismaClient } from '@/utils/db';
-import { v4 as uuidv4 } from 'uuid';
 import {
   createAccessToken,
-  createRefreshToken,
   setAuthCookies,
 } from '@/services/auth/jwt-auth-service';
 
@@ -69,16 +67,6 @@ export const POST = withAuth(async (request: Request, { auth }: { auth: any }) =
       organizationId: result.organizationId,
     });
 
-    const tokenFamily = uuidv4();
-    const session = await prismaClient.session.create({
-      data: {
-        userId: result.id,
-        tokenFamily,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-    const refreshToken = await createRefreshToken(session.id, tokenFamily);
-
     const response = NextResponse.json({
       success: true,
       organization: {
@@ -87,7 +75,7 @@ export const POST = withAuth(async (request: Request, { auth }: { auth: any }) =
       },
     });
 
-    setAuthCookies(response.headers, accessToken, refreshToken);
+    setAuthCookies(response.headers, accessToken);
     return response;
   } catch (error) {
     console.error('Error accepting invitation:', error);

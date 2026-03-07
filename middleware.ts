@@ -52,13 +52,14 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next();
   } catch {
-    // Token expired or invalid — try to let the client refresh
+    // Token expired or invalid — redirect to sign-in
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
         { error: "Authentication required", code: "UNAUTHENTICATED" },
         { status: 401 }
       );
     }
+
     return NextResponse.redirect(new URL("/sign-in", request.url));
   }
 }

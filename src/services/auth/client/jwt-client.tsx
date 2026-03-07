@@ -36,22 +36,6 @@ const AuthProvider: ClientAuthService["components"]["AuthProvider"] = ({ childre
     try {
       const res = await fetch("/api/user/me");
       if (res.status === 401) {
-        // Try to refresh
-        const refreshRes = await fetch("/api/auth/refresh", { method: "POST" });
-        if (refreshRes.ok) {
-          const retryRes = await fetch("/api/user/me");
-          if (retryRes.ok) {
-            const data = await retryRes.json();
-            setState({
-              isLoaded: true,
-              isSignedIn: true,
-              userId: data.user?.id || null,
-              organizationId: data.user?.organizationId || null,
-              user: data.user || null,
-            });
-            return;
-          }
-        }
         setState({ isLoaded: true, isSignedIn: false, userId: null, organizationId: null, user: null });
         router.push("/sign-in");
         return;

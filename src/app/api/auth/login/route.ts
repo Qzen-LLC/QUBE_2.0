@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
 import { prismaClient } from "@/utils/db";
 import {
   createAccessToken,
-  createRefreshToken,
   setAuthCookies,
 } from "@/services/auth/jwt-auth-service";
 
@@ -57,22 +55,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create session
-    const tokenFamily = uuidv4();
-    const session = await prismaClient.session.create({
-      data: {
-        userId: user.id,
-        tokenFamily,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-
     const accessToken = await createAccessToken({
       clerkId: user.clerkId,
       role: user.role,
       organizationId: user.organizationId,
     });
-    const refreshToken = await createRefreshToken(session.id, tokenFamily);
 
     const response = NextResponse.json({
       success: true,
@@ -86,7 +73,7 @@ export async function POST(request: Request) {
       },
     });
 
-    setAuthCookies(response.headers, accessToken, refreshToken);
+    setAuthCookies(response.headers, accessToken);
     return response;
   } catch (error) {
     console.error("Login error:", error);

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { prismaClient } from "@/utils/db";
 import { getAuthService } from "@/services/auth/auth-service-factory";
-import { createAccessToken, setAuthCookies, createRefreshToken } from "@/services/auth/jwt-auth-service";
-import { v4 as uuidv4 } from "uuid";
+import { createAccessToken, setAuthCookies } from "@/services/auth/jwt-auth-service";
 
 export async function POST(request: Request) {
   try {
@@ -69,16 +68,6 @@ export async function POST(request: Request) {
       organizationId: result.org.id,
     });
 
-    const tokenFamily = uuidv4();
-    const session = await prismaClient.session.create({
-      data: {
-        userId: result.user.id,
-        tokenFamily,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-    const refreshToken = await createRefreshToken(session.id, tokenFamily);
-
     const response = NextResponse.json({
       success: true,
       organization: {
@@ -88,7 +77,7 @@ export async function POST(request: Request) {
       },
     });
 
-    setAuthCookies(response.headers, accessToken, refreshToken);
+    setAuthCookies(response.headers, accessToken);
     return response;
   } catch (error) {
     console.error("Organization setup error:", error);
