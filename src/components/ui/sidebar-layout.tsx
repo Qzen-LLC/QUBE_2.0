@@ -11,11 +11,10 @@ import {
   ShieldCheck,
   Building,
   DollarSign,
-  FileText,
+
   Shield,
   Home,
   Settings,
-  HelpCircle,
   Code2,
   Cog,
   GraduationCap,
@@ -103,12 +102,6 @@ const navigationItems: NavigationItem[] = [
     icon: Building,
     description: 'Vendor Evaluation'
   },
-  {
-    title: 'Policy Center',
-    href: '/dashboard/policy-center',
-    icon: FileText,
-    description: 'Policy Management'
-  },
 ];
 
 interface SidebarLayoutProps {
@@ -146,7 +139,6 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
       if (pathnameChanged && expandedMenu === 'Organization Setup') {
         // Check if current path matches any Organization Setup sub-item
         const orgSetupPaths = [
-          '/dashboard/configure-questions',
           '/dashboard/configure-models',
           '/dashboard/governance-setup',
           '/dashboard/training',
@@ -182,15 +174,6 @@ function SidebarLayoutContent({ children }: SidebarLayoutProps) {
 
   // Organization Setup sub-items
   const organizationSetupItems: NavigationItem[] = [
-    ...(userData?.role === 'ORG_ADMIN'
-      ? [{
-          title: 'Configure Questions',
-          href: '/dashboard/configure-questions',
-          icon: HelpCircle,
-          description: 'Question Management',
-          isAdmin: true
-        }]
-      : []),
     {
       title: 'Configure Models',
       href: '/dashboard/configure-models',

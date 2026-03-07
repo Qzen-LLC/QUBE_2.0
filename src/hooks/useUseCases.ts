@@ -145,7 +145,7 @@ export function useUseCases(): UseUseCasesReturn {
           ...uc,
           stage: uc.stage || 'discovery',
           priority: uc.priority || 'medium',
-          owner: uc.primaryStakeholders?.[0] || 'Unknown',
+          owner: uc.primaryStakeholders?.[0] || creatorName || 'Unknown',
           lastUpdated: uc.updatedAt
             ? new Date(uc.updatedAt).toLocaleDateString()
             : '',

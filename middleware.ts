@@ -30,11 +30,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Noop mode — skip auth entirely
-  if (process.env.AUTH_PROVIDER === "noop") {
-    return NextResponse.next();
-  }
-
   const accessToken = request.cookies.get("qube-access-token")?.value;
 
   if (!accessToken) {

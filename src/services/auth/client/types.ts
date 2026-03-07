@@ -1,6 +1,6 @@
 import React from "react";
 
-export type AuthProviderName = "NONE" | "CUSTOM";
+export type AuthProviderName = "CUSTOM";
 
 export type UseAuthResult = {
   isLoaded: boolean;

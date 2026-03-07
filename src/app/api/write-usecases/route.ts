@@ -161,6 +161,12 @@ export const POST = withAuth(async (
                 nextAiucId = (maxUserAiucId._max.aiucId || 0) + 1;
             }
             
+            // Default owner to the creator if primaryStakeholders is empty
+            if (!data.primaryStakeholders || data.primaryStakeholders.length === 0) {
+                const creatorName = [userRecord.firstName, userRecord.lastName].filter(Boolean).join(' ') || userRecord.email;
+                data.primaryStakeholders = [creatorName];
+            }
+
             useCase = await prismaClient.useCase.create({
                 data: {
                     ...data,

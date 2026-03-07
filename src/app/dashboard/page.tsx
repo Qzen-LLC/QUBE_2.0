@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUserData } from '@/contexts/UserContext';
 import {
@@ -79,6 +79,53 @@ const Dashboard = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [showTip, setShowTip] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Owner editing state
+  const [editingOwnerId, setEditingOwnerId] = useState<string | null>(null);
+  const [orgMembers, setOrgMembers] = useState<{ id: string; firstName?: string; lastName?: string; email: string }[]>([]);
+  const [membersLoaded, setMembersLoaded] = useState(false);
+  const ownerDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Load org members once for the owner dropdown
+  useEffect(() => {
+    if (membersLoaded) return;
+    fetch('/api/organizations/members')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.users) {
+          setOrgMembers(data.users);
+          setMembersLoaded(true);
+        }
+      })
+      .catch(() => {});
+  }, [membersLoaded]);
+
+  const handleOwnerChange = async (useCaseId: string, ownerName: string) => {
+    setEditingOwnerId(null);
+    try {
+      const res = await fetch('/api/update-owner', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ useCaseId, ownerName }),
+      });
+      if (res.ok) {
+        refetch();
+      }
+    } catch { /* ignore */ }
+  };
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ownerDropdownRef.current && !ownerDropdownRef.current.contains(e.target as Node)) {
+        setEditingOwnerId(null);
+      }
+    };
+    if (editingOwnerId) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [editingOwnerId]);
 
   const filteredUseCases = useMemo(() => {
     let result = useCases;
@@ -420,8 +467,39 @@ const Dashboard = () => {
                         </Badge>
                       )}
                     </td>
-                    <td className="px-5 py-3.5 text-sm text-muted-foreground truncate max-w-[180px]">
-                      {uc.owner}
+                    <td className="px-5 py-3.5 text-sm text-muted-foreground max-w-[180px] relative">
+                      {editingOwnerId === uc.id ? (
+                        <div ref={ownerDropdownRef} className="relative" onClick={(e) => e.stopPropagation()}>
+                          <select
+                            autoFocus
+                            defaultValue=""
+                            className="w-full h-8 px-2 text-sm border border-border rounded-md bg-background text-foreground"
+                            onChange={(e) => {
+                              if (e.target.value) handleOwnerChange(uc.id, e.target.value);
+                            }}
+                            onBlur={() => setEditingOwnerId(null)}
+                          >
+                            <option value="" disabled>Select owner</option>
+                            {orgMembers.map((m) => {
+                              const name = [m.firstName, m.lastName].filter(Boolean).join(' ') || m.email;
+                              return (
+                                <option key={m.id} value={name}>{name}</option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                      ) : (
+                        <button
+                          className="text-left truncate w-full hover:text-foreground hover:underline transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingOwnerId(uc.id);
+                          }}
+                          title="Click to change owner"
+                        >
+                          {uc.owner}
+                        </button>
+                      )}
                     </td>
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       <Badge

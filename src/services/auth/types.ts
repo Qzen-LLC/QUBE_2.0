@@ -48,7 +48,7 @@ export interface AuthContext {
   sessionId?: string | null;
   organizationId?: string | null;
   tokenClaims?: Record<string, unknown> | null;
-  provider: "NONE" | "CUSTOM" | string;
+  provider: string;
   /** Which auth method authenticated the request */
   method?: "session" | "bearer" | "api_key";
 }
