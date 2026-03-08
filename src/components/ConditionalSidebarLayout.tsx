@@ -26,8 +26,6 @@ const NO_SIDEBAR_ROUTES = [
 const SIDEBAR_ROUTES = [
   '/dashboard',
   '/new-usecase',
-  '/edit-usecase',
-  '/view-usecase',
   '/dev',
   '/invite',
 ];
