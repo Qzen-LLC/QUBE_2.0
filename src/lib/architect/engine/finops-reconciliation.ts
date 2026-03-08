@@ -191,6 +191,7 @@ export async function reconcileFinOps(
   if (mcpEnabled) {
     try {
       const mcpAvailable = await isMCPAvailable();
+      console.log("[Reconciliation] MCP enabled, available:", mcpAvailable);
       if (mcpAvailable) {
         const mcpResult = await fetchCostsViaMCP({
           startDate: periodStart,
@@ -199,10 +200,13 @@ export async function reconcileFinOps(
         });
         actualCosts = mcpResult.costs;
         source = mcpResult.source;
+        console.log("[Reconciliation] MCP source:", source, "costs:", JSON.stringify(actualCosts));
       } else {
+        console.log("[Reconciliation] MCP not available, falling back to simulated");
         actualCosts = generateSimulatedCosts(finopsOutput);
       }
-    } catch {
+    } catch (err) {
+      console.error("[Reconciliation] MCP error, falling back to simulated:", err);
       actualCosts = generateSimulatedCosts(finopsOutput);
     }
   } else if (awsCostExplorerEnabled && CostExplorerClient) {

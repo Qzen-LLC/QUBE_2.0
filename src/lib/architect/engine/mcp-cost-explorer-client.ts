@@ -37,11 +37,20 @@ export async function isMCPAvailable(): Promise<boolean> {
   if (!url) return false;
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
-    await fetch(url, { method: "HEAD", signal: controller.signal });
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    // Use POST since MCP Streamable HTTP servers may not support HEAD/GET
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", method: "initialize", id: 0 }),
+      signal: controller.signal,
+    });
     clearTimeout(timeout);
+    // Any response (even 4xx) means the server is reachable
+    console.log("[MCP-Client] Availability check status:", res.status);
     return true;
-  } catch {
+  } catch (err) {
+    console.log("[MCP-Client] Availability check failed:", err instanceof Error ? err.message : err);
     return false;
   }
 }
@@ -94,28 +103,52 @@ export async function fetchCostsViaMCP(options: {
     // Parse MCP tool response — content is an array of content blocks
     const content = result.content as Array<{ type: string; text?: string }>;
     const textBlock = content?.find((c) => c.type === "text");
+    console.log("[MCP-Client] Raw content blocks:", JSON.stringify(content?.map(c => c.type)));
     if (textBlock?.text) {
       const parsed = JSON.parse(textBlock.text);
+      console.log("[MCP-Client] Parsed response keys:", Object.keys(parsed));
 
       // Handle AWS Cost Explorer response format
+      // The response may be nested in ResultsByTime or be a flat array of services
       const groups =
         parsed.ResultsByTime?.[0]?.Groups ??
         parsed.results?.[0]?.groups ??
+        parsed.results?.[0]?.Groups ??
         parsed.groups ??
+        parsed.Groups ??
         [];
 
-      for (const group of groups) {
-        const serviceName =
-          group.Keys?.[0] ?? group.key ?? group.service ?? "";
-        const amount = parseFloat(
-          group.Metrics?.UnblendedCost?.Amount ??
-            group.amount ??
-            group.cost ??
-            "0"
-        );
-        const category = mapServiceToCategory(serviceName);
-        costs[category] = (costs[category] || 0) + amount;
+      // Also handle flat service array format: [{ service: "...", amount: N }, ...]
+      const serviceArray = Array.isArray(parsed) ? parsed :
+        (Array.isArray(parsed.services) ? parsed.services : []);
+
+      if (groups.length > 0) {
+        for (const group of groups) {
+          const serviceName =
+            group.Keys?.[0] ?? group.key ?? group.service ?? group.Service ?? "";
+          const amount = parseFloat(
+            group.Metrics?.UnblendedCost?.Amount ??
+              group.metrics?.UnblendedCost?.Amount ??
+              group.amount ??
+              group.Amount ??
+              group.cost ??
+              "0"
+          );
+          const category = mapServiceToCategory(serviceName);
+          costs[category] = (costs[category] || 0) + amount;
+        }
+      } else if (serviceArray.length > 0) {
+        for (const item of serviceArray) {
+          const serviceName = item.service ?? item.Service ?? item.name ?? "";
+          const amount = parseFloat(item.amount ?? item.Amount ?? item.cost ?? "0");
+          const category = mapServiceToCategory(serviceName);
+          costs[category] = (costs[category] || 0) + amount;
+        }
       }
+
+      console.log("[MCP-Client] Mapped costs:", JSON.stringify(costs));
+    } else {
+      console.log("[MCP-Client] No text block found in MCP response");
     }
 
     return { costs, source: options.tagFilter ? "mcp:tagged" : "mcp:global" };

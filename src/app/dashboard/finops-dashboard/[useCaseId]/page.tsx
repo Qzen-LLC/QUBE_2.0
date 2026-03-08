@@ -851,82 +851,14 @@ export default function FinancialDashboard() {
         })()}
       </Card>
 
-      {/* Reconciliation Comparison Panel */}
-      {reconciliationData && reconciliationData.totalProjected != null && (
-        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold text-foreground">Cost Reconciliation</h2>
-            <div className="text-xs text-muted-foreground">
-              Last reconciled: {new Date(reconciliationData.reconciledAt).toLocaleString()}
-              {reconciliationData.source && <span className="ml-2">· {reconciliationData.source}</span>}
-            </div>
-          </div>
-          {/* Summary row */}
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="text-center p-3 rounded-lg bg-muted/50">
-              <div className="text-xs text-muted-foreground">Total Projected</div>
-              <div className="text-lg font-bold text-foreground">{formatCurrency(reconciliationData.totalProjected)}</div>
-            </div>
-            <div className="text-center p-3 rounded-lg bg-muted/50">
-              <div className="text-xs text-muted-foreground">Total Actual</div>
-              <div className="text-lg font-bold text-foreground">{formatCurrency(reconciliationData.totalActual)}</div>
-            </div>
-            <div className="text-center p-3 rounded-lg bg-muted/50">
-              <div className="text-xs text-muted-foreground">Overall Variance</div>
-              <div className={`text-lg font-bold ${reconciliationData.totalVariancePercent > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                {reconciliationData.totalVariancePercent > 0 ? '+' : ''}{formatPercent(reconciliationData.totalVariancePercent)}
-              </div>
-            </div>
-          </div>
-          {/* Per-category table */}
-          {reconciliationData.varianceLines && reconciliationData.varianceLines.length > 0 && (
-            <div className="overflow-x-auto mb-4">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-muted-foreground">
-                    <th className="text-left py-2 font-medium">Category</th>
-                    <th className="text-right py-2 font-medium">Projected</th>
-                    <th className="text-right py-2 font-medium">Actual</th>
-                    <th className="text-right py-2 font-medium">Variance</th>
-                    <th className="text-right py-2 font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {reconciliationData.varianceLines.map((line: any, idx: number) => (
-                    <tr key={idx} className="border-b border-border/50">
-                      <td className="py-2 capitalize">{(line.category ?? '').replace(/_/g, ' ')}</td>
-                      <td className="py-2 text-right">{formatCurrency(line.projectedMonthly ?? 0)}</td>
-                      <td className="py-2 text-right">{formatCurrency(line.actualMonthly ?? 0)}</td>
-                      <td className={`py-2 text-right ${(line.variancePercent ?? 0) > 0 ? 'text-red-500' : 'text-green-500'}`}>
-                        {(line.variancePercent ?? 0) > 0 ? '+' : ''}{formatPercent(line.variancePercent ?? 0)}
-                      </td>
-                      <td className="py-2 text-right">
-                        <Badge variant={
-                          line.status === 'over_budget' || line.status === 'anomaly' ? 'destructive' :
-                          line.status === 'under_budget' ? 'secondary' : 'outline'
-                        }>
-                          {(line.status ?? 'unknown').replace(/_/g, ' ')}
-                        </Badge>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-          {reconciliationData.narrative && (
-            <p className="text-sm text-muted-foreground">{reconciliationData.narrative}</p>
-          )}
-        </Card>
-      )}
-
-      {/* Run Reconciliation */}
+      {/* Cost Reconciliation */}
       {reconciliationFinopsOutput && (
         <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
-          <h2 className="text-base font-semibold text-foreground mb-4">Run Reconciliation</h2>
           <FinOpsReconciliationTab
             finopsOutput={reconciliationFinopsOutput}
             useCaseId={useCaseId}
+            onReconciled={fetchData}
+            initialData={reconciliationData}
           />
         </Card>
       )}

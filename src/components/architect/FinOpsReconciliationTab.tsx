@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { RefreshCw } from "lucide-react";
 
 function fmt(n: number | null | undefined): string {
   if (n == null) return "\u2014";
@@ -13,23 +15,67 @@ function fmt(n: number | null | undefined): string {
   });
 }
 
+function fmtPct(n: number): string {
+  return n.toFixed(1) + "%";
+}
+
+interface ReconciliationResult {
+  source: string;
+  totalProjected: number;
+  totalActual: number;
+  totalVariancePercent: number;
+  varianceLines: Array<{
+    category: string;
+    projectedMonthly: number;
+    actualMonthly: number;
+    variancePercent: number;
+    status: string;
+  }>;
+  anomalies: Array<{ category: string; variance_percent: number; message: string }>;
+  narrative: string;
+  reconciledAt: string;
+}
+
 interface FinOpsReconciliationTabProps {
   finopsOutput: Record<string, unknown>;
   useCaseId: string;
+  onReconciled?: () => void;
+  initialData?: ReconciliationResult | null;
 }
 
 export function FinOpsReconciliationTab({
   finopsOutput,
   useCaseId,
+  onReconciled,
+  initialData,
 }: FinOpsReconciliationTabProps) {
+  const [data, setData] = useState<ReconciliationResult | null>(initialData ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [tagKey, setTagKey] = useState("");
   const [tagValue, setTagValue] = useState("");
   const [tagSaving, setTagSaving] = useState(false);
   const [tagOpen, setTagOpen] = useState(false);
   const [tagSaved, setTagSaved] = useState(false);
 
-  // Extract projected costs from finopsOutput (uses architect engine output shape)
-  const totalProjected = (finopsOutput?.summaryMonthlyMid ?? finopsOutput?.summary_monthly_mid) as number | undefined;
+  // Sync initialData when it changes (e.g. page refetch)
+  useEffect(() => {
+    if (initialData) setData(initialData);
+  }, [initialData]);
+
+  // Load existing tag config
+  useEffect(() => {
+    fetch(`/api/production/setup?useCaseId=${useCaseId}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((cfg) => {
+        if (cfg?.costAllocationTagKey) setTagKey(cfg.costAllocationTagKey);
+        if (cfg?.costAllocationTagValue) setTagValue(cfg.costAllocationTagValue);
+      })
+      .catch(() => {});
+  }, [useCaseId]);
+
+  // Extract projected costs from finopsOutput
+  const totalProjected = (finopsOutput?.totalMonthlyCost ?? finopsOutput?.summaryMonthlyMid ?? finopsOutput?.summary_monthly_mid) as number | undefined;
   const lineItems = (finopsOutput?.lineItems ?? finopsOutput?.line_items) as Record<string, unknown>[] | undefined;
 
   const projectedLines = (lineItems ?? []).map((item) => ({
@@ -37,80 +83,191 @@ export function FinOpsReconciliationTab({
     value: (item.monthlyCostMid ?? item.monthly_cost_mid) as number | undefined,
   })).filter(l => l.value != null && l.value > 0);
 
+  const runReconciliation = useCallback(async () => {
+    if (!finopsOutput) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/production/finops/reconcile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          useCaseId,
+          finopsOutput,
+          periodDays: 30,
+        }),
+      });
+      if (!res.ok) throw new Error("Reconciliation failed");
+      const result = await res.json();
+      setData(result);
+      onReconciled?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Unknown error");
+    }
+    setLoading(false);
+  }, [finopsOutput, useCaseId, onReconciled]);
+
+  const isConnected = data != null && data.source !== "simulated";
+
   return (
     <div className="space-y-6">
+      {/* Header with title and Run button */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-base font-semibold text-foreground">Cost Reconciliation</h2>
+          {data?.reconciledAt && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              Last reconciled: {new Date(data.reconciledAt).toLocaleString()}
+              {isConnected && <span className="ml-1">· {data.source}</span>}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          {error && <span className="text-sm text-red-500">{error}</span>}
+          <Button onClick={runReconciliation} disabled={loading} size="sm">
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+            {loading ? "Running..." : "Run Reconciliation"}
+          </Button>
+        </div>
+      </div>
+
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
           <p className="text-xs text-gray-500 uppercase tracking-wider">Projected</p>
-          <p className="text-2xl font-bold dark:text-white mt-1">{fmt(totalProjected)}</p>
+          <p className="text-2xl font-bold dark:text-white mt-1">
+            {isConnected ? fmt(data.totalProjected) : fmt(totalProjected)}
+          </p>
         </Card>
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800 border-dashed">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">Actual</p>
-          <p className="text-lg text-gray-400 dark:text-gray-500 mt-1">Pending</p>
-          <p className="text-[10px] text-gray-400 dark:text-gray-600">MCP connection required</p>
-        </Card>
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800 border-dashed">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">Variance</p>
-          <p className="text-lg text-gray-400 dark:text-gray-500 mt-1">Pending</p>
-          <p className="text-[10px] text-gray-400 dark:text-gray-600">MCP connection required</p>
-        </Card>
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800 border-dashed">
-          <p className="text-xs text-gray-500 uppercase tracking-wider">Anomalies</p>
-          <p className="text-lg text-gray-400 dark:text-gray-500 mt-1">Pending</p>
-          <p className="text-[10px] text-gray-400 dark:text-gray-600">MCP connection required</p>
-        </Card>
+        {isConnected ? (
+          <>
+            <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Actual</p>
+              <p className="text-2xl font-bold dark:text-white mt-1">{fmt(data.totalActual)}</p>
+            </Card>
+            <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Variance</p>
+              <p className={`text-2xl font-bold mt-1 ${data.totalVariancePercent > 0 ? "text-red-500" : "text-green-500"}`}>
+                {data.totalVariancePercent > 0 ? "+" : ""}{fmtPct(data.totalVariancePercent)}
+              </p>
+            </Card>
+            <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Anomalies</p>
+              <p className="text-2xl font-bold dark:text-white mt-1">
+                {data.anomalies?.length ?? 0}
+              </p>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Card className="p-4 dark:bg-gray-900 dark:border-gray-800 border-dashed">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Actual</p>
+              <p className="text-lg text-gray-400 dark:text-gray-500 mt-1">Pending</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-600">MCP connection required</p>
+            </Card>
+            <Card className="p-4 dark:bg-gray-900 dark:border-gray-800 border-dashed">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Variance</p>
+              <p className="text-lg text-gray-400 dark:text-gray-500 mt-1">Pending</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-600">MCP connection required</p>
+            </Card>
+            <Card className="p-4 dark:bg-gray-900 dark:border-gray-800 border-dashed">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Anomalies</p>
+              <p className="text-lg text-gray-400 dark:text-gray-500 mt-1">Pending</p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-600">MCP connection required</p>
+            </Card>
+          </>
+        )}
       </div>
 
-      {/* Projected Cost Breakdown */}
-      {projectedLines.length > 0 && (
-        <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
-          <h3 className="text-base font-semibold dark:text-white mb-4">Projected Cost Breakdown</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-gray-500 text-xs uppercase tracking-wider">
-                  <th className="pb-3">Category</th>
-                  <th className="pb-3 text-right">Projected (Monthly)</th>
-                  <th className="pb-3 text-right">Actual</th>
-                  <th className="pb-3 text-right">Status</th>
+      {/* Cost Breakdown Table */}
+      {isConnected && data.varianceLines?.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th className="text-left py-2 font-medium">Category</th>
+                <th className="text-right py-2 font-medium">Projected</th>
+                <th className="text-right py-2 font-medium">Actual</th>
+                <th className="text-right py-2 font-medium">Variance</th>
+                <th className="text-right py-2 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.varianceLines.map((line, i) => (
+                <tr key={i} className="border-b border-border/50">
+                  <td className="py-2 capitalize dark:text-white font-medium">
+                    {(line.category ?? "").replace(/_/g, " ")}
+                  </td>
+                  <td className="py-2 text-right text-muted-foreground">{fmt(line.projectedMonthly)}</td>
+                  <td className="py-2 text-right dark:text-white">{fmt(line.actualMonthly)}</td>
+                  <td className={`py-2 text-right ${(line.variancePercent ?? 0) > 0 ? "text-red-500" : "text-green-500"}`}>
+                    {(line.variancePercent ?? 0) > 0 ? "+" : ""}{fmtPct(line.variancePercent ?? 0)}
+                  </td>
+                  <td className="py-2 text-right">
+                    <Badge variant={
+                      line.status === "over_budget" || line.status === "anomaly" ? "destructive" :
+                      line.status === "under_budget" ? "secondary" : "outline"
+                    }>
+                      {(line.status ?? "unknown").replace(/_/g, " ")}
+                    </Badge>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {projectedLines.map((line, i) => (
-                  <tr key={i} className="border-t border-gray-100 dark:border-gray-800">
-                    <td className="py-3 dark:text-white font-medium">{line.category}</td>
-                    <td className="py-3 text-right text-gray-500">{fmt(line.value)}</td>
-                    <td className="py-3 text-right text-gray-400 dark:text-gray-500 italic">Pending</td>
-                    <td className="py-3 text-right">
-                      <span className="text-xs text-gray-400">awaiting data</span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : projectedLines.length > 0 ? (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-muted-foreground">
+                <th className="text-left py-2 font-medium">Category</th>
+                <th className="text-right py-2 font-medium">Projected (Monthly)</th>
+                <th className="text-right py-2 font-medium">Actual</th>
+                <th className="text-right py-2 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {projectedLines.map((line, i) => (
+                <tr key={i} className="border-b border-border/50">
+                  <td className="py-2 dark:text-white font-medium">{line.category}</td>
+                  <td className="py-2 text-right text-muted-foreground">{fmt(line.value)}</td>
+                  <td className="py-2 text-right text-gray-400 dark:text-gray-500 italic">Pending</td>
+                  <td className="py-2 text-right">
+                    <span className="text-xs text-gray-400">awaiting data</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+
+      {/* Narrative */}
+      {isConnected && data.narrative && (
+        <p className="text-sm text-muted-foreground">{data.narrative}</p>
+      )}
+
+      {/* MCP Connection Banner (only when not connected) */}
+      {!isConnected && (
+        <Card className="p-5 dark:bg-gray-900 border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-950/10">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 text-amber-500 text-lg">&#9888;</div>
+            <div>
+              <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400">Cloud Cost Data Not Connected</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                To view actual costs, variance analysis, anomaly detection, and spend trends, connect your cloud provider via MCP (Model Context Protocol).
+              </p>
+              <div className="mt-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
+                <p>Supported providers: <strong>AWS Cost Explorer</strong>, <strong>Azure Cost Management</strong>, <strong>GCP Billing</strong></p>
+                <p>Once connected, click &quot;Run Reconciliation&quot; to pull actual costs and compare against projections.</p>
+              </div>
+            </div>
           </div>
         </Card>
       )}
 
-      {/* MCP Connection Banner */}
-      <Card className="p-5 dark:bg-gray-900 border-amber-200 dark:border-amber-800/50 bg-amber-50/50 dark:bg-amber-950/10">
-        <div className="flex items-start gap-3">
-          <div className="mt-0.5 text-amber-500 text-lg">&#9888;</div>
-          <div>
-            <h3 className="text-sm font-semibold text-amber-700 dark:text-amber-400">Cloud Cost Data Not Connected</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              To view actual costs, variance analysis, anomaly detection, and spend trends, connect your cloud provider via MCP (Model Context Protocol).
-            </p>
-            <div className="mt-3 space-y-1 text-xs text-gray-500 dark:text-gray-400">
-              <p>Supported providers: <strong>AWS Cost Explorer</strong>, <strong>Azure Cost Management</strong>, <strong>GCP Billing</strong></p>
-              <p>Once connected, this tab will automatically reconcile projected vs. actual costs.</p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* Cost Allocation Tag Configuration — pre-configure before MCP */}
+      {/* Cost Allocation Tag Configuration */}
       <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
         <button
           onClick={() => setTagOpen(!tagOpen)}
@@ -127,7 +284,7 @@ export function FinOpsReconciliationTab({
         {tagOpen && (
           <div className="mt-4 space-y-3">
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Pre-configure your cost allocation tag so reconciliation works automatically once MCP is connected.
+              Pre-configure your cost allocation tag so reconciliation filters costs to this use case.
             </p>
             <div className="grid grid-cols-2 gap-3">
               <div>

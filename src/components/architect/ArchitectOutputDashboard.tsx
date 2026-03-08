@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FinOpsReconciliationTab } from "./FinOpsReconciliationTab";
@@ -55,6 +55,19 @@ export function ArchitectOutputDashboard({
   onBack,
 }: ArchitectOutputDashboardProps) {
   const [tab, setTab] = useState("summary");
+  const [reconciliationData, setReconciliationData] = useState<Record<string, unknown> | null>(null);
+
+  // Fetch latest reconciliation data for the Cost Reconciliation tab
+  const fetchReconciliation = () => {
+    fetch(`/api/production/finops/reconcile/latest/${useCaseId}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data && !data.error) setReconciliationData(data); })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    if (useCaseId) fetchReconciliation();
+  }, [useCaseId]);
 
   if (!output) return <p className="text-gray-500">No output generated yet.</p>;
 
@@ -102,7 +115,12 @@ export function ArchitectOutputDashboard({
       {tab === "threat" && <ThreatTab data={threat} />}
       {tab === "guardrails" && <GuardrailsTab data={guardrails} />}
       {tab === "reconciliation" && (
-        <FinOpsReconciliationTab finopsOutput={finops} useCaseId={useCaseId} />
+        <FinOpsReconciliationTab
+          finopsOutput={finops}
+          useCaseId={useCaseId}
+          initialData={reconciliationData as any}
+          onReconciled={fetchReconciliation}
+        />
       )}
       {tab === "live_evals" && (
         <EvalsMonitoringTab guardrailsOutput={guardrails} useCaseId={useCaseId} />

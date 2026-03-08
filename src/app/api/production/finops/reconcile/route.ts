@@ -85,6 +85,7 @@ export const POST = withAuth(async (request: Request) => {
       },
     });
 
+    console.log("[Reconcile API] source:", result.source, "totalActual:", result.totalActual, "totalProjected:", result.totalProjected);
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
