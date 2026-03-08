@@ -17,21 +17,25 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
+  PointElement,
+  LineElement,
+  Filler,
   Tooltip,
   Legend
 } from "chart.js";
-import { Bar } from 'react-chartjs-2';
+import { Bar, Line } from 'react-chartjs-2';
 import {
   DollarSign,
   TrendingUp,
-  Activity,
   Target,
   ChevronLeft,
   ChevronRight,
-  BarChart3
+  BarChart3,
+  AlertTriangle,
+  Receipt
 } from "lucide-react";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Filler, Tooltip, Legend);
 
 function formatCurrency(num: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -80,6 +84,16 @@ export default function FinOpsDashboardPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [actualSpendKPIs, setActualSpendKPIs] = useState<{
+    totalActualSpend: number;
+    portfolioVariance: number;
+    useCasesOverBudget: number;
+    reconciled: number;
+  } | null>(null);
+  const [portfolioTrend, setPortfolioTrend] = useState<{
+    trend: Array<{ month: string; totalActual: number; totalProjected: number; breakdown: Record<string, number> }>;
+    useCases: Array<{ id: string; title: string; label: string }>;
+  } | null>(null);
 
   // Filtering & Sorting ------------------------------------------------------
   const filteredFinops = useMemo(() => {
@@ -216,13 +230,25 @@ export default function FinOpsDashboardPage() {
         if (!res.ok) throw new Error("Failed to fetch FinOps data");
         const data = await res.json();
         setFinops(data.finops || []);
+        if (data.actualSpendKPIs) setActualSpendKPIs(data.actualSpendKPIs);
       } catch (error) {
         setError('Unable to load financial data.');
       }
       setLoading(false);
     }
 
+    async function fetchTrend() {
+      try {
+        const res = await fetch('/api/finops-dashboard/portfolio-trend');
+        if (res.ok) {
+          const data = await res.json();
+          setPortfolioTrend(data);
+        }
+      } catch { /* non-critical */ }
+    }
+
     fetchData();
+    fetchTrend();
   }, [isReady]);
 
   const handleRowClick = (id: string) =>
@@ -312,6 +338,121 @@ export default function FinOpsDashboardPage() {
               </div>
             </Card>
           </div>
+        )}
+
+        {/* Actual Spend KPIs */}
+        {!loading && !error && actualSpendKPIs && actualSpendKPIs.reconciled > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <Card className="border border-border bg-card rounded-md p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase text-muted-foreground mb-1">
+                    Total Actual Spend
+                  </p>
+                  <p className="text-lg font-semibold">
+                    {formatCurrency(actualSpendKPIs.totalActualSpend)}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {actualSpendKPIs.reconciled} use case{actualSpendKPIs.reconciled !== 1 ? 's' : ''} reconciled
+                  </p>
+                </div>
+                <div className="p-2 bg-muted rounded-md">
+                  <Receipt className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="border border-border bg-card rounded-md p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase text-muted-foreground mb-1">
+                    Portfolio Variance
+                  </p>
+                  <p className={`text-lg font-semibold ${actualSpendKPIs.portfolioVariance > 10 ? 'text-red-600' : actualSpendKPIs.portfolioVariance > 0 ? 'text-amber-600' : 'text-green-600'}`}>
+                    {actualSpendKPIs.portfolioVariance > 0 ? '+' : ''}{actualSpendKPIs.portfolioVariance.toFixed(1)}%
+                  </p>
+                </div>
+                <div className="p-2 bg-muted rounded-md">
+                  <TrendingUp className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="border border-border bg-card rounded-md p-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase text-muted-foreground mb-1">
+                    Over Budget
+                  </p>
+                  <p className={`text-lg font-semibold ${actualSpendKPIs.useCasesOverBudget > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                    {actualSpendKPIs.useCasesOverBudget}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    use case{actualSpendKPIs.useCasesOverBudget !== 1 ? 's' : ''} with &gt;10% variance
+                  </p>
+                </div>
+                <div className="p-2 bg-muted rounded-md">
+                  <AlertTriangle className="w-5 h-5 text-muted-foreground" />
+                </div>
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Portfolio Spend Trend Chart */}
+        {!loading && !error && portfolioTrend && portfolioTrend.trend.length > 1 && (
+          <Card className="p-3 border border-border bg-card rounded-md">
+            <p className="text-sm font-medium mb-2">Portfolio Spend Trend</p>
+            <div className="h-64">
+              <Line
+                data={{
+                  labels: portfolioTrend.trend.map(t => t.month),
+                  datasets: [
+                    {
+                      label: 'Projected',
+                      data: portfolioTrend.trend.map(t => t.totalProjected),
+                      borderColor: 'rgba(100, 116, 139, 0.8)',
+                      borderDash: [6, 4],
+                      backgroundColor: 'transparent',
+                      pointRadius: 3,
+                      borderWidth: 2,
+                      tension: 0.2,
+                    },
+                    {
+                      label: 'Actual',
+                      data: portfolioTrend.trend.map(t => t.totalActual),
+                      borderColor: 'rgba(59, 130, 246, 1)',
+                      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                      fill: true,
+                      pointRadius: 3,
+                      borderWidth: 2,
+                      tension: 0.2,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                      callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: ${formatCurrency(ctx.parsed.y)}`,
+                      },
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        callback: (value) => formatCurrency(Number(value)),
+                      },
+                    },
+                  },
+                }}
+              />
+            </div>
+          </Card>
         )}
 
         {/* Charts */}

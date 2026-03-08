@@ -106,6 +106,13 @@ export default function FinancialDashboard() {
   const [insightsError, setInsightsError] = useState<string | null>(null);
   const [growthOverrides, setGrowthOverrides] = useState<any | null>(null);
   const [reconciliationData, setReconciliationData] = useState<ReconciliationData | null>(null);
+  const [unitEconomics, setUnitEconomics] = useState<{
+    costPerApiCall: number | null;
+    costPerUser: number | null;
+    estimatedApiVolume: number | null;
+    estimatedUsers: number | null;
+    actualSpend: number | null;
+  } | null>(null);
 
   const fetchData = () => {
     if (!useCaseId) return;
@@ -152,6 +159,26 @@ export default function FinancialDashboard() {
       })
       .then(data => {
         if (data && !data.error) setReconciliationData(data);
+      })
+      .catch(() => {});
+
+    // Fetch architect session for unit economics (daily_request_volume, target_users)
+    fetch(`/api/architect/session/${useCaseId}`)
+      .then(res => res.ok ? res.json() : null)
+      .then(session => {
+        if (!session?.enrichedContext) return;
+        const ctx = session.enrichedContext;
+        const dailyRequests = ctx.dailyRequestVolume || ctx.daily_request_volume;
+        const targetUsers = ctx.targetUsers || ctx.target_users;
+        if (dailyRequests || targetUsers) {
+          setUnitEconomics({
+            costPerApiCall: null,
+            costPerUser: null,
+            estimatedApiVolume: dailyRequests ? Number(dailyRequests) * 30 : null,
+            estimatedUsers: targetUsers ? Number(targetUsers) : null,
+            actualSpend: null,
+          });
+        }
       })
       .catch(() => {});
   };
@@ -222,6 +249,24 @@ export default function FinancialDashboard() {
       netValue: last.netValue || 0,
     };
   }, [rows]);
+
+  const computedUnitEconomics = useMemo(() => {
+    if (!unitEconomics) return null;
+    const actualSpend = reconciliationData?.totalActual ?? (baseApiCost + baseInfraCost + baseOpCost);
+    if (!actualSpend) return null;
+
+    return {
+      costPerApiCall: unitEconomics.estimatedApiVolume && unitEconomics.estimatedApiVolume > 0
+        ? actualSpend / unitEconomics.estimatedApiVolume
+        : null,
+      costPerUser: unitEconomics.estimatedUsers && unitEconomics.estimatedUsers > 0
+        ? actualSpend / unitEconomics.estimatedUsers
+        : null,
+      estimatedApiVolume: unitEconomics.estimatedApiVolume,
+      estimatedUsers: unitEconomics.estimatedUsers,
+      actualSpend,
+    };
+  }, [unitEconomics, reconciliationData, baseApiCost, baseInfraCost, baseOpCost]);
 
   const reconciliationFinopsOutput = useMemo(() => {
     if (!baseApiCost && !baseInfraCost && !baseOpCost) return null;
@@ -850,6 +895,48 @@ export default function FinancialDashboard() {
           );
         })()}
       </Card>
+
+      {/* Unit Economics */}
+      {computedUnitEconomics && (
+        <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+          <h2 className="text-base font-semibold text-foreground mb-4">Unit Economics</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {computedUnitEconomics.costPerApiCall != null && (
+              <div className="text-center">
+                <div className="text-2xl font-bold text-foreground">
+                  ${computedUnitEconomics.costPerApiCall < 0.01
+                    ? computedUnitEconomics.costPerApiCall.toFixed(4)
+                    : computedUnitEconomics.costPerApiCall.toFixed(3)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">Cost per API Call</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  ~{(computedUnitEconomics.estimatedApiVolume ?? 0).toLocaleString()} calls/mo
+                </div>
+              </div>
+            )}
+            {computedUnitEconomics.costPerUser != null && (
+              <div className="text-center">
+                <div className="text-2xl font-bold text-foreground">
+                  {formatCurrency(computedUnitEconomics.costPerUser)}
+                </div>
+                <div className="text-sm text-muted-foreground mt-1">Cost per User</div>
+                <div className="text-xs text-muted-foreground mt-0.5">
+                  ~{(computedUnitEconomics.estimatedUsers ?? 0).toLocaleString()} users
+                </div>
+              </div>
+            )}
+            <div className="text-center">
+              <div className="text-2xl font-bold text-foreground">
+                {formatCurrency(computedUnitEconomics.actualSpend)}
+              </div>
+              <div className="text-sm text-muted-foreground mt-1">Monthly Spend</div>
+              <div className="text-xs text-muted-foreground mt-0.5">
+                {reconciliationData ? 'from reconciliation' : 'from projection'}
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Cost Reconciliation */}
       {reconciliationFinopsOutput && (

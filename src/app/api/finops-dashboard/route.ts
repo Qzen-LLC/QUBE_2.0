@@ -73,8 +73,58 @@ export const GET = withAuth(async (request, { auth }) => {
       organizationName: uc.organization?.name || '',
     }));
 
-    // Removed Redis set logic
-    return NextResponse.json({ finops });
+    // Fetch latest reconciliation per use case for actual spend KPIs
+    const useCaseIds = useCases.map(uc => uc.id);
+    let actualSpendKPIs = {
+      totalActualSpend: 0,
+      portfolioVariance: 0,
+      useCasesOverBudget: 0,
+      reconciled: 0,
+    };
+
+    if (useCaseIds.length > 0) {
+      const recentReconciliations = await prismaClient.costReconciliation.findMany({
+        where: { useCaseId: { in: useCaseIds } },
+        orderBy: { reconciledAt: 'desc' },
+        select: {
+          useCaseId: true,
+          totalActual: true,
+          totalProjected: true,
+          totalVariancePercent: true,
+        },
+      });
+
+      // Deduplicate: keep latest per use case
+      const latestByUseCase = new Map<string, typeof recentReconciliations[0]>();
+      for (const rec of recentReconciliations) {
+        if (!latestByUseCase.has(rec.useCaseId)) {
+          latestByUseCase.set(rec.useCaseId, rec);
+        }
+      }
+
+      let totalActual = 0;
+      let weightedVarianceSum = 0;
+      let totalProjectedSum = 0;
+      let overBudgetCount = 0;
+
+      for (const rec of latestByUseCase.values()) {
+        totalActual += rec.totalActual;
+        weightedVarianceSum += rec.totalVariancePercent * rec.totalProjected;
+        totalProjectedSum += rec.totalProjected;
+        if (Math.abs(rec.totalVariancePercent) > 10) overBudgetCount++;
+      }
+
+      actualSpendKPIs = {
+        totalActualSpend: totalActual,
+        portfolioVariance: totalProjectedSum > 0
+          ? Math.round((weightedVarianceSum / totalProjectedSum) * 100) / 100
+          : 0,
+        useCasesOverBudget: overBudgetCount,
+        reconciled: latestByUseCase.size,
+      };
+    }
+
+    return NextResponse.json({ finops, actualSpendKPIs });
   } catch (err) {
     return NextResponse.json({ error: 'Failed to fetch FinOps dashboard data', details: String(err) }, { status: 500 });
   }

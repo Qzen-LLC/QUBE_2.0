@@ -2108,6 +2108,8 @@ model ProductionConfiguration {
   awsCostExplorerEnabled  Boolean  @default(false)
   costAllocationTagKey    String?
   costAllocationTagValue  String?
+  autoReconcile           Boolean  @default(false)
+  reconcileFrequency      String   @default("weekly") // "daily" | "weekly" | "monthly"
   langfuseEnabled         Boolean  @default(false)
   langfuseHost            String?
   langsmithEnabled        Boolean  @default(false)

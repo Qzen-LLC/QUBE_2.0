@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { useUseCases, useDeleteUseCase, type MappedUseCase } from '@/hooks/useUseCases';
+import { DollarSign } from 'lucide-react';
 
 const PAGE_SIZE = 10;
 
@@ -79,6 +80,19 @@ const Dashboard = () => {
   const [pageSize, setPageSize] = useState(PAGE_SIZE);
   const [showTip, setShowTip] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Budget health status
+  const [budgetStatus, setBudgetStatus] = useState<Record<string, { variance: number; status: string; lastReconciled: string }>>({});
+
+  // Fetch budget status for all use cases
+  useEffect(() => {
+    fetch('/api/finops-dashboard/budget-status')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.budgetStatus) setBudgetStatus(data.budgetStatus);
+      })
+      .catch(() => {});
+  }, []);
 
   // Owner editing state
   const [editingOwnerId, setEditingOwnerId] = useState<string | null>(null);
@@ -413,7 +427,7 @@ const Dashboard = () => {
                     ['owner', 'OWNER', 'w-[180px]'],
                     ['stage', 'STAGE', 'w-[160px]'],
                     ['lastUpdated', 'LAST UPDATED', 'w-[150px]'],
-                  ] as [SortKey, string, string][]).map(([key, label, width]) => (
+                  ] as [SortKey, string, string][]).map(([key, label, width]: [SortKey, string, string]) => (
                     <th
                       key={key}
                       className={`px-5 py-3 text-left text-[11px] font-semibold tracking-wider text-muted-foreground uppercase cursor-pointer select-none hover:text-foreground transition-colors ${width}`}
@@ -425,13 +439,16 @@ const Dashboard = () => {
                       </span>
                     </th>
                   ))}
+                  <th className="px-4 py-3 text-left text-[11px] font-semibold tracking-wider text-muted-foreground uppercase w-[120px]">
+                    BUDGET
+                  </th>
                   <th className="px-3 py-3 w-[60px]" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {pagedUseCases.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-5 py-16 text-center">
+                    <td colSpan={8} className="px-5 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <Search className="w-8 h-8 text-muted-foreground/30" />
                         <p className="text-sm text-muted-foreground">No use cases found</p>
@@ -511,6 +528,36 @@ const Dashboard = () => {
                     </td>
                     <td className="px-5 py-3.5 text-sm text-muted-foreground whitespace-nowrap">
                       {formatDate(uc.updatedAt)}
+                    </td>
+                    <td className="px-4 py-3.5 whitespace-nowrap">
+                      {(() => {
+                        const bs = budgetStatus[uc.id];
+                        if (!bs) {
+                          return (
+                            <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/60">
+                              <DollarSign className="w-3 h-3" />
+                              No Data
+                            </span>
+                          );
+                        }
+                        const badgeConfig = bs.status === 'on_budget'
+                          ? { label: 'On Budget', className: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950 dark:text-emerald-300 dark:border-emerald-800' }
+                          : bs.status === 'over_budget'
+                          ? { label: 'Over Budget', className: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800' }
+                          : { label: 'Alert', className: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950 dark:text-red-300 dark:border-red-800' };
+                        return (
+                          <Badge
+                            variant="outline"
+                            className={`text-[11px] font-semibold border cursor-pointer ${badgeConfig.className}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/dashboard/finops-dashboard/${uc.id}`);
+                            }}
+                          >
+                            {badgeConfig.label}
+                          </Badge>
+                        );
+                      })()}
                     </td>
                     <td className="px-3 py-3.5">
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

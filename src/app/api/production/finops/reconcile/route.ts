@@ -3,6 +3,7 @@ import { withAuth } from "@/lib/auth-gateway";
 import { reconcileFinOps } from "@/lib/architect";
 import type { FinOpsOutput } from "@/lib/architect";
 import { prismaClient } from "@/utils/db";
+import { checkAndNotifyFinOpsAnomalies } from "@/lib/notifications/finops-alerts";
 
 export const POST = withAuth(async (request: Request) => {
   try {
@@ -86,6 +87,14 @@ export const POST = withAuth(async (request: Request) => {
     });
 
     console.log("[Reconcile API] source:", result.source, "totalActual:", result.totalActual, "totalProjected:", result.totalProjected);
+
+    // Check for anomalies and create notifications
+    await checkAndNotifyFinOpsAnomalies({
+      useCaseId,
+      totalVariancePercent: result.totalVariancePercent,
+      anomalies: result.anomalies,
+    });
+
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

@@ -5,6 +5,28 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw } from "lucide-react";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Tooltip as ChartTooltip,
+  Legend as ChartLegend,
+  Filler,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ChartTooltip, ChartLegend, Filler);
+
+interface HistoryRecord {
+  id: string;
+  reconciledAt: string;
+  totalProjected: number;
+  totalActual: number;
+  totalVariancePercent: number;
+  source: string;
+}
 
 function fmt(n: number | null | undefined): string {
   if (n == null) return "\u2014";
@@ -58,10 +80,22 @@ export function FinOpsReconciliationTab({
   const [tagOpen, setTagOpen] = useState(false);
   const [tagSaved, setTagSaved] = useState(false);
 
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
+
   // Sync initialData when it changes (e.g. page refetch)
   useEffect(() => {
     if (initialData) setData(initialData);
   }, [initialData]);
+
+  // Fetch reconciliation history for trend chart
+  useEffect(() => {
+    fetch(`/api/production/finops/reconcile/history?useCaseId=${useCaseId}&limit=12`)
+      .then((r) => (r.ok ? r.json() : []))
+      .then((records) => {
+        if (Array.isArray(records)) setHistory(records);
+      })
+      .catch(() => {});
+  }, [useCaseId, data]);
 
   // Load existing tag config
   useEffect(() => {
@@ -242,6 +276,71 @@ export function FinOpsReconciliationTab({
           </table>
         </div>
       ) : null}
+
+      {/* Reconciliation Trend Chart */}
+      {history.length > 1 && (() => {
+        const sorted = [...history].sort(
+          (a, b) => new Date(a.reconciledAt).getTime() - new Date(b.reconciledAt).getTime()
+        );
+        const labels = sorted.map((r) => {
+          const d = new Date(r.reconciledAt);
+          return d.toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+        });
+        return (
+          <Card className="p-4 dark:bg-gray-900 dark:border-gray-800">
+            <p className="text-sm font-semibold mb-3">Projected vs Actual Trend</p>
+            <div style={{ height: 240 }}>
+              <Line
+                data={{
+                  labels,
+                  datasets: [
+                    {
+                      label: "Projected",
+                      data: sorted.map((r) => r.totalProjected),
+                      borderColor: "rgba(100, 116, 139, 0.8)",
+                      borderDash: [6, 4],
+                      backgroundColor: "transparent",
+                      pointRadius: 4,
+                      borderWidth: 2,
+                      tension: 0.2,
+                    },
+                    {
+                      label: "Actual",
+                      data: sorted.map((r) => r.totalActual),
+                      borderColor: "rgba(59, 130, 246, 1)",
+                      backgroundColor: "rgba(59, 130, 246, 0.1)",
+                      fill: true,
+                      pointRadius: 4,
+                      borderWidth: 2,
+                      tension: 0.2,
+                    },
+                  ],
+                }}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: {
+                    legend: { position: "bottom" },
+                    tooltip: {
+                      callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`,
+                      },
+                    },
+                  },
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      ticks: {
+                        callback: (value) => fmt(Number(value)),
+                      },
+                    },
+                  },
+                }}
+              />
+            </div>
+          </Card>
+        );
+      })()}
 
       {/* Narrative */}
       {isConnected && data.narrative && (
