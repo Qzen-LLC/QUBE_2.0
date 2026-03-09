@@ -23,6 +23,10 @@ export const GET = withAuth(async (request: Request, { auth }) => {
         awsCostExplorerEnabled: false,
         langfuseEnabled: false,
         langsmithEnabled: false,
+        mlflowEnabled: false,
+        mlflowTrackingUrl: null,
+        autoReconcile: false,
+        reconcileFrequency: "weekly",
       });
     }
 
@@ -31,7 +35,8 @@ export const GET = withAuth(async (request: Request, { auth }) => {
       configured:
         config.awsCostExplorerEnabled ||
         config.langfuseEnabled ||
-        config.langsmithEnabled,
+        config.langsmithEnabled ||
+        config.mlflowEnabled,
     });
   } catch (error) {
     console.error("Production status error:", error);

@@ -19,6 +19,8 @@ interface ProductionConfig {
   mlflowTrackingUrl: string;
   mlflowAuthUsername: string;
   mlflowAuthPassword: string;
+  autoReconcile: boolean;
+  reconcileFrequency: string;
 }
 
 const DEFAULT_CONFIG: ProductionConfig = {
@@ -32,6 +34,8 @@ const DEFAULT_CONFIG: ProductionConfig = {
   mlflowTrackingUrl: "",
   mlflowAuthUsername: "",
   mlflowAuthPassword: "",
+  autoReconcile: false,
+  reconcileFrequency: "weekly",
 };
 
 export default function ProductionConfigPage() {
@@ -58,6 +62,8 @@ export default function ProductionConfigPage() {
             mlflowTrackingUrl: data.config.mlflowTrackingUrl || "",
             mlflowAuthUsername: data.config.mlflowAuthUsername || "",
             mlflowAuthPassword: data.config.mlflowAuthPassword || "",
+            autoReconcile: data.config.autoReconcile ?? false,
+            reconcileFrequency: data.config.reconcileFrequency || "weekly",
           });
         }
       })
@@ -212,6 +218,43 @@ export default function ProductionConfigPage() {
             >
               Go to Model Discovery →
             </Link>
+          </div>
+        )}
+      </Card>
+
+      {/* Auto-Reconciliation */}
+      <Card className="p-6 dark:bg-gray-900 dark:border-gray-800">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-semibold dark:text-white">Auto-Reconciliation</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Automatically reconcile FinOps costs on a schedule.
+            </p>
+          </div>
+          <Switch
+            checked={config.autoReconcile}
+            onCheckedChange={(checked) =>
+              setConfig((c) => ({ ...c, autoReconcile: checked }))
+            }
+          />
+        </div>
+        {config.autoReconcile && (
+          <div className="space-y-3 pt-2 border-t border-gray-100 dark:border-gray-800">
+            <div className="space-y-1">
+              <Label className="text-sm dark:text-gray-300">Frequency</Label>
+              <select
+                value={config.reconcileFrequency}
+                onChange={(e) => setConfig((c) => ({ ...c, reconcileFrequency: e.target.value }))}
+                className="w-full rounded-md border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm dark:text-gray-200"
+              >
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly (Mondays)</option>
+                <option value="monthly">Monthly (1st)</option>
+              </select>
+            </div>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              Requires a Cloud Scheduler job to trigger the cron endpoint.
+            </p>
           </div>
         )}
       </Card>
