@@ -65,7 +65,7 @@ export function AccordionTrigger({ children }: AccordionTriggerProps) {
   
   return (
     <button
-      className="w-full flex items-center justify-between px-4 py-3 bg-white border rounded shadow-sm hover:bg-gray-50 transition text-left font-medium text-lg"
+      className="w-full flex items-center justify-between px-4 py-3 bg-card border border-border rounded-lg shadow-sm hover:bg-muted/50 transition text-left font-medium text-sm text-foreground"
       aria-expanded={isOpen}
       onClick={handleClick}
       ref={buttonRef}

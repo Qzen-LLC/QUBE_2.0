@@ -1,6 +1,20 @@
 import { callLLMJson } from "./llm-client";
 import type { UseCaseInput, PillarScorecard } from "../models/pillars";
-import type { EnrichedContext, ArchitectureComponent, DataFlow } from "../models/context";
+import type {
+  EnrichedContext,
+  ArchitectureComponent,
+  DataFlow,
+  EncryptionRequirements,
+  ComplianceCostEstimate,
+  BiasTesting,
+  SlaRequirements,
+  StageGate,
+  RemediationItem,
+  IncidentEscalation,
+  AssumptionLogEntry,
+  FollowUpQuestion,
+  ModelAlternative,
+} from "../models/context";
 import {
   CONTEXT_ENRICHMENT_PROMPT,
   PILLAR_SCORING_PROMPT,
@@ -32,6 +46,17 @@ export function matchArchetype(
   return matches.length > 0
     ? matches[0]
     : archetypes[0];
+}
+
+// ── Helpers for sub-object parsing ─────────────────────
+function parseSubObj<T>(raw: unknown, mapper: (r: Record<string, unknown>) => T): T | undefined {
+  if (!raw || typeof raw !== "object") return undefined;
+  return mapper(raw as Record<string, unknown>);
+}
+
+function parseSubArray<T>(raw: unknown, mapper: (r: Record<string, unknown>) => T): T[] | undefined {
+  if (!Array.isArray(raw)) return undefined;
+  return raw.map((item) => mapper(item as Record<string, unknown>));
 }
 
 // ── Stage 3: Context Enrichment ────────────────────────
@@ -104,6 +129,95 @@ export async function enrichContext(
 
   const useCaseId = `uc-${useCase.name.toLowerCase().replace(/\s+/g, "-").slice(0, 30)}`;
 
+  // Parse sub-objects for new fields
+  const encryptionRequirements = parseSubObj<EncryptionRequirements>(
+    tech.encryption_requirements,
+    (r) => ({
+      atRest: r.at_rest as boolean | undefined,
+      inTransit: r.in_transit as boolean | undefined,
+      keyManagement: r.key_management as string | undefined,
+    })
+  );
+
+  const complianceCostEstimateUsd = parseSubObj<ComplianceCostEstimate>(
+    legal.compliance_cost_estimate_usd,
+    (r) => ({
+      setup: r.setup as number | undefined,
+      annual: r.annual as number | undefined,
+    })
+  );
+
+  const biasTesting = parseSubObj<BiasTesting>(
+    resp.bias_testing,
+    (r) => ({
+      required: r.required as boolean | undefined,
+      methodology: r.methodology as string | undefined,
+      frequency: r.frequency as string | undefined,
+    })
+  );
+
+  const slaRequirements = parseSubObj<SlaRequirements>(
+    data.sla_requirements,
+    (r) => ({
+      uptime: r.uptime as string | undefined,
+      latencyP99Ms: r.latency_p99_ms as number | undefined,
+      throughputRps: r.throughput_rps as number | undefined,
+    })
+  );
+
+  const stageGateRequirements = parseSubArray<StageGate>(
+    resp.stage_gate_requirements,
+    (r) => ({
+      gate: r.gate as string | undefined,
+      owner: r.owner as string | undefined,
+      criteria: r.criteria as string | undefined,
+    })
+  );
+
+  const remediationRoadmap = parseSubArray<RemediationItem>(
+    resp.remediation_roadmap,
+    (r) => ({
+      priority: r.priority as string | undefined,
+      action: r.action as string | undefined,
+      owner: r.owner as string | undefined,
+    })
+  );
+
+  const incidentEscalationMatrix = parseSubArray<IncidentEscalation>(
+    data.incident_escalation_matrix,
+    (r) => ({
+      severity: r.severity as string | undefined,
+      escalateTo: r.escalate_to as string | undefined,
+      withinHours: r.within_hours as number | undefined,
+    })
+  );
+
+  const assumptionLog = parseSubArray<AssumptionLogEntry>(
+    enrichedRaw.assumption_log,
+    (r) => ({
+      field: r.field as string | undefined,
+      assumed: r.assumed as string | undefined,
+      risk: r.risk as string | undefined,
+    })
+  );
+
+  const followUpQuestionsRequired = parseSubArray<FollowUpQuestion>(
+    enrichedRaw.follow_up_questions_required,
+    (r) => ({
+      pillar: r.pillar as string | undefined,
+      question: r.question as string | undefined,
+      impact: r.impact as string | undefined,
+    })
+  );
+
+  const modelAlternativeCostDelta = parseSubArray<ModelAlternative>(
+    biz.model_alternative_cost_delta,
+    (r) => ({
+      model: r.model as string | undefined,
+      savingsPercent: r.savings_percent as number | undefined,
+    })
+  );
+
   const context: EnrichedContext = {
     useCaseId,
     useCaseName: useCase.name,
@@ -126,6 +240,15 @@ export async function enrichContext(
       latencyTargetMs: (tech.latency_target_ms as number) ?? 3000,
       orchestrationPattern:
         (tech.orchestration_pattern as string) ?? "simple_chain",
+      // New technical fields
+      hasToolUse: tech.has_tool_use as boolean | undefined,
+      apiSurfaceExposure: tech.api_surface_exposure as string | undefined,
+      multiVendorCount: tech.multi_vendor_count as number | undefined,
+      infrastructureMaturityLevel: tech.infrastructure_maturity_level as string | undefined,
+      networkBoundaryCrossings: tech.network_boundary_crossings as number | undefined,
+      encryptionRequirements,
+      failoverStrategy: tech.failover_strategy as string | undefined,
+      deploymentStrategy: tech.deployment_strategy as string | undefined,
     },
     business: {
       businessOutcome:
@@ -148,6 +271,15 @@ export async function enrichContext(
         (biz.roi_hypothesis as string) ?? useCase.business.roiHypothesis,
       operationalReadinessScore:
         biz.operational_readiness_score as string | undefined,
+      // New business fields
+      costSensitivityLevel: biz.cost_sensitivity_level as string | undefined,
+      budgetCeilingUsdMonthly: biz.budget_ceiling_usd_monthly as number | undefined,
+      scalingProfile: biz.scaling_profile as string | undefined,
+      pilotRecommended: biz.pilot_recommended as boolean | undefined,
+      strategicImportance: biz.strategic_importance as string | undefined,
+      costPerRequestEstimatedUsd: biz.cost_per_request_estimated_usd as number | undefined,
+      costExplosionRiskMultiplier: biz.cost_explosion_risk_multiplier as number | undefined,
+      modelAlternativeCostDelta,
     },
     responsible: {
       decisionImpactLevel:
@@ -162,6 +294,17 @@ export async function enrichContext(
         useCase.responsible.humanOversight,
       affectedPopulation: resp.affected_population as string | undefined,
       fairnessCriteria: resp.fairness_criteria as string | undefined,
+      // New responsible fields
+      guardrailLayersRequired: resp.guardrail_layers_required as string[] | undefined,
+      evalPlatformHint: resp.eval_platform_hint as string | undefined,
+      humanReviewRequired: resp.human_review_required as boolean | undefined,
+      protectedAttributes: resp.protected_attributes as string[] | undefined,
+      fairnessMetricCategories: resp.fairness_metric_categories as string[] | undefined,
+      biasTesting,
+      transparencyObligations: resp.transparency_obligations as string[] | undefined,
+      conditionalApprovalConditions: resp.conditional_approval_conditions as string[] | undefined,
+      stageGateRequirements,
+      remediationRoadmap,
     },
     legal: {
       regulations:
@@ -180,6 +323,17 @@ export async function enrichContext(
         useCase.legal.crossBorderDataFlows,
       liabilityModel: legal.liability_model as string | undefined,
       ipConcerns: legal.ip_concerns as string | undefined,
+      // New legal fields
+      regulatoryBurdenScore: legal.regulatory_burden_score as number | undefined,
+      sensitiveDataFlowExists: legal.sensitive_data_flow_exists as boolean | undefined,
+      euAiActRiskCategory: legal.eu_ai_act_risk_category as string | undefined,
+      auditEnforcementLevel: legal.audit_enforcement_level as string | undefined,
+      complianceCostEstimateUsd,
+      vendorSupplyChainRiskLevel: legal.vendor_supply_chain_risk_level as string | undefined,
+      dataResidencyRequirements: legal.data_residency_requirements as string[] | undefined,
+      authenticationModel: legal.authentication_model as string | undefined,
+      secretsManagementRequired: legal.secrets_management_required as boolean | undefined,
+      zeroTrustRequired: legal.zero_trust_required as boolean | undefined,
     },
     dataReadiness: {
       dataSources:
@@ -206,6 +360,15 @@ export async function enrichContext(
       pipelineMaturity:
         (data.pipeline_maturity as string) ??
         useCase.dataReadiness.pipelineMaturity,
+      // New data readiness fields
+      dataPreparationCritical: data.data_preparation_critical as boolean | undefined,
+      dataFreshnessGuardrailIntervalDays: data.data_freshness_guardrail_interval_days as number | undefined,
+      dataStalenessRisk: data.data_staleness_risk as string | undefined,
+      observabilityRequired: data.observability_required as boolean | undefined,
+      observabilityCostEstimateUsdMonthly: data.observability_cost_estimate_usd_monthly as number | undefined,
+      slaRequirements,
+      incidentEscalationMatrix,
+      periodicReviewCadence: data.periodic_review_cadence as string | undefined,
     },
     overallRiskPosture:
       (enrichedRaw.overall_risk_posture as string) ?? "medium",
@@ -213,6 +376,13 @@ export async function enrichContext(
       (enrichedRaw.estimated_complexity as string) ?? "moderate",
     recommendedTier:
       (enrichedRaw.recommended_tier as string) ?? "tier_2",
+    // New root-level fields
+    readinessBlockers: enrichedRaw.readiness_blockers as string[] | undefined,
+    crossPillarConflicts: enrichedRaw.cross_pillar_conflicts as string[] | undefined,
+    confidenceFactors: enrichedRaw.confidence_factors as Record<string, string> | undefined,
+    assumptionLog,
+    followUpQuestionsRequired,
+    goNoGoRecommendation: enrichedRaw.go_no_go_recommendation as string | undefined,
   };
 
   return context;

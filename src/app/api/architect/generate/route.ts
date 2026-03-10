@@ -146,7 +146,13 @@ export const POST = withAuth(async (request: Request, { auth }) => {
       .replace("{critical_risks}", String(riskOutput.criticalRisks))
       .replace("{threat_posture}", threatOutput.threatPosture)
       .replace("{critical_threats}", String(threatOutput.criticalThreats))
-      .replace("{guardrail_coverage}", String(guardrailsOutput.coverageScore));
+      .replace("{guardrail_coverage}", String(guardrailsOutput.coverageScore))
+      .replace("{go_no_go}", context.goNoGoRecommendation ?? "not_assessed")
+      .replace("{strategic_importance}", context.business.strategicImportance ?? "not_assessed")
+      .replace("{eu_ai_act_category}", context.legal.euAiActRiskCategory ?? "not_classified")
+      .replace("{pilot_recommended}", String(context.business.pilotRecommended ?? false))
+      .replace("{readiness_blockers}", (context.readinessBlockers ?? []).join(", ") || "None")
+      .replace("{conditional_conditions}", (context.responsible.conditionalApprovalConditions ?? []).join(", ") || "None");
 
     const executiveSummary = await callLLM(summaryPrompt, {
       maxTokens: 1024,

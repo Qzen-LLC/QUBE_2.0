@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from '@/components/ui/accordion';
+import { Button } from '@/components/ui/button';
 import type { EnrichedContext, ArchitectureComponent } from '@/lib/architect';
 
 interface EnrichedContextReviewProps {
@@ -25,6 +26,21 @@ const TIER_OPTIONS = ['tier_1', 'tier_2', 'tier_3'] as const;
 const OVERSIGHT_OPTIONS = ['none', 'escalation_only', 'review_before_action', 'always_in_loop'] as const;
 const IMPACT_OPTIONS = ['informational', 'advisory', 'decision_support', 'autonomous'] as const;
 const DATA_CLASSIFICATION_OPTIONS = ['public', 'internal', 'confidential', 'restricted'] as const;
+const EU_AI_ACT_OPTIONS = ['minimal', 'limited', 'high_risk', 'prohibited'] as const;
+const AUDIT_ENFORCEMENT_OPTIONS = ['none', 'periodic', 'continuous', 'critical'] as const;
+const AUTH_MODEL_OPTIONS = ['api_key', 'oauth2', 'saml', 'mfa', 'zero_trust'] as const;
+const VENDOR_RISK_OPTIONS = ['low', 'medium', 'high', 'critical'] as const;
+const GO_NO_GO_OPTIONS = ['go', 'conditional_go', 'no_go'] as const;
+const EVAL_PLATFORM_OPTIONS = ['langfuse', 'langsmith', 'custom', 'none'] as const;
+const STALENESS_RISK_OPTIONS = ['none', 'low', 'medium', 'high'] as const;
+const REVIEW_CADENCE_OPTIONS = ['weekly', 'monthly', 'quarterly', 'annually'] as const;
+const COST_SENSITIVITY_OPTIONS = ['low', 'medium', 'high', 'critical'] as const;
+const SCALING_PROFILE_OPTIONS = ['flat', 'linear', 'exponential'] as const;
+const STRATEGIC_IMPORTANCE_OPTIONS = ['low', 'medium', 'high', 'critical'] as const;
+const MATURITY_OPTIONS = ['nascent', 'developing', 'established', 'advanced'] as const;
+const EXPOSURE_OPTIONS = ['none', 'internal_only', 'partner_api', 'public_api'] as const;
+const FAILOVER_OPTIONS = ['none', 'active_passive', 'active_active', 'multi_region'] as const;
+const DEPLOYMENT_STRATEGY_OPTIONS = ['direct', 'rolling', 'blue_green', 'canary'] as const;
 
 function Badge({ overridden }: { overridden: boolean }) {
   return overridden ? (
@@ -35,6 +51,54 @@ function Badge({ overridden }: { overridden: boolean }) {
     <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
       Inferred
     </span>
+  );
+}
+
+function BooleanBadge({ value }: { value: boolean | null | undefined }) {
+  if (value == null) return <span className="text-xs text-muted-foreground">—</span>;
+  return value ? (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300">Yes</span>
+  ) : (
+    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">No</span>
+  );
+}
+
+function TagList({ tags }: { tags: string[] | null | undefined }) {
+  if (!tags?.length) return <span className="text-xs text-muted-foreground">—</span>;
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {tags.map((tag) => (
+        <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground">
+          {tag}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function MiniTable({ data, columns }: { data: Record<string, unknown>[] | null | undefined; columns: { key: string; label: string }[] }) {
+  if (!data?.length) return <span className="text-xs text-muted-foreground">—</span>;
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-xs">
+        <thead>
+          <tr className="border-b border-border">
+            {columns.map((col) => (
+              <th key={col.key} className="px-2 py-1 text-left font-medium text-muted-foreground">{col.label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((row, i) => (
+            <tr key={i} className="border-b border-border last:border-0">
+              {columns.map((col) => (
+                <td key={col.key} className="px-2 py-1 text-foreground">{String(row[col.key] ?? '—')}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -50,10 +114,27 @@ function FieldRow({
   overrides: FieldOverrides;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 py-2 border-b border-gray-100 dark:border-gray-800 last:border-0">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 py-2 border-b border-border last:border-0">
       <div className="flex items-center min-w-[200px]">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{label}</span>
+        <span className="text-sm font-medium text-foreground">{label}</span>
         <Badge overridden={!!overrides[fieldKey]} />
+      </div>
+      <div className="flex-1">{children}</div>
+    </div>
+  );
+}
+
+function ReadOnlyFieldRow({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 py-2 border-b border-border last:border-0">
+      <div className="flex items-center min-w-[200px]">
+        <span className="text-sm font-medium text-foreground">{label}</span>
       </div>
       <div className="flex-1">{children}</div>
     </div>
@@ -71,7 +152,7 @@ function SelectField({
 }) {
   return (
     <select
-      className="w-full sm:w-auto px-3 py-1.5 text-sm border rounded-md bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+      className="w-full sm:w-auto px-3 py-1.5 text-sm border rounded-md bg-background border-border text-foreground"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     >
@@ -98,7 +179,7 @@ function NumberField({
   return (
     <input
       type="number"
-      className="w-full sm:w-32 px-3 py-1.5 text-sm border rounded-md bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+      className="w-full sm:w-32 px-3 py-1.5 text-sm border rounded-md bg-background border-border text-foreground"
       value={value}
       min={min ?? 0}
       step={step ?? 1}
@@ -111,7 +192,7 @@ function TextField({ value, onChange }: { value: string; onChange: (val: string)
   return (
     <input
       type="text"
-      className="w-full sm:w-64 px-3 py-1.5 text-sm border rounded-md bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
+      className="w-full sm:w-64 px-3 py-1.5 text-sm border rounded-md bg-background border-border text-foreground"
       value={value}
       onChange={(e) => onChange(e.target.value)}
     />
@@ -119,7 +200,19 @@ function TextField({ value, onChange }: { value: string; onChange: (val: string)
 }
 
 function ReadOnlyField({ value }: { value: string }) {
-  return <span className="text-sm text-gray-600 dark:text-gray-400">{value}</span>;
+  return <span className="text-sm text-muted-foreground">{value}</span>;
+}
+
+function ToggleField({ value, onChange }: { value: boolean; onChange: (val: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!value)}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${value ? 'bg-primary' : 'bg-muted'}`}
+    >
+      <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${value ? 'translate-x-6' : 'translate-x-1'}`} />
+    </button>
+  );
 }
 
 function PillarScoreBadge({ score }: { score: string }) {
@@ -133,6 +226,36 @@ function PillarScoreBadge({ score }: { score: string }) {
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${colors[score] || colors.amber}`}>
       {score}
     </span>
+  );
+}
+
+function GoNoGoBadge({ value }: { value: string | null | undefined }) {
+  if (!value) return <span className="text-xs text-muted-foreground">—</span>;
+  const colors: Record<string, string> = {
+    go: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+    conditional_go: 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300',
+    no_go: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+  };
+  return (
+    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${colors[value] || colors.conditional_go}`}>
+      {value.replace(/_/g, ' ').toUpperCase()}
+    </span>
+  );
+}
+
+function BadgedList({ items, color }: { items: string[] | null | undefined; color: 'red' | 'amber' }) {
+  if (!items?.length) return <span className="text-xs text-muted-foreground">None</span>;
+  const cls = color === 'red'
+    ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800'
+    : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800';
+  return (
+    <div className="flex flex-col gap-1">
+      {items.map((item, i) => (
+        <span key={i} className={`inline-flex items-center px-2 py-1 rounded text-xs border ${cls}`}>
+          {item}
+        </span>
+      ))}
+    </div>
   );
 }
 
@@ -162,21 +285,21 @@ function ComponentCard({
 
   if (isEditing) {
     return (
-      <div className="p-3 border-2 border-indigo-400 dark:border-indigo-500 rounded-lg bg-white dark:bg-gray-800 space-y-2">
+      <div className="p-3 border-2 border-primary rounded-lg bg-card space-y-2">
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-[10px] uppercase text-gray-500 dark:text-gray-400">Model / Service</label>
+            <label className="text-[10px] uppercase text-muted-foreground">Model / Service</label>
             <input
-              className="w-full px-2 py-1 text-sm border rounded bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200"
+              className="w-full px-2 py-1 text-sm border rounded bg-background border-border text-foreground"
               value={draft.modelOrService}
               onChange={(e) => setDraft({ ...draft, modelOrService: e.target.value })}
               placeholder="e.g. gpt-4o"
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase text-gray-500 dark:text-gray-400">Provider</label>
+            <label className="text-[10px] uppercase text-muted-foreground">Provider</label>
             <input
-              className="w-full px-2 py-1 text-sm border rounded bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200"
+              className="w-full px-2 py-1 text-sm border rounded bg-background border-border text-foreground"
               value={draft.provider}
               onChange={(e) => setDraft({ ...draft, provider: e.target.value })}
               placeholder="e.g. openai"
@@ -184,9 +307,9 @@ function ComponentCard({
           </div>
         </div>
         <div>
-          <label className="text-[10px] uppercase text-gray-500 dark:text-gray-400">Type</label>
+          <label className="text-[10px] uppercase text-muted-foreground">Type</label>
           <select
-            className="w-full px-2 py-1 text-sm border rounded bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200"
+            className="w-full px-2 py-1 text-sm border rounded bg-background border-border text-foreground"
             value={draft.type}
             onChange={(e) => setDraft({ ...draft, type: e.target.value })}
           >
@@ -197,10 +320,10 @@ function ComponentCard({
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-[10px] uppercase text-gray-500 dark:text-gray-400">$/M input tokens</label>
+            <label className="text-[10px] uppercase text-muted-foreground">$/M input tokens</label>
             <input
               type="number"
-              className="w-full px-2 py-1 text-sm border rounded bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200"
+              className="w-full px-2 py-1 text-sm border rounded bg-background border-border text-foreground"
               value={draft.pricing.inputPerMtok ?? ''}
               onChange={(e) => setDraft({ ...draft, pricing: { ...draft.pricing, inputPerMtok: e.target.value ? Number(e.target.value) : null } })}
               placeholder="—"
@@ -208,10 +331,10 @@ function ComponentCard({
             />
           </div>
           <div>
-            <label className="text-[10px] uppercase text-gray-500 dark:text-gray-400">$/M output tokens</label>
+            <label className="text-[10px] uppercase text-muted-foreground">$/M output tokens</label>
             <input
               type="number"
-              className="w-full px-2 py-1 text-sm border rounded bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200"
+              className="w-full px-2 py-1 text-sm border rounded bg-background border-border text-foreground"
               value={draft.pricing.outputPerMtok ?? ''}
               onChange={(e) => setDraft({ ...draft, pricing: { ...draft.pricing, outputPerMtok: e.target.value ? Number(e.target.value) : null } })}
               placeholder="—"
@@ -220,17 +343,17 @@ function ComponentCard({
           </div>
         </div>
         <div>
-          <label className="text-[10px] uppercase text-gray-500 dark:text-gray-400">Monthly base ($)</label>
+          <label className="text-[10px] uppercase text-muted-foreground">Monthly base ($)</label>
           <input
             type="number"
-            className="w-full px-2 py-1 text-sm border rounded bg-white dark:bg-gray-900 dark:border-gray-700 dark:text-gray-200"
+            className="w-full px-2 py-1 text-sm border rounded bg-background border-border text-foreground"
             value={draft.pricing.monthlyBase ?? ''}
             onChange={(e) => setDraft({ ...draft, pricing: { ...draft.pricing, monthlyBase: e.target.value ? Number(e.target.value) : null } })}
             placeholder="—"
             step="1"
           />
         </div>
-        <div className="flex items-center justify-between pt-1 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between pt-1 border-t border-border">
           <button
             type="button"
             onClick={onRemove}
@@ -242,7 +365,7 @@ function ComponentCard({
             <button
               type="button"
               onClick={onCancel}
-              className="text-xs px-2.5 py-1 rounded border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="text-xs px-2.5 py-1 rounded border border-border text-muted-foreground hover:bg-muted"
             >
               Cancel
             </button>
@@ -261,24 +384,24 @@ function ComponentCard({
 
   return (
     <div
-      className="p-3 border rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-500 transition group relative"
+      className="p-3 border rounded-lg bg-muted/50 border-border cursor-pointer hover:border-primary transition group relative"
       onClick={onStartEdit}
       title="Click to edit"
     >
-      <div className="font-medium text-sm text-gray-900 dark:text-white">
+      <div className="font-medium text-sm text-foreground">
         {component.modelOrService || '(unnamed)'}
       </div>
-      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+      <div className="text-xs text-muted-foreground mt-0.5">
         {component.provider || '—'} &middot; {component.type}
       </div>
       {(component.pricing.inputPerMtok != null || component.pricing.monthlyBase != null) && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div className="text-xs text-muted-foreground mt-1">
           {component.pricing.inputPerMtok != null && `$${component.pricing.inputPerMtok}/M input`}
           {component.pricing.outputPerMtok != null && ` · $${component.pricing.outputPerMtok}/M output`}
           {component.pricing.monthlyBase != null && `$${component.pricing.monthlyBase}/mo`}
         </div>
       )}
-      <span className="absolute top-2 right-2 text-[10px] text-gray-400 dark:text-gray-500 opacity-0 group-hover:opacity-100 transition">
+      <span className="absolute top-2 right-2 text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition">
         edit
       </span>
     </div>
@@ -326,18 +449,17 @@ export function EnrichedContextReview({
   const scores = pillarScores as Record<string, { score?: string; rationale?: string }>;
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Review Inferred Parameters
-          </h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            The AI has analyzed your inputs and inferred the following parameters.
-            Review and optionally override any values before generating your full assessment.
-          </p>
-        </div>
+    <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-semibold text-foreground tracking-tight">
+          Review Inferred Parameters
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          The AI has analyzed your inputs and inferred the following parameters.
+          Review and optionally override any values before generating your full assessment.
+        </p>
+      </div>
 
         <Accordion type="single" collapsible>
           {/* Section 1: Architecture & Components */}
@@ -357,7 +479,7 @@ export function EnrichedContextReview({
                 <div className="py-3">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center">
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Components</span>
+                      <span className="text-sm font-medium text-foreground">Components</span>
                       <Badge overridden={!!overrides['components']} />
                     </div>
                     <button
@@ -380,7 +502,7 @@ export function EnrichedContextReview({
                         updateField('technical', 'components', updated, 'components');
                         setEditingComponentId(newComp.id);
                       }}
-                      className="text-xs px-2.5 py-1 rounded border border-dashed border-gray-400 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                      className="text-xs px-2.5 py-1 rounded border border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition"
                     >
                       + Add Component
                     </button>
@@ -408,7 +530,7 @@ export function EnrichedContextReview({
                       />
                     ))}
                     {context.technical.components.length === 0 && (
-                      <div className="text-sm text-gray-400 dark:text-gray-500">No components — click &quot;+ Add Component&quot; to add one</div>
+                      <div className="text-sm text-muted-foreground">No components — click &quot;+ Add Component&quot; to add one</div>
                     )}
                   </div>
                 </div>
@@ -416,7 +538,7 @@ export function EnrichedContextReview({
             </AccordionContent>
           </AccordionItem>
 
-          {/* Section 2: Deployment & Infrastructure */}
+          {/* Section 2: Deployment & Infrastructure (extended) */}
           <AccordionItem value="deployment">
             <AccordionTrigger>Deployment &amp; Infrastructure</AccordionTrigger>
             <AccordionContent>
@@ -448,11 +570,46 @@ export function EnrichedContextReview({
                     step={100}
                   />
                 </FieldRow>
+                <FieldRow label="Failover Strategy" fieldKey="failoverStrategy" overrides={overrides}>
+                  <SelectField
+                    value={context.technical.failoverStrategy ?? 'none'}
+                    options={FAILOVER_OPTIONS}
+                    onChange={(v) => updateField('technical', 'failoverStrategy', v, 'failoverStrategy')}
+                  />
+                </FieldRow>
+                <FieldRow label="Deployment Strategy" fieldKey="deploymentStrategy" overrides={overrides}>
+                  <SelectField
+                    value={context.technical.deploymentStrategy ?? 'rolling'}
+                    options={DEPLOYMENT_STRATEGY_OPTIONS}
+                    onChange={(v) => updateField('technical', 'deploymentStrategy', v, 'deploymentStrategy')}
+                  />
+                </FieldRow>
+                <FieldRow label="Infra Maturity Level" fieldKey="infrastructureMaturityLevel" overrides={overrides}>
+                  <SelectField
+                    value={context.technical.infrastructureMaturityLevel ?? 'developing'}
+                    options={MATURITY_OPTIONS}
+                    onChange={(v) => updateField('technical', 'infrastructureMaturityLevel', v, 'infrastructureMaturityLevel')}
+                  />
+                </FieldRow>
+                <FieldRow label="API Surface Exposure" fieldKey="apiSurfaceExposure" overrides={overrides}>
+                  <SelectField
+                    value={context.technical.apiSurfaceExposure ?? 'internal_only'}
+                    options={EXPOSURE_OPTIONS}
+                    onChange={(v) => updateField('technical', 'apiSurfaceExposure', v, 'apiSurfaceExposure')}
+                  />
+                </FieldRow>
+                <FieldRow label="Multi-Vendor Count" fieldKey="multiVendorCount" overrides={overrides}>
+                  <NumberField
+                    value={context.technical.multiVendorCount ?? 1}
+                    onChange={(v) => updateField('technical', 'multiVendorCount', v, 'multiVendorCount')}
+                    min={0}
+                  />
+                </FieldRow>
               </div>
             </AccordionContent>
           </AccordionItem>
 
-          {/* Section 3: Traffic & Cost Estimates */}
+          {/* Section 3: Traffic & Cost Estimates (extended) */}
           <AccordionItem value="traffic">
             <AccordionTrigger>Traffic &amp; Cost Estimates</AccordionTrigger>
             <AccordionContent>
@@ -486,6 +643,57 @@ export function EnrichedContextReview({
                     step={0.01}
                   />
                 </FieldRow>
+                <FieldRow label="Cost Sensitivity" fieldKey="costSensitivityLevel" overrides={overrides}>
+                  <SelectField
+                    value={context.business.costSensitivityLevel ?? 'medium'}
+                    options={COST_SENSITIVITY_OPTIONS}
+                    onChange={(v) => updateField('business', 'costSensitivityLevel', v, 'costSensitivityLevel')}
+                  />
+                </FieldRow>
+                <FieldRow label="Budget Ceiling ($/mo)" fieldKey="budgetCeilingUsdMonthly" overrides={overrides}>
+                  <NumberField
+                    value={context.business.budgetCeilingUsdMonthly ?? 0}
+                    onChange={(v) => updateField('business', 'budgetCeilingUsdMonthly', v || null, 'budgetCeilingUsdMonthly')}
+                    min={0}
+                    step={100}
+                  />
+                </FieldRow>
+                <FieldRow label="Scaling Profile" fieldKey="scalingProfile" overrides={overrides}>
+                  <SelectField
+                    value={context.business.scalingProfile ?? 'linear'}
+                    options={SCALING_PROFILE_OPTIONS}
+                    onChange={(v) => updateField('business', 'scalingProfile', v, 'scalingProfile')}
+                  />
+                </FieldRow>
+                <FieldRow label="Strategic Importance" fieldKey="strategicImportance" overrides={overrides}>
+                  <SelectField
+                    value={context.business.strategicImportance ?? 'medium'}
+                    options={STRATEGIC_IMPORTANCE_OPTIONS}
+                    onChange={(v) => updateField('business', 'strategicImportance', v, 'strategicImportance')}
+                  />
+                </FieldRow>
+                <FieldRow label="Pilot Recommended" fieldKey="pilotRecommended" overrides={overrides}>
+                  <ToggleField
+                    value={context.business.pilotRecommended ?? false}
+                    onChange={(v) => updateField('business', 'pilotRecommended', v, 'pilotRecommended')}
+                  />
+                </FieldRow>
+                {context.business.costPerRequestEstimatedUsd != null && (
+                  <ReadOnlyFieldRow label="Est. Cost/Request">
+                    <ReadOnlyField value={`$${context.business.costPerRequestEstimatedUsd.toFixed(4)}`} />
+                  </ReadOnlyFieldRow>
+                )}
+                {context.business.modelAlternativeCostDelta?.length ? (
+                  <ReadOnlyFieldRow label="Model Alternatives">
+                    <MiniTable
+                      data={context.business.modelAlternativeCostDelta as unknown as Record<string, unknown>[]}
+                      columns={[
+                        { key: 'model', label: 'Model' },
+                        { key: 'savingsPercent', label: 'Savings %' },
+                      ]}
+                    />
+                  </ReadOnlyFieldRow>
+                ) : null}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -527,7 +735,206 @@ export function EnrichedContextReview({
             </AccordionContent>
           </AccordionItem>
 
-          {/* Section 5: Assessment Summary (read-only) */}
+          {/* Section 5: Security & Compliance (NEW) */}
+          <AccordionItem value="security">
+            <AccordionTrigger>Security &amp; Compliance</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-1 px-4">
+                <FieldRow label="EU AI Act Category" fieldKey="euAiActRiskCategory" overrides={overrides}>
+                  <SelectField
+                    value={context.legal.euAiActRiskCategory ?? 'minimal'}
+                    options={EU_AI_ACT_OPTIONS}
+                    onChange={(v) => updateField('legal', 'euAiActRiskCategory', v, 'euAiActRiskCategory')}
+                  />
+                </FieldRow>
+                <FieldRow label="Regulatory Burden (1-10)" fieldKey="regulatoryBurdenScore" overrides={overrides}>
+                  <NumberField
+                    value={context.legal.regulatoryBurdenScore ?? 1}
+                    onChange={(v) => updateField('legal', 'regulatoryBurdenScore', v, 'regulatoryBurdenScore')}
+                    min={1}
+                    step={1}
+                  />
+                </FieldRow>
+                <FieldRow label="Audit Enforcement" fieldKey="auditEnforcementLevel" overrides={overrides}>
+                  <SelectField
+                    value={context.legal.auditEnforcementLevel ?? 'none'}
+                    options={AUDIT_ENFORCEMENT_OPTIONS}
+                    onChange={(v) => updateField('legal', 'auditEnforcementLevel', v, 'auditEnforcementLevel')}
+                  />
+                </FieldRow>
+                <FieldRow label="Authentication Model" fieldKey="authenticationModel" overrides={overrides}>
+                  <SelectField
+                    value={context.legal.authenticationModel ?? 'api_key'}
+                    options={AUTH_MODEL_OPTIONS}
+                    onChange={(v) => updateField('legal', 'authenticationModel', v, 'authenticationModel')}
+                  />
+                </FieldRow>
+                <FieldRow label="Zero Trust Required" fieldKey="zeroTrustRequired" overrides={overrides}>
+                  <ToggleField
+                    value={context.legal.zeroTrustRequired ?? false}
+                    onChange={(v) => updateField('legal', 'zeroTrustRequired', v, 'zeroTrustRequired')}
+                  />
+                </FieldRow>
+                <FieldRow label="Secrets Mgmt Required" fieldKey="secretsManagementRequired" overrides={overrides}>
+                  <ToggleField
+                    value={context.legal.secretsManagementRequired ?? false}
+                    onChange={(v) => updateField('legal', 'secretsManagementRequired', v, 'secretsManagementRequired')}
+                  />
+                </FieldRow>
+                <FieldRow label="Vendor Supply Chain Risk" fieldKey="vendorSupplyChainRiskLevel" overrides={overrides}>
+                  <SelectField
+                    value={context.legal.vendorSupplyChainRiskLevel ?? 'low'}
+                    options={VENDOR_RISK_OPTIONS}
+                    onChange={(v) => updateField('legal', 'vendorSupplyChainRiskLevel', v, 'vendorSupplyChainRiskLevel')}
+                  />
+                </FieldRow>
+                <ReadOnlyFieldRow label="Data Residency">
+                  <TagList tags={context.legal.dataResidencyRequirements} />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Sensitive Data Flow">
+                  <BooleanBadge value={context.legal.sensitiveDataFlowExists} />
+                </ReadOnlyFieldRow>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Section 6: Safety & Governance (NEW) */}
+          <AccordionItem value="safety">
+            <AccordionTrigger>Safety &amp; Governance</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-1 px-4">
+                <FieldRow label="Go/No-Go" fieldKey="goNoGoRecommendation" overrides={overrides}>
+                  <div className="flex items-center gap-3">
+                    <GoNoGoBadge value={context.goNoGoRecommendation} />
+                    <SelectField
+                      value={context.goNoGoRecommendation ?? 'conditional_go'}
+                      options={GO_NO_GO_OPTIONS}
+                      onChange={(v) => updateTopLevel('goNoGoRecommendation', v, 'goNoGoRecommendation')}
+                    />
+                  </div>
+                </FieldRow>
+                <ReadOnlyFieldRow label="Guardrail Layers">
+                  <TagList tags={context.responsible.guardrailLayersRequired} />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Human Review Required">
+                  <BooleanBadge value={context.responsible.humanReviewRequired} />
+                </ReadOnlyFieldRow>
+                <FieldRow label="Eval Platform" fieldKey="evalPlatformHint" overrides={overrides}>
+                  <SelectField
+                    value={context.responsible.evalPlatformHint ?? 'none'}
+                    options={EVAL_PLATFORM_OPTIONS}
+                    onChange={(v) => updateField('responsible', 'evalPlatformHint', v, 'evalPlatformHint')}
+                  />
+                </FieldRow>
+                <ReadOnlyFieldRow label="Approval Conditions">
+                  {context.responsible.conditionalApprovalConditions?.length ? (
+                    <ul className="text-sm text-muted-foreground list-disc list-inside">
+                      {context.responsible.conditionalApprovalConditions.map((c, i) => <li key={i}>{c}</li>)}
+                    </ul>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Protected Attributes">
+                  <TagList tags={context.responsible.protectedAttributes} />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Transparency Obligations">
+                  {context.responsible.transparencyObligations?.length ? (
+                    <ul className="text-sm text-muted-foreground list-disc list-inside">
+                      {context.responsible.transparencyObligations.map((o, i) => <li key={i}>{o}</li>)}
+                    </ul>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Stage Gates">
+                  <MiniTable
+                    data={context.responsible.stageGateRequirements as unknown as Record<string, unknown>[] | undefined}
+                    columns={[
+                      { key: 'gate', label: 'Gate' },
+                      { key: 'owner', label: 'Owner' },
+                      { key: 'criteria', label: 'Criteria' },
+                    ]}
+                  />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Remediation Roadmap">
+                  <MiniTable
+                    data={context.responsible.remediationRoadmap as unknown as Record<string, unknown>[] | undefined}
+                    columns={[
+                      { key: 'priority', label: 'Priority' },
+                      { key: 'action', label: 'Action' },
+                      { key: 'owner', label: 'Owner' },
+                    ]}
+                  />
+                </ReadOnlyFieldRow>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Section 7: Readiness & Quality (NEW) */}
+          <AccordionItem value="readiness">
+            <AccordionTrigger>Readiness &amp; Quality</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-1 px-4">
+                <ReadOnlyFieldRow label="Readiness Blockers">
+                  <BadgedList items={context.readinessBlockers} color="red" />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Cross-Pillar Conflicts">
+                  <BadgedList items={context.crossPillarConflicts} color="amber" />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Assumption Log">
+                  <MiniTable
+                    data={context.assumptionLog as unknown as Record<string, unknown>[] | undefined}
+                    columns={[
+                      { key: 'field', label: 'Field' },
+                      { key: 'assumed', label: 'Assumed Value' },
+                      { key: 'risk', label: 'Risk if Wrong' },
+                    ]}
+                  />
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Follow-Up Questions">
+                  {context.followUpQuestionsRequired?.length ? (
+                    <div className="space-y-1">
+                      {context.followUpQuestionsRequired.map((q, i) => (
+                        <div key={i} className="text-sm text-muted-foreground">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground mr-1.5">{q.pillar}</span>
+                          {q.question}
+                          {q.impact && <span className="text-xs ml-1 text-muted-foreground">(impact: {q.impact})</span>}
+                        </div>
+                      ))}
+                    </div>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </ReadOnlyFieldRow>
+                <ReadOnlyFieldRow label="Confidence Factors">
+                  {context.confidenceFactors ? (
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(context.confidenceFactors).map(([pillar, level]) => (
+                        <div key={pillar} className="flex items-center gap-1.5">
+                          <span className="text-xs text-muted-foreground capitalize">{pillar.replace(/_/g, ' ')}:</span>
+                          <PillarScoreBadge score={level === 'high' ? 'green' : level === 'low' ? 'red' : 'amber'} />
+                        </div>
+                      ))}
+                    </div>
+                  ) : <span className="text-xs text-muted-foreground">—</span>}
+                </ReadOnlyFieldRow>
+                <FieldRow label="Review Cadence" fieldKey="periodicReviewCadence" overrides={overrides}>
+                  <SelectField
+                    value={context.dataReadiness.periodicReviewCadence ?? 'quarterly'}
+                    options={REVIEW_CADENCE_OPTIONS}
+                    onChange={(v) => updateField('dataReadiness', 'periodicReviewCadence', v, 'periodicReviewCadence')}
+                  />
+                </FieldRow>
+                <ReadOnlyFieldRow label="Observability Required">
+                  <BooleanBadge value={context.dataReadiness.observabilityRequired} />
+                </ReadOnlyFieldRow>
+                <FieldRow label="Data Staleness Risk" fieldKey="dataStalenessRisk" overrides={overrides}>
+                  <SelectField
+                    value={context.dataReadiness.dataStalenessRisk ?? 'low'}
+                    options={STALENESS_RISK_OPTIONS}
+                    onChange={(v) => updateField('dataReadiness', 'dataStalenessRisk', v, 'dataStalenessRisk')}
+                  />
+                </FieldRow>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Section 8: Assessment Summary (read-only) */}
           <AccordionItem value="summary">
             <AccordionTrigger>Assessment Summary</AccordionTrigger>
             <AccordionContent>
@@ -543,15 +950,15 @@ export function EnrichedContextReview({
                 </FieldRow>
 
                 {/* Pillar Scores */}
-                <div className="py-3 border-b border-gray-100 dark:border-gray-800">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Pillar Scores</span>
+                <div className="py-3 border-b border-border">
+                  <span className="text-sm font-medium text-foreground">Pillar Scores</span>
                   <div className="flex flex-wrap gap-3 mt-2">
                     {(['technical', 'business', 'responsible', 'legal', 'data_readiness'] as const).map((pillar) => {
                       const s = scores[pillar];
                       const displayName = pillar.replace(/_/g, ' ');
                       return (
                         <div key={pillar} className="flex items-center gap-1.5">
-                          <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{displayName}:</span>
+                          <span className="text-xs text-muted-foreground capitalize">{displayName}:</span>
                           <PillarScoreBadge score={s?.score ?? 'amber'} />
                         </div>
                       );
@@ -561,13 +968,13 @@ export function EnrichedContextReview({
 
                 {/* Bias Risk Factors */}
                 {context.responsible.biasRiskFactors.length > 0 && (
-                  <div className="py-3 border-b border-gray-100 dark:border-gray-800">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Bias Risk Factors</span>
+                  <div className="py-3 border-b border-border">
+                    <span className="text-sm font-medium text-foreground">Bias Risk Factors</span>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {context.responsible.biasRiskFactors.map((factor) => (
                         <span
                           key={factor}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground"
                         >
                           {factor}
                         </span>
@@ -579,12 +986,12 @@ export function EnrichedContextReview({
                 {/* Regulations */}
                 {context.legal.regulations.length > 0 && (
                   <div className="py-3">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Regulations</span>
+                    <span className="text-sm font-medium text-foreground">Regulations</span>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {context.legal.regulations.map((reg) => (
                         <span
                           key={reg}
-                          className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                          className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-muted text-muted-foreground"
                         >
                           {reg}
                         </span>
@@ -598,32 +1005,21 @@ export function EnrichedContextReview({
         </Accordion>
 
         {/* Action Buttons */}
-        <div className="mt-8 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={onBack}
-            disabled={loading}
-            className="px-5 py-2.5 text-sm font-medium border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition disabled:opacity-50"
-          >
+        <div className="flex items-center justify-between">
+          <Button variant="outline" onClick={onBack} disabled={loading}>
             Back to Wizard
-          </button>
-          <button
-            type="button"
-            onClick={() => onConfirm(context)}
-            disabled={loading}
-            className="px-6 py-2.5 text-sm font-medium text-white rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Generating...' : 'Confirm & Generate'}
-          </button>
-        </div>
-
-        {/* Override count */}
-        {Object.keys(overrides).length > 0 && (
-          <div className="mt-3 text-right text-xs text-gray-500 dark:text-gray-400">
-            {Object.keys(overrides).length} field{Object.keys(overrides).length !== 1 ? 's' : ''} overridden
+          </Button>
+          <div className="flex items-center gap-3">
+            {Object.keys(overrides).length > 0 && (
+              <span className="text-xs text-muted-foreground">
+                {Object.keys(overrides).length} field{Object.keys(overrides).length !== 1 ? 's' : ''} overridden
+              </span>
+            )}
+            <Button onClick={() => onConfirm(context)} disabled={loading}>
+              {loading ? 'Generating...' : 'Confirm & Generate'}
+            </Button>
           </div>
-        )}
+        </div>
       </div>
-    </div>
   );
 }

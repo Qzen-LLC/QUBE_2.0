@@ -10,6 +10,25 @@ layered guardrail framework with evaluation metrics.
 ## Identified Risks
 {risks_json}
 
+## Key Context Signals — Use These to Drive Guardrail Design
+
+- **hasToolUse**: If true, MUST generate guardrails for agent_tool (tool input validation, output sanitization), agent_reasoning (chain-of-thought monitoring), agent_autonomy (action boundary enforcement), and agent_cascade (multi-step failure detection, circuit breakers).
+- **guardrailLayersRequired**: Each listed layer MUST have at least one guardrail. This is the minimum set.
+- **evalPlatformHint**: Tailor measurement_approach to the platform — "langfuse" = use LangFuse traces/scores, "langsmith" = use LangSmith datasets/evaluators, "custom" = define custom metrics.
+- **humanReviewRequired**: If true, generate human-in-the-loop (HITL) guardrails with specific trigger conditions and review workflows.
+- **protectedAttributes**: For each attribute, generate a bias detection guardrail that monitors for discrimination.
+- **fairnessMetricCategories**: Use these as eval metrics (e.g., demographic_parity → measure output distribution across groups).
+- **biasTesting**: If required, generate bias testing guardrails with the specified methodology and frequency.
+- **euAiActRiskCategory**: If "high_risk", generate conformity assessment guardrails (documentation, human oversight, accuracy monitoring). If "limited", generate transparency guardrails.
+- **auditEnforcementLevel**: If "critical", generate immutable audit trail guardrails. If "continuous", generate real-time audit logging.
+- **dataFreshnessGuardrailIntervalDays**: Generate a staleness detection guardrail that alerts when data exceeds this interval.
+- **slaRequirements**: Generate SLA monitoring guardrails for uptime, latency P99, and throughput targets.
+- **periodicReviewCadence**: Generate periodic review trigger guardrails at the specified cadence.
+- **deploymentStrategy**: If "canary" or "blue_green", generate rollback guardrails (automatic rollback on error rate threshold). If "rolling", generate gradual rollout monitoring.
+- **encryptionRequirements**: If encryption is required, generate data protection guardrails for at-rest and in-transit encryption verification.
+- **transparencyObligations**: For each obligation, generate a transparency guardrail (e.g., AI disclosure, decision explanation).
+- **conditionalApprovalConditions**: Each condition should map to a guardrail that verifies the condition is met before allowing progression.
+
 ## Instructions
 For each threat **and each high/critical risk**, recommend guardrails. Layer them: input, retrieval, generation, agent_tool, agent_reasoning, agent_autonomy, agent_cascade, observability.
 Also define evaluation metrics for each layer.

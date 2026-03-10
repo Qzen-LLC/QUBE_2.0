@@ -195,6 +195,58 @@ function calcDataPrepCosts(ctx: EnrichedContext): CostLineItem | null {
   };
 }
 
+function calcObservabilityCosts(ctx: EnrichedContext): CostLineItem | null {
+  if (!ctx.dataReadiness.observabilityRequired) return null;
+
+  const monthlyCost =
+    ctx.dataReadiness.observabilityCostEstimateUsdMonthly ??
+    (ctx.business.dailyRequests > 10000 ? 300 : ctx.business.dailyRequests > 1000 ? 150 : 50);
+
+  return {
+    category: "observability",
+    description: `Observability: logging, tracing, and monitoring (${ctx.responsible.evalPlatformHint ?? "custom"})`,
+    monthlyCostLow: monthlyCost * 0.7,
+    monthlyCostMid: monthlyCost,
+    monthlyCostHigh: monthlyCost * 1.3,
+    unit: "USD/month",
+    calculationBasis: `Observability platform costs for ${(ctx.business.dailyRequests * 30).toLocaleString()} monthly requests with trace retention`,
+    sourcePillar: "data_readiness + responsible",
+  };
+}
+
+function calcComplianceCosts(ctx: EnrichedContext): { monthly: CostLineItem | null; oneTime: CostLineItem | null } {
+  const estimate = ctx.legal.complianceCostEstimateUsd;
+  if (!estimate) return { monthly: null, oneTime: null };
+
+  const monthlyItem: CostLineItem | null = estimate.annual
+    ? {
+        category: "compliance",
+        description: `Compliance: annual regulatory maintenance (${ctx.legal.euAiActRiskCategory ?? "standard"})`,
+        monthlyCostLow: (estimate.annual / 12) * 0.8,
+        monthlyCostMid: estimate.annual / 12,
+        monthlyCostHigh: (estimate.annual / 12) * 1.3,
+        unit: "USD/month",
+        calculationBasis: `Annual compliance cost $${estimate.annual.toLocaleString()} / 12 months`,
+        sourcePillar: "legal",
+      }
+    : null;
+
+  const oneTimeItem: CostLineItem | null = estimate.setup
+    ? {
+        category: "compliance_setup",
+        description: `Compliance setup: initial certification and audit preparation`,
+        monthlyCostLow: 0,
+        monthlyCostMid: 0,
+        monthlyCostHigh: 0,
+        unit: "USD (one-time)",
+        calculationBasis: `One-time compliance setup cost: $${estimate.setup.toLocaleString()}`,
+        sourcePillar: "legal",
+      }
+    : null;
+
+  return { monthly: monthlyItem, oneTime: oneTimeItem };
+}
+
 async function generateNarrative(
   ctx: EnrichedContext,
   lineItems: CostLineItem[],
@@ -207,8 +259,21 @@ async function generateNarrative(
     )
     .join("\n");
 
-  const projected12m =
-    totalMid * Math.pow(1 + ctx.business.growthRateMonthly, 12);
+  const growthFactor = ctx.business.scalingProfile === "flat"
+    ? 1.0
+    : ctx.business.scalingProfile === "exponential"
+    ? Math.pow(1 + ctx.business.growthRateMonthly * 1.5, 12)
+    : Math.pow(1 + ctx.business.growthRateMonthly, 12);
+
+  const projected12m = totalMid * growthFactor;
+
+  const budgetNote = ctx.business.budgetCeilingUsdMonthly
+    ? `\nBudget ceiling: $${ctx.business.budgetCeilingUsdMonthly.toLocaleString()}/month${totalMid > ctx.business.budgetCeilingUsdMonthly ? " — WARNING: estimate exceeds budget" : ""}`
+    : "";
+
+  const alternativesNote = ctx.business.modelAlternativeCostDelta?.length
+    ? `\nModel alternatives: ${ctx.business.modelAlternativeCostDelta.map((a) => `${a.model ?? "unknown"} (${a.savingsPercent ?? 0}% savings)`).join(", ")}`
+    : "";
 
   const prompt = `Write a 2-paragraph FinOps narrative for this Gen AI use case.
 
@@ -219,8 +284,8 @@ Total estimated monthly cost: $${totalMid.toLocaleString(undefined, { maximumFra
 Cost breakdown:
 ${itemsSummary}
 
-Growth rate: ${(ctx.business.growthRateMonthly * 100).toFixed(0)}% monthly
-12-month projected cost: $${projected12m.toLocaleString(undefined, { maximumFractionDigits: 0 })}/month
+Growth rate: ${(ctx.business.growthRateMonthly * 100).toFixed(0)}% monthly (${ctx.business.scalingProfile ?? "linear"} profile)
+12-month projected cost: $${projected12m.toLocaleString(undefined, { maximumFractionDigits: 0 })}/month${budgetNote}${alternativesNote}
 
 Focus on: key cost drivers, scaling implications, and optimization opportunities.
 Keep it under 150 words. Be direct and specific.`;
@@ -243,18 +308,35 @@ export async function generateFinOps(
 
   lineItems.push(calcInfrastructureCosts(ctx));
 
+  // New: observability costs
+  const obsCosts = calcObservabilityCosts(ctx);
+  if (obsCosts) lineItems.push(obsCosts);
+
+  // New: compliance costs
+  const complianceCosts = calcComplianceCosts(ctx);
+  if (complianceCosts.monthly) lineItems.push(complianceCosts.monthly);
+
   const oneTime: CostLineItem[] = [];
   const dataPrep = calcDataPrepCosts(ctx);
   if (dataPrep) oneTime.push(dataPrep);
+  if (complianceCosts.oneTime) oneTime.push(complianceCosts.oneTime);
 
   const totalLow = lineItems.reduce((s, li) => s + li.monthlyCostLow, 0);
   const totalMid = lineItems.reduce((s, li) => s + li.monthlyCostMid, 0);
   const totalHigh = lineItems.reduce((s, li) => s + li.monthlyCostHigh, 0);
 
+  // Use scaling profile to determine growth factor
   const growth = ctx.business.growthRateMonthly;
   const projections: FinOpsProjection[] = [];
   for (let month = 1; month <= 12; month++) {
-    const factor = Math.pow(1 + growth, month - 1);
+    let factor: number;
+    if (ctx.business.scalingProfile === "flat") {
+      factor = 1.0;
+    } else if (ctx.business.scalingProfile === "exponential") {
+      factor = Math.pow(1 + growth * 1.5, month - 1);
+    } else {
+      factor = Math.pow(1 + growth, month - 1);
+    }
     projections.push({
       month,
       totalLow: totalLow * factor,
@@ -266,7 +348,7 @@ export async function generateFinOps(
   const pricingMeta = pricing as Record<string, unknown>;
   const assumptions = [
     `Pricing as of ${(pricingMeta.last_updated as string) ?? "latest"}`,
-    `Monthly growth rate: ${(growth * 100).toFixed(0)}%`,
+    `Monthly growth rate: ${(growth * 100).toFixed(0)}% (${ctx.business.scalingProfile ?? "linear"} scaling profile)`,
     `Average request: ${ctx.business.avgInputTokens} input + ${ctx.business.avgOutputTokens} output tokens`,
     "Guardrail overhead: ~15% additional inference cost",
     "Vector store chunk ratio: ~3 chunks per document",
@@ -279,10 +361,34 @@ export async function generateFinOps(
       "Data preparation costs are one-time and not included in monthly run rate"
     );
   }
+  // New: budget ceiling comparison
+  if (ctx.business.budgetCeilingUsdMonthly) {
+    if (totalMid > ctx.business.budgetCeilingUsdMonthly) {
+      assumptions.push(
+        `WARNING: Estimated mid-range cost ($${totalMid.toLocaleString(undefined, { maximumFractionDigits: 0 })}) exceeds budget ceiling ($${ctx.business.budgetCeilingUsdMonthly.toLocaleString()})`
+      );
+    } else {
+      assumptions.push(
+        `Budget ceiling: $${ctx.business.budgetCeilingUsdMonthly.toLocaleString()}/month — estimate is within budget`
+      );
+    }
+  }
+  // New: model alternatives
+  if (ctx.business.modelAlternativeCostDelta?.length) {
+    for (const alt of ctx.business.modelAlternativeCostDelta) {
+      if (alt.model && alt.savingsPercent) {
+        assumptions.push(
+          `Alternative: ${alt.model} could save ~${alt.savingsPercent}% on LLM inference costs`
+        );
+      }
+    }
+  }
 
   const narrative = await generateNarrative(ctx, lineItems, totalMid);
 
-  const costUnderAttack = totalHigh * 10;
+  // Use costExplosionRiskMultiplier instead of hardcoded 10x
+  const explosionMultiplier = ctx.business.costExplosionRiskMultiplier ?? 10;
+  const costUnderAttack = totalHigh * explosionMultiplier;
 
   return {
     summaryMonthlyLow: totalLow,
