@@ -172,57 +172,17 @@ export function PillarWizard({
   draftId: initialDraftId,
   onDraftIdChange,
 }: PillarWizardProps) {
-  const DRAFT_KEY = "qube-wizard-draft";
-  const DRAFT_STEP_KEY = "qube-wizard-step";
-
-  const [step, setStep] = useState(() => {
-    if (typeof window === "undefined") return startStep;
-    const saved = localStorage.getItem(DRAFT_STEP_KEY);
-    return saved ? Math.min(Number(saved), startStep || 6) : startStep;
-  });
-  const [formData, setFormData] = useState<WizardFormData>(() => {
-    // Try to restore from localStorage
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(DRAFT_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved) as WizardFormData;
-          return {
-            ...DEFAULT_FORM,
-            ...parsed,
-            ...initialData,
-            technical: { ...DEFAULT_FORM.technical, ...parsed.technical, ...initialData?.technical },
-            business: { ...DEFAULT_FORM.business, ...parsed.business, ...initialData?.business },
-            responsible: { ...DEFAULT_FORM.responsible, ...parsed.responsible, ...initialData?.responsible },
-            legal: { ...DEFAULT_FORM.legal, ...parsed.legal, ...initialData?.legal },
-            dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...parsed.dataReadiness, ...initialData?.dataReadiness },
-          };
-        } catch { /* ignore corrupted data */ }
-      }
-    }
-    return {
-      ...DEFAULT_FORM,
-      ...initialData,
-      technical: { ...DEFAULT_FORM.technical, ...initialData?.technical },
-      business: { ...DEFAULT_FORM.business, ...initialData?.business },
-      responsible: { ...DEFAULT_FORM.responsible, ...initialData?.responsible },
-      legal: { ...DEFAULT_FORM.legal, ...initialData?.legal },
-      dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...initialData?.dataReadiness },
-    };
-  });
-  const [hasDraft, setHasDraft] = useState(() => typeof window !== "undefined" && !!localStorage.getItem(DRAFT_KEY));
+  const [step, setStep] = useState(startStep);
+  const [formData, setFormData] = useState<WizardFormData>(() => ({
+    ...DEFAULT_FORM,
+    ...initialData,
+    technical: { ...DEFAULT_FORM.technical, ...initialData?.technical },
+    business: { ...DEFAULT_FORM.business, ...initialData?.business },
+    responsible: { ...DEFAULT_FORM.responsible, ...initialData?.responsible },
+    legal: { ...DEFAULT_FORM.legal, ...initialData?.legal },
+    dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...initialData?.dataReadiness },
+  }));
   const [pillarScores, setPillarScores] = useState<Record<string, unknown> | null>(() => {
-    // Restore pillar scores from localStorage or initialData
-    if (typeof window !== "undefined") {
-      const saved = localStorage.getItem(DRAFT_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (parsed._pillarScores) return parsed._pillarScores;
-        } catch { /* ignore */ }
-      }
-    }
-    // Check initialData (from DB draft)
     const id = initialData as Record<string, unknown> | undefined;
     if (id?._pillarScores) return id._pillarScores as Record<string, unknown>;
     return null;
@@ -239,12 +199,7 @@ export function PillarWizard({
 
   // Debounced auto-save to DB (2s after last change)
   useEffect(() => {
-    // Save to localStorage immediately (include pillar scores)
-    localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...formData, _pillarScores: pillarScores }));
-    localStorage.setItem(DRAFT_STEP_KEY, String(step));
-    setHasDraft(true);
-
-    // Debounce DB save — only if the user has entered a name
+    // Only save if the user has entered a name
     if (!formData.name) return;
 
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
@@ -267,7 +222,6 @@ export function PillarWizard({
             onDraftIdChange?.(data.draft.id);
           }
           if (isMountedRef.current) setSavingStatus("saved");
-          // Reset to idle after 2s
           setTimeout(() => { if (isMountedRef.current) setSavingStatus("idle"); }, 2000);
         } else {
           const errBody = await res.json().catch(() => ({}));
@@ -284,25 +238,6 @@ export function PillarWizard({
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
   }, [formData, step, currentDraftId, onDraftIdChange, pillarScores]);
-
-  const clearDraft = useCallback(() => {
-    localStorage.removeItem(DRAFT_KEY);
-    localStorage.removeItem(DRAFT_STEP_KEY);
-    setFormData({
-      ...DEFAULT_FORM,
-      ...initialData,
-      technical: { ...DEFAULT_FORM.technical, ...initialData?.technical },
-      business: { ...DEFAULT_FORM.business, ...initialData?.business },
-      responsible: { ...DEFAULT_FORM.responsible, ...initialData?.responsible },
-      legal: { ...DEFAULT_FORM.legal, ...initialData?.legal },
-      dataReadiness: { ...DEFAULT_FORM.dataReadiness, ...initialData?.dataReadiness },
-    });
-    setStep(0);
-    setPillarScores(null);
-    setHasDraft(false);
-    setCurrentDraftId(undefined);
-    setSavingStatus("idle");
-  }, [initialData]);
 
   const updateField = useCallback(
     (pillar: string | null, field: string, value: unknown) => {
@@ -353,6 +288,11 @@ export function PillarWizard({
     }
   }, [formData, onScorePillars]);
 
+  // Save status indicator text
+  const saveStatusText = savingStatus === "saving" ? "Saving..." :
+    savingStatus === "saved" ? "Saved to cloud" :
+    savingStatus === "error" ? "Save failed" : null;
+
   const NavButtons = ({ hideNext }: { hideNext?: boolean }) => (
     <div className="flex justify-between items-center pt-4">
       <Button variant="outline" onClick={() => setStep(Math.max(0, step - 1))} disabled={step <= 0}>
@@ -371,35 +311,10 @@ export function PillarWizard({
     </div>
   );
 
-  // Save status indicator text
-  const saveStatusText = savingStatus === "saving" ? "Saving..." :
-    savingStatus === "saved" ? "Saved to cloud" :
-    savingStatus === "error" ? "Save failed" : null;
-
-  // Draft banner
-  const DraftBanner = hasDraft && formData.name ? (
-    <div className="mb-4 flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3">
-      <div className="flex items-center gap-3">
-        <p className="text-sm text-blue-700 dark:text-blue-300">
-          Draft: <strong>{formData.name}</strong>
-        </p>
-        {saveStatusText && (
-          <span className={`text-xs ${savingStatus === "error" ? "text-red-500" : "text-gray-500 dark:text-gray-400"}`}>
-            {saveStatusText}
-          </span>
-        )}
-      </div>
-      <Button variant="ghost" size="sm" onClick={clearDraft} className="text-blue-600 dark:text-blue-400 hover:text-blue-800">
-        Clear draft
-      </Button>
-    </div>
-  ) : null;
-
   // Step 0: Archetype
   if (step === 0) {
     return (
       <div>
-        {DraftBanner}
         <ArchetypeSelector onSelect={handleArchetypeSelect} onSkip={() => setStep(1)} />
       </div>
     );
@@ -674,7 +589,7 @@ export function PillarWizard({
         {/* Generate Button */}
         <Button
           className="w-full py-6 text-lg bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-500 hover:to-violet-500 text-white"
-          onClick={() => { const id = currentDraftId; clearDraft(); onGenerate(formData, id); }}
+          onClick={() => onGenerate(formData, currentDraftId)}
           disabled={loading}
         >
           {loading

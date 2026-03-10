@@ -94,6 +94,28 @@ export const POST = withAuth(async (request: Request, { auth }: { auth: any }) =
       return NextResponse.json({ success: true, draft: { id: updated.id, title: updated.title } });
     }
 
+    // Deduplicate: if a draft with the same title already exists for this user/org, update it instead
+    const dedupeWhere: Record<string, unknown> = {
+      title: name,
+      stage: "draft",
+    };
+    if (userRecord.organizationId) {
+      dedupeWhere.organizationId = userRecord.organizationId;
+    } else {
+      dedupeWhere.userId = userRecord.id;
+    }
+    const existingDraft = await prismaClient.useCase.findFirst({ where: dedupeWhere });
+    if (existingDraft) {
+      const updated = await prismaClient.useCase.update({
+        where: { id: existingDraft.id },
+        data: {
+          wizardDraft: wizardData,
+          updatedAt: new Date(),
+        },
+      });
+      return NextResponse.json({ success: true, draft: { id: updated.id, title: updated.title } });
+    }
+
     // Create new draft
     let nextAiucId = 1;
     if (userRecord.organizationId) {

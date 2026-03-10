@@ -5,25 +5,18 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { PillarWizard, type WizardFormData } from '@/components/architect/PillarWizard';
 import { PipelineProgressTracker } from '@/components/architect/PipelineProgressTracker';
 import { ArchitectOutputDashboard } from '@/components/architect/ArchitectOutputDashboard';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { EnrichedContextReview } from '@/components/architect/EnrichedContextReview';
+import type { EnrichedContext } from '@/lib/architect';
 import type { PipelineStep } from '@/hooks/useArchitectPipeline';
-
-interface DraftItem {
-  id: string;
-  title: string;
-  wizardDraft: Record<string, unknown> | null;
-  updatedAt: string;
-  user: { firstName: string; lastName: string; email: string };
-}
 
 function NewUseCaseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resumeDraftId = searchParams.get('draft');
 
-  const [phase, setPhase] = useState<'loading' | 'drafts' | 'wizard' | 'generating' | 'done'>('loading');
-  const [drafts, setDrafts] = useState<DraftItem[]>([]);
+  const [phase, setPhase] = useState<'loading' | 'wizard' | 'enriching' | 'reviewing' | 'generating' | 'done'>(
+    resumeDraftId ? 'loading' : 'wizard'
+  );
   const [selectedDraftId, setSelectedDraftId] = useState<string | undefined>(resumeDraftId ?? undefined);
   const [initialWizardData, setInitialWizardData] = useState<Partial<WizardFormData> | undefined>();
   const [startStep, setStartStep] = useState(0);
@@ -32,146 +25,162 @@ function NewUseCaseContent() {
   const [output, setOutput] = useState<Record<string, unknown> | null>(null);
   const [createdUseCaseId, setCreatedUseCaseId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [enrichedContext, setEnrichedContext] = useState<EnrichedContext | null>(null);
+  const [pillarScores, setPillarScores] = useState<Record<string, unknown> | null>(null);
+  const [formDataRef, setFormDataRef] = useState<WizardFormData | null>(null);
 
-  // Load existing drafts on mount
+  // If resuming a draft from URL param, load its wizard data from DB
   useEffect(() => {
-    async function loadDrafts() {
+    if (!resumeDraftId) return;
+
+    async function loadDraft() {
       try {
         const res = await fetch('/api/usecase-draft');
         if (res.ok) {
           const data = await res.json();
-          const fetchedDrafts = data.drafts || [];
-          setDrafts(fetchedDrafts);
-
-          // If resuming a specific draft from URL param, go straight to wizard
-          if (resumeDraftId) {
-            const draft = fetchedDrafts.find((d: DraftItem) => d.id === resumeDraftId);
-            if (draft?.wizardDraft) {
-              const wd = draft.wizardDraft as Record<string, unknown>;
-              setInitialWizardData(wd as Partial<WizardFormData>);
-              setStartStep((wd.currentStep as number) ?? 0);
+          const drafts = data.drafts || [];
+          const draft = drafts.find((d: { id: string }) => d.id === resumeDraftId);
+          if (draft?.wizardDraft) {
+            const wd = draft.wizardDraft as Record<string, unknown>;
+            // If user was in review phase, restore directly to review screen
+            if (wd._phase === 'reviewing' && wd._enrichedContext) {
+              setEnrichedContext(wd._enrichedContext as EnrichedContext);
+              setPillarScores((wd._pillarScores as Record<string, unknown>) ?? {});
+              setFormDataRef(wd as unknown as WizardFormData);
+              setCreatedUseCaseId(draft.id);
               setSelectedDraftId(draft.id);
-              setPhase('wizard');
+              setPhase('reviewing');
               return;
             }
+            setInitialWizardData(wd as Partial<WizardFormData>);
+            setStartStep((wd.currentStep as number) ?? 0);
+            setSelectedDraftId(draft.id);
           }
-
-          // If there are drafts, show the draft picker; otherwise go to wizard
-          setPhase(fetchedDrafts.length > 0 ? 'drafts' : 'wizard');
-        } else {
-          setPhase('wizard');
         }
       } catch {
-        setPhase('wizard');
+        // Draft load failed — start fresh
       }
+      setPhase('wizard');
     }
-    loadDrafts();
+    loadDraft();
   }, [resumeDraftId]);
-
-  const handleSelectDraft = useCallback((draft: DraftItem) => {
-    if (draft.wizardDraft) {
-      const wd = draft.wizardDraft as Record<string, unknown>;
-      setInitialWizardData(wd as Partial<WizardFormData>);
-      setStartStep((wd.currentStep as number) ?? 0);
-      // Also set the name from the wizard data in localStorage so it shows in draft banner
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('qube-wizard-draft', JSON.stringify(wd));
-        localStorage.setItem('qube-wizard-step', String((wd.currentStep as number) ?? 0));
-      }
-    }
-    setSelectedDraftId(draft.id);
-    setPhase('wizard');
-  }, []);
-
-  const handleStartNew = useCallback(() => {
-    // Clear any localStorage drafts when starting fresh
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('qube-wizard-draft');
-      localStorage.removeItem('qube-wizard-step');
-    }
-    setSelectedDraftId(undefined);
-    setInitialWizardData(undefined);
-    setStartStep(0);
-    setPhase('wizard');
-  }, []);
 
   const handleDraftIdChange = useCallback((id: string) => {
     setSelectedDraftId(id);
+    // Update URL so draft survives full page reload
+    router.replace(`/new-usecase?draft=${id}`, { scroll: false });
+  }, [router]);
+
+  // Helper to create/update UseCase record
+  const ensureUseCase = useCallback(async (formData: WizardFormData, draftId?: string): Promise<string> => {
+    const payload = {
+      ...(draftId ? { id: draftId } : {}),
+      title: formData.name,
+      problemStatement: (formData.technical as Record<string, unknown>).description || '',
+      aiType: (formData.technical as Record<string, unknown>).useCaseCategory || 'Gen AI',
+      regulatoryFrameworks: [
+        ...((formData.legal as Record<string, unknown>).regulations as string[] || []),
+        ...((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
+          (f: string) => f === 'EU AI Act' || f === 'UAE AI/GenAI Controls'
+        ),
+      ],
+      industryStandards: ((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
+        (f: string) => f === 'ISO/IEC 42001' || f === 'ISO 27001'
+      ),
+      stage: 'discovery',
+      priority: 'MEDIUM',
+      proposedAISolution: '',
+      businessFunction: '',
+    };
+
+    const ucRes = await fetch('/api/write-usecases', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!ucRes.ok) throw new Error(draftId ? 'Failed to update use case' : 'Failed to create use case');
+
+    if (draftId) return draftId;
+    const ucData = await ucRes.json();
+    return ucData.useCase?.id ?? ucData.id;
   }, []);
 
-  const handleGenerate = useCallback(async (formData: WizardFormData, draftId?: string) => {
+  // Step 1: Enrich — called from wizard's Generate button
+  const handleEnrich = useCallback(async (formData: WizardFormData, draftId?: string) => {
     setLoading(true);
     setPipelineError(null);
+    setFormDataRef(formData);
+
     try {
-      let useCaseId: string;
-
-      if (draftId) {
-        // Draft exists — update it from "draft" to "discovery" stage
-        const ucRes = await fetch('/api/write-usecases', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: draftId,
-            title: formData.name,
-            problemStatement: (formData.technical as Record<string, unknown>).description || '',
-            aiType: (formData.technical as Record<string, unknown>).useCaseCategory || 'Gen AI',
-            regulatoryFrameworks: [
-              ...((formData.legal as Record<string, unknown>).regulations as string[] || []),
-              ...((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
-                (f: string) => f === 'EU AI Act' || f === 'UAE AI/GenAI Controls'
-              ),
-            ],
-            industryStandards: ((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
-              (f: string) => f === 'ISO/IEC 42001' || f === 'ISO 27001'
-            ),
-            stage: 'discovery',
-            priority: 'MEDIUM',
-            proposedAISolution: '',
-            businessFunction: '',
-          }),
-        });
-        if (!ucRes.ok) throw new Error('Failed to update use case');
-        useCaseId = draftId;
-      } else {
-        // No draft — create new UseCase record
-        const ucRes = await fetch('/api/write-usecases', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            title: formData.name,
-            problemStatement: (formData.technical as Record<string, unknown>).description || '',
-            aiType: (formData.technical as Record<string, unknown>).useCaseCategory || 'Gen AI',
-            regulatoryFrameworks: [
-              ...((formData.legal as Record<string, unknown>).regulations as string[] || []),
-              ...((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
-                (f: string) => f === 'EU AI Act' || f === 'UAE AI/GenAI Controls'
-              ),
-            ],
-            industryStandards: ((formData.legal as Record<string, unknown>).governanceFrameworks as string[] || []).filter(
-              (f: string) => f === 'ISO/IEC 42001' || f === 'ISO 27001'
-            ),
-            stage: 'discovery',
-            priority: 'MEDIUM',
-            proposedAISolution: '',
-            businessFunction: '',
-          }),
-        });
-        if (!ucRes.ok) throw new Error('Failed to create use case');
-        const ucData = await ucRes.json();
-        useCaseId = ucData.useCase?.id ?? ucData.id;
-      }
-
+      const useCaseId = await ensureUseCase(formData, draftId);
       setCreatedUseCaseId(useCaseId);
 
-      // Switch to generating phase
-      setPhase('generating');
-      setPipelineStep('scoring_pillars');
+      // Switch to enriching phase
+      setPhase('enriching');
 
-      // Trigger full generation pipeline
-      const genRes = await fetch('/api/architect/generate', {
+      const enrichRes = await fetch('/api/architect/enrich', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ useCaseId, input: formData }),
+      });
+
+      if (!enrichRes.ok) {
+        const err = await enrichRes.json();
+        throw new Error(err.error || 'Enrichment failed');
+      }
+
+      const enrichData = await enrichRes.json();
+      setEnrichedContext(enrichData.enrichedContext);
+      setPillarScores(enrichData.pillarScores);
+
+      // Save review state to draft for resume
+      try {
+        await fetch('/api/usecase-draft', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: useCaseId,
+            wizardDraft: {
+              ...formData,
+              _phase: 'reviewing',
+              _enrichedContext: enrichData.enrichedContext,
+              _pillarScores: enrichData.pillarScores,
+            },
+          }),
+        });
+      } catch {
+        // Non-critical — draft save failure shouldn't block review
+      }
+
+      setPhase('reviewing');
+      setLoading(false);
+    } catch (err) {
+      setPipelineError(err instanceof Error ? err.message : 'Unknown error');
+      setPhase('wizard');
+      setLoading(false);
+    }
+  }, [ensureUseCase]);
+
+  // Step 2: Confirm & Generate — called from review component
+  const handleConfirmGenerate = useCallback(async (context: EnrichedContext) => {
+    if (!createdUseCaseId || !formDataRef) return;
+
+    setLoading(true);
+    setPipelineError(null);
+    setPhase('generating');
+    setPipelineStep('scoring_pillars');
+
+    try {
+      const genRes = await fetch('/api/architect/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          useCaseId: createdUseCaseId,
+          input: formDataRef,
+          enrichedContext: context,
+          pillarScores,
+        }),
       });
 
       if (!genRes.ok) {
@@ -185,14 +194,14 @@ function NewUseCaseContent() {
       setPhase('done');
 
       setTimeout(() => {
-        router.push(`/dashboard/${useCaseId}`);
+        router.push(`/dashboard/${createdUseCaseId}`);
       }, 2000);
     } catch (err) {
       setPipelineStep('failed');
       setPipelineError(err instanceof Error ? err.message : 'Unknown error');
       setLoading(false);
     }
-  }, [router]);
+  }, [router, createdUseCaseId, formDataRef, pillarScores]);
 
   const handleScorePillars = useCallback(async (formData: WizardFormData) => {
     const res = await fetch('/api/architect/score-pillars', {
@@ -207,62 +216,35 @@ function NewUseCaseContent() {
     return res.json();
   }, []);
 
-  // Loading state
+  // Loading state (only when resuming a draft)
   if (phase === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <p className="text-gray-500 dark:text-gray-400">Loading drafts...</p>
+        <p className="text-gray-500 dark:text-gray-400">Loading draft...</p>
       </div>
     );
   }
 
-  // Draft picker
-  if (phase === 'drafts') {
+  if (phase === 'enriching') {
     return (
-      <div className="min-h-screen flex justify-center items-start bg-gray-50 dark:bg-gray-900 p-4">
-        <div className="w-full max-w-2xl mt-8 space-y-6">
-          <div>
-            <h1 className="text-2xl font-bold dark:text-white">New AI Use Case</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">
-              Continue a draft or start from scratch.
-            </p>
-          </div>
-
-          <Button onClick={handleStartNew} className="w-full py-5 text-base">
-            Start New Use Case
-          </Button>
-
-          {drafts.length > 0 && (
-            <div className="space-y-3">
-              <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                Continue a Draft
-              </h2>
-              {drafts.map((draft) => (
-                <Card
-                  key={draft.id}
-                  className="p-4 dark:bg-gray-900 dark:border-gray-800 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
-                  onClick={() => handleSelectDraft(draft)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="font-semibold dark:text-white">{draft.title}</h3>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        by {draft.user.firstName} {draft.user.lastName} &middot;{' '}
-                        {new Date(draft.updatedAt).toLocaleDateString(undefined, {
-                          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                        })}
-                      </p>
-                    </div>
-                    <span className="text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 px-2 py-1 rounded-full">
-                      Draft
-                    </span>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-gray-600 dark:text-gray-400 text-sm">Analyzing your inputs...</p>
         </div>
       </div>
+    );
+  }
+
+  if (phase === 'reviewing' && enrichedContext) {
+    return (
+      <EnrichedContextReview
+        enrichedContext={enrichedContext}
+        pillarScores={pillarScores ?? {}}
+        onConfirm={handleConfirmGenerate}
+        onBack={() => setPhase('wizard')}
+        loading={loading}
+      />
     );
   }
 
@@ -299,7 +281,7 @@ function NewUseCaseContent() {
     <div className="min-h-screen flex justify-center items-start bg-gray-50 dark:bg-gray-900 p-0 sm:p-4">
       <div className="w-full max-w-4xl sm:mt-6 sm:mb-6">
         <PillarWizard
-          onGenerate={handleGenerate}
+          onGenerate={handleEnrich}
           onScorePillars={handleScorePillars}
           loading={loading}
           initialData={initialWizardData}

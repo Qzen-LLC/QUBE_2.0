@@ -576,7 +576,7 @@ const Dashboard = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <button
-                              onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/${uc.id}`); }}
+                              onClick={(e) => { e.stopPropagation(); router.push(uc.stage === 'draft' ? `/new-usecase?draft=${uc.id}` : `/dashboard/${uc.id}`); }}
                               className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                             >
                               <Settings className="w-3.5 h-3.5" />

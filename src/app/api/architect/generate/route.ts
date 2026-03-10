@@ -4,6 +4,7 @@ import { prismaClient } from "@/utils/db";
 import { verifyUseCaseAccess } from "@/lib/org-scope";
 import {
   UseCaseInputSchema,
+  EnrichedContextSchema,
   interpret,
   generateFinOps,
   generateRisks,
@@ -16,7 +17,7 @@ import {
   mapGuardrails,
   mapFinOps,
 } from "@/lib/architect";
-import type { ArchitectureOutput } from "@/lib/architect";
+import type { ArchitectureOutput, EnrichedContext } from "@/lib/architect";
 
 export const maxDuration = 120;
 
@@ -83,7 +84,21 @@ export const POST = withAuth(async (request: Request, { auth }) => {
     });
 
     // Stage 1: Interpret (score + archetype match + enrich)
-    const { context, pillarScores } = await interpret(input);
+    // When enrichedContext is provided (from review step), skip interpret()
+    // When absent, run interpret() as before (backward compat)
+    let context: EnrichedContext;
+    let pillarScores: Record<string, unknown>;
+
+    if (body.enrichedContext) {
+      context = EnrichedContextSchema.parse(body.enrichedContext);
+      // Ensure useCaseId on context matches the request
+      context = { ...context, useCaseId };
+      pillarScores = (body.pillarScores as Record<string, unknown>) ?? {};
+    } else {
+      const result = await interpret(input);
+      context = result.context;
+      pillarScores = result.pillarScores;
+    }
 
     await prismaClient.architectSession.update({
       where: { useCaseId },

@@ -29,7 +29,10 @@ export function useArchitectPipeline(useCaseId: string | undefined) {
   });
 
   const generate = useCallback(
-    async (input: Record<string, unknown>) => {
+    async (input: Record<string, unknown>, options?: {
+      enrichedContext?: Record<string, unknown>;
+      pillarScores?: Record<string, unknown>;
+    }) => {
       if (!useCaseId) return;
 
       setState({ step: "scoring_pillars", error: null, output: null, duration: null });
@@ -38,7 +41,12 @@ export function useArchitectPipeline(useCaseId: string | undefined) {
         const res = await fetch("/api/architect/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ useCaseId, input }),
+          body: JSON.stringify({
+            useCaseId,
+            input,
+            ...(options?.enrichedContext ? { enrichedContext: options.enrichedContext } : {}),
+            ...(options?.pillarScores ? { pillarScores: options.pillarScores } : {}),
+          }),
         });
 
         if (!res.ok) {

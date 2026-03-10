@@ -7,9 +7,11 @@ import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArchitectOutputDashboard } from "@/components/architect/ArchitectOutputDashboard";
 import { PipelineProgressTracker } from "@/components/architect/PipelineProgressTracker";
+import { EnrichedContextReview } from "@/components/architect/EnrichedContextReview";
 import { PillarWizard, type WizardFormData } from "@/components/architect/PillarWizard";
 import { useArchitectSession } from "@/hooks/useArchitectSession";
 import { useArchitectPipeline, type PipelineStep } from "@/hooks/useArchitectPipeline";
+import type { EnrichedContext } from "@/lib/architect";
 
 interface UseCase {
   title: string;
@@ -172,6 +174,30 @@ export default function UseCaseDetailPage() {
             currentStep={
               (architectSession.pipelineStep as PipelineStep) || "scoring_pillars"
             }
+          />
+        </div>
+      );
+    }
+
+    // Awaiting review — show enriched context review screen
+    if (sessionStatus === "awaiting_review" && architectSession.enrichedContext) {
+      return (
+        <div className="space-y-4">
+          <BackButton />
+          <EnrichedContextReview
+            enrichedContext={architectSession.enrichedContext as unknown as EnrichedContext}
+            pillarScores={(architectSession.pillarScores as Record<string, unknown>) ?? {}}
+            onConfirm={(reviewedContext: EnrichedContext) => {
+              pipeline.generate(
+                (architectSession.pillarInputs as Record<string, unknown>) ?? {},
+                {
+                  enrichedContext: reviewedContext as unknown as Record<string, unknown>,
+                  pillarScores: (architectSession.pillarScores as Record<string, unknown>) ?? {},
+                }
+              );
+            }}
+            onBack={() => router.push("/dashboard")}
+            loading={pipeline.isRunning}
           />
         </div>
       );
