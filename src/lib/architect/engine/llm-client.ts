@@ -23,7 +23,16 @@ export async function callLLM(
     messages: [{ role: "user", content: prompt }],
   });
   const block = response.content[0];
-  return block.type === "text" ? block.text : "";
+  const text = block.type === "text" ? block.text : "";
+
+  // Log truncation warning for debugging
+  if (response.stop_reason === "max_tokens") {
+    console.warn(
+      `[llm-client] Response truncated (max_tokens). Model: ${options.model ?? "claude-3-haiku-20240307"}, maxTokens: ${options.maxTokens ?? 4096}`
+    );
+  }
+
+  return text;
 }
 
 export async function callLLMJson<T = Record<string, unknown>>(
@@ -48,9 +57,93 @@ export function parseJsonFromLLM<T = Record<string, unknown>>(raw: string): T {
     }
   }
 
+  cleaned = cleaned.trim();
+
+  // Try direct parse first
   try {
-    return JSON.parse(cleaned.trim()) as T;
+    return JSON.parse(cleaned) as T;
   } catch {
-    return JSON.parse(jsonrepair(cleaned.trim())) as T;
+    // noop — fall through to repair
   }
+
+  // Try jsonrepair (handles most malformed JSON)
+  try {
+    return JSON.parse(jsonrepair(cleaned)) as T;
+  } catch {
+    // noop — fall through to truncation handling
+  }
+
+  // Handle truncated JSON: find the last valid brace/bracket and close
+  // This happens when the LLM hits max_tokens mid-output
+  try {
+    const truncated = repairTruncatedJson(cleaned);
+    return JSON.parse(truncated) as T;
+  } catch {
+    // noop
+  }
+
+  // Last resort: try jsonrepair on the truncation-repaired version
+  try {
+    const truncated = repairTruncatedJson(cleaned);
+    return JSON.parse(jsonrepair(truncated)) as T;
+  } catch (e) {
+    throw new Error(
+      `Failed to parse LLM JSON output (${cleaned.length} chars). ` +
+      `First 200 chars: ${cleaned.slice(0, 200)}... ` +
+      `Last 200 chars: ...${cleaned.slice(-200)}. ` +
+      `Parse error: ${e instanceof Error ? e.message : String(e)}`
+    );
+  }
+}
+
+/**
+ * Repair truncated JSON by closing any open structures.
+ * When the LLM hits max_tokens, the JSON is cut off mid-stream.
+ * This function counts open braces/brackets and closes them.
+ */
+function repairTruncatedJson(input: string): string {
+  // Remove any trailing partial key/value (e.g., `"some_key": "partial val`)
+  let s = input;
+
+  // Remove trailing comma or colon
+  s = s.replace(/[,:\s]+$/, "");
+
+  // If we're inside an unclosed string, close it
+  let inString = false;
+  let lastQuoteIdx = -1;
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === '"' && (i === 0 || s[i - 1] !== "\\")) {
+      inString = !inString;
+      if (inString) lastQuoteIdx = i;
+    }
+  }
+  if (inString) {
+    // Close the string
+    s += '"';
+  }
+
+  // Count open structures
+  const stack: string[] = [];
+  inString = false;
+  for (let i = 0; i < s.length; i++) {
+    const ch = s[i];
+    if (ch === '"' && (i === 0 || s[i - 1] !== "\\")) {
+      inString = !inString;
+      continue;
+    }
+    if (inString) continue;
+    if (ch === "{") stack.push("}");
+    else if (ch === "[") stack.push("]");
+    else if (ch === "}" || ch === "]") stack.pop();
+  }
+
+  // Remove trailing comma before closing
+  s = s.replace(/,\s*$/, "");
+
+  // Close all open structures
+  while (stack.length > 0) {
+    s += stack.pop();
+  }
+
+  return s;
 }

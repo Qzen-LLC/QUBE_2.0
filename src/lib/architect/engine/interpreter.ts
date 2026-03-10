@@ -16,7 +16,13 @@ import type {
   ModelAlternative,
 } from "../models/context";
 import {
-  CONTEXT_ENRICHMENT_PROMPT,
+  TECHNICAL_ENRICHMENT_PROMPT,
+  BUSINESS_ENRICHMENT_PROMPT,
+  RESPONSIBLE_ENRICHMENT_PROMPT,
+  LEGAL_ENRICHMENT_PROMPT,
+  DATA_READINESS_ENRICHMENT_PROMPT,
+  ROOT_META_ENRICHMENT_PROMPT,
+  SYNTHESIS_ENRICHMENT_PROMPT,
   PILLAR_SCORING_PROMPT,
 } from "../prompts/enrichment";
 import archetypesData from "../patterns/archetypes.json";
@@ -59,22 +65,120 @@ function parseSubArray<T>(raw: unknown, mapper: (r: Record<string, unknown>) => 
   return raw.map((item) => mapper(item as Record<string, unknown>));
 }
 
-// ── Stage 3: Context Enrichment ────────────────────────
+// ── Safe pillar call wrapper ───────────────────────────
+async function safePillarCall(
+  prompt: string,
+  maxTokens: number,
+  label: string
+): Promise<Record<string, unknown>> {
+  try {
+    const result = await callLLMJson<Record<string, unknown>>(prompt, { maxTokens });
+    console.log(`[enrichContext] ${label} call succeeded`);
+    return result;
+  } catch (err) {
+    console.warn(`[enrichContext] ${label} call failed, using empty fallback:`, err);
+    return {};
+  }
+}
+
+// ── Build pillar summary for synthesis ─────────────────
+function buildPillarSummary(
+  tech: Record<string, unknown>,
+  biz: Record<string, unknown>,
+  resp: Record<string, unknown>,
+  legal: Record<string, unknown>,
+  data: Record<string, unknown>,
+  rootMeta: Record<string, unknown>
+): Record<string, unknown> {
+  return {
+    technical: {
+      deployment_target: tech.deployment_target,
+      topology: tech.topology,
+      has_tool_use: tech.has_tool_use,
+      orchestration_pattern: tech.orchestration_pattern,
+      api_surface_exposure: tech.api_surface_exposure,
+      failover_strategy: tech.failover_strategy,
+      encryption_requirements: tech.encryption_requirements,
+    },
+    business: {
+      is_customer_facing: biz.is_customer_facing,
+      daily_requests: biz.daily_requests,
+      strategic_importance: biz.strategic_importance,
+      cost_sensitivity_level: biz.cost_sensitivity_level,
+      pilot_recommended: biz.pilot_recommended,
+      cost_explosion_risk_multiplier: biz.cost_explosion_risk_multiplier,
+    },
+    responsible: {
+      decision_impact_level: resp.decision_impact_level,
+      human_oversight_model: resp.human_oversight_model,
+      human_review_required: resp.human_review_required,
+      guardrail_layers_required: resp.guardrail_layers_required,
+    },
+    legal: {
+      data_classification: legal.data_classification,
+      pii_present: legal.pii_present,
+      eu_ai_act_risk_category: legal.eu_ai_act_risk_category,
+      regulatory_burden_score: legal.regulatory_burden_score,
+      sensitive_data_flow_exists: legal.sensitive_data_flow_exists,
+    },
+    data_readiness: {
+      quality_score: data.quality_score,
+      pipeline_maturity: data.pipeline_maturity,
+      data_staleness_risk: data.data_staleness_risk,
+      observability_required: data.observability_required,
+      golden_dataset_exists: data.golden_dataset_exists,
+    },
+    root_meta: rootMeta,
+  };
+}
+
+// ── Stage 3: Context Enrichment (multi-call pipeline) ──
 export async function enrichContext(
   useCase: UseCaseInput,
   archetype: Record<string, unknown>,
   pillarScores: Record<string, unknown>
 ): Promise<EnrichedContext> {
-  const prompt = CONTEXT_ENRICHMENT_PROMPT.replace(
-    "{use_case_json}",
-    JSON.stringify(useCase, null, 2)
-  )
-    .replace("{archetype_json}", JSON.stringify(archetype, null, 2))
-    .replace("{pricing_json}", JSON.stringify(pricingData, null, 2));
+  const useCaseJson = JSON.stringify(useCase, null, 2);
+  const archetypeJson = JSON.stringify(archetype, null, 2);
+  const pricingJson = JSON.stringify(pricingData, null, 2);
 
-  const enrichedRaw = await callLLMJson<Record<string, unknown>>(prompt, {
-    maxTokens: 4096,
-  });
+  // Helper to fill placeholders in a prompt template
+  const fillPrompt = (template: string, extras?: Record<string, string>): string => {
+    let result = template
+      .replace("{use_case_json}", useCaseJson)
+      .replace("{archetype_json}", archetypeJson);
+    if (template.includes("{pricing_json}")) {
+      result = result.replace("{pricing_json}", pricingJson);
+    }
+    if (extras) {
+      for (const [key, value] of Object.entries(extras)) {
+        result = result.replace(`{${key}}`, value);
+      }
+    }
+    return result;
+  };
+
+  // Phase 1: 6 parallel calls
+  console.log("[enrichContext] Starting Phase 1: 6 parallel pillar calls");
+  const [tech, biz, resp, legal, data, rootMeta] = await Promise.all([
+    safePillarCall(fillPrompt(TECHNICAL_ENRICHMENT_PROMPT), 2000, "technical"),
+    safePillarCall(fillPrompt(BUSINESS_ENRICHMENT_PROMPT), 2000, "business"),
+    safePillarCall(fillPrompt(RESPONSIBLE_ENRICHMENT_PROMPT), 2000, "responsible"),
+    safePillarCall(fillPrompt(LEGAL_ENRICHMENT_PROMPT), 2000, "legal"),
+    safePillarCall(fillPrompt(DATA_READINESS_ENRICHMENT_PROMPT), 2000, "data_readiness"),
+    safePillarCall(fillPrompt(ROOT_META_ENRICHMENT_PROMPT), 512, "root_meta"),
+  ]);
+
+  // Phase 2: synthesis with pillar summaries
+  console.log("[enrichContext] Starting Phase 2: synthesis call");
+  const pillarSummary = buildPillarSummary(tech, biz, resp, legal, data, rootMeta);
+  const synthesis = await safePillarCall(
+    fillPrompt(SYNTHESIS_ENRICHMENT_PROMPT, {
+      pillar_summaries_json: JSON.stringify(pillarSummary, null, 2),
+    }),
+    2000,
+    "synthesis"
+  );
 
   // Build scorecard from LLM scoring
   const getScore = (pillar: string) => {
@@ -93,8 +197,7 @@ export async function enrichContext(
     blockers: (pillarScores.blockers as string[]) ?? [],
   };
 
-  // Parse components from LLM output
-  const tech = (enrichedRaw.technical as Record<string, unknown>) ?? {};
+  // Parse components from technical call
   const rawComponents = (tech.components as Record<string, unknown>[]) ?? [];
   const components: ArchitectureComponent[] = rawComponents.map((c) => {
     const pricing = (c.pricing as Record<string, unknown>) ?? {};
@@ -121,11 +224,6 @@ export async function enrichContext(
     dataType: (df.data_type as string) ?? "",
     volumeEstimate: df.volume_estimate as string | undefined,
   }));
-
-  const biz = (enrichedRaw.business as Record<string, unknown>) ?? {};
-  const resp = (enrichedRaw.responsible as Record<string, unknown>) ?? {};
-  const legal = (enrichedRaw.legal as Record<string, unknown>) ?? {};
-  const data = (enrichedRaw.data_readiness as Record<string, unknown>) ?? {};
 
   const useCaseId = `uc-${useCase.name.toLowerCase().replace(/\s+/g, "-").slice(0, 30)}`;
 
@@ -193,7 +291,7 @@ export async function enrichContext(
   );
 
   const assumptionLog = parseSubArray<AssumptionLogEntry>(
-    enrichedRaw.assumption_log,
+    synthesis.assumption_log,
     (r) => ({
       field: r.field as string | undefined,
       assumed: r.assumed as string | undefined,
@@ -202,7 +300,7 @@ export async function enrichContext(
   );
 
   const followUpQuestionsRequired = parseSubArray<FollowUpQuestion>(
-    enrichedRaw.follow_up_questions_required,
+    synthesis.follow_up_questions_required,
     (r) => ({
       pillar: r.pillar as string | undefined,
       question: r.question as string | undefined,
@@ -222,14 +320,14 @@ export async function enrichContext(
     useCaseId,
     useCaseName: useCase.name,
     archetype:
-      (enrichedRaw.archetype as string) ??
+      (rootMeta.archetype as string) ??
       (archetype.id as string),
-    confidence: (enrichedRaw.confidence as number) ?? 0.7,
+    confidence: (rootMeta.confidence as number) ?? 0.7,
     pillarScores: pillarScorecardData,
     technical: {
       category: useCase.technical.useCaseCategory,
       archetype:
-        (enrichedRaw.archetype as string) ??
+        (rootMeta.archetype as string) ??
         (archetype.id as string),
       components,
       dataFlows,
@@ -240,7 +338,6 @@ export async function enrichContext(
       latencyTargetMs: (tech.latency_target_ms as number) ?? 3000,
       orchestrationPattern:
         (tech.orchestration_pattern as string) ?? "simple_chain",
-      // New technical fields
       hasToolUse: tech.has_tool_use as boolean | undefined,
       apiSurfaceExposure: tech.api_surface_exposure as string | undefined,
       multiVendorCount: tech.multi_vendor_count as number | undefined,
@@ -271,7 +368,6 @@ export async function enrichContext(
         (biz.roi_hypothesis as string) ?? useCase.business.roiHypothesis,
       operationalReadinessScore:
         biz.operational_readiness_score as string | undefined,
-      // New business fields
       costSensitivityLevel: biz.cost_sensitivity_level as string | undefined,
       budgetCeilingUsdMonthly: biz.budget_ceiling_usd_monthly as number | undefined,
       scalingProfile: biz.scaling_profile as string | undefined,
@@ -294,7 +390,6 @@ export async function enrichContext(
         useCase.responsible.humanOversight,
       affectedPopulation: resp.affected_population as string | undefined,
       fairnessCriteria: resp.fairness_criteria as string | undefined,
-      // New responsible fields
       guardrailLayersRequired: resp.guardrail_layers_required as string[] | undefined,
       evalPlatformHint: resp.eval_platform_hint as string | undefined,
       humanReviewRequired: resp.human_review_required as boolean | undefined,
@@ -323,7 +418,6 @@ export async function enrichContext(
         useCase.legal.crossBorderDataFlows,
       liabilityModel: legal.liability_model as string | undefined,
       ipConcerns: legal.ip_concerns as string | undefined,
-      // New legal fields
       regulatoryBurdenScore: legal.regulatory_burden_score as number | undefined,
       sensitiveDataFlowExists: legal.sensitive_data_flow_exists as boolean | undefined,
       euAiActRiskCategory: legal.eu_ai_act_risk_category as string | undefined,
@@ -360,7 +454,6 @@ export async function enrichContext(
       pipelineMaturity:
         (data.pipeline_maturity as string) ??
         useCase.dataReadiness.pipelineMaturity,
-      // New data readiness fields
       dataPreparationCritical: data.data_preparation_critical as boolean | undefined,
       dataFreshnessGuardrailIntervalDays: data.data_freshness_guardrail_interval_days as number | undefined,
       dataStalenessRisk: data.data_staleness_risk as string | undefined,
@@ -371,18 +464,17 @@ export async function enrichContext(
       periodicReviewCadence: data.periodic_review_cadence as string | undefined,
     },
     overallRiskPosture:
-      (enrichedRaw.overall_risk_posture as string) ?? "medium",
+      (rootMeta.overall_risk_posture as string) ?? "medium",
     estimatedComplexity:
-      (enrichedRaw.estimated_complexity as string) ?? "moderate",
+      (rootMeta.estimated_complexity as string) ?? "moderate",
     recommendedTier:
-      (enrichedRaw.recommended_tier as string) ?? "tier_2",
-    // New root-level fields
-    readinessBlockers: enrichedRaw.readiness_blockers as string[] | undefined,
-    crossPillarConflicts: enrichedRaw.cross_pillar_conflicts as string[] | undefined,
-    confidenceFactors: enrichedRaw.confidence_factors as Record<string, string> | undefined,
+      (rootMeta.recommended_tier as string) ?? "tier_2",
+    readinessBlockers: synthesis.readiness_blockers as string[] | undefined,
+    crossPillarConflicts: synthesis.cross_pillar_conflicts as string[] | undefined,
+    confidenceFactors: synthesis.confidence_factors as Record<string, string> | undefined,
     assumptionLog,
     followUpQuestionsRequired,
-    goNoGoRecommendation: enrichedRaw.go_no_go_recommendation as string | undefined,
+    goNoGoRecommendation: synthesis.go_no_go_recommendation as string | undefined,
   };
 
   return context;

@@ -90,7 +90,9 @@ export const POST = withAuth(async (request: Request, { auth }) => {
     let pillarScores: Record<string, unknown>;
 
     if (body.enrichedContext) {
-      context = EnrichedContextSchema.parse(body.enrichedContext);
+      // Sanitize: LLM may return objects where strings are expected in sub-arrays
+      const sanitized = sanitizeEnrichedContext(body.enrichedContext);
+      context = EnrichedContextSchema.parse(sanitized);
       // Ensure useCaseId on context matches the request
       context = { ...context, useCaseId };
       pillarScores = (body.pillarScores as Record<string, unknown>) ?? {};
@@ -267,4 +269,55 @@ async function persistOutputsToDb(
   } catch {
     // FinOps table may have different constraints, non-critical
   }
+}
+
+// Coerce non-string values to strings in sub-arrays where Zod expects strings
+function sanitizeEnrichedContext(ctx: Record<string, unknown>): Record<string, unknown> {
+  const stringifyFields = (arr: unknown, fields: string[]): unknown => {
+    if (!Array.isArray(arr)) return arr;
+    return arr.map((item) => {
+      if (typeof item !== "object" || item === null) return item;
+      const obj = { ...item } as Record<string, unknown>;
+      for (const f of fields) {
+        if (obj[f] != null && typeof obj[f] !== "string") {
+          obj[f] = JSON.stringify(obj[f]);
+        }
+      }
+      return obj;
+    });
+  };
+
+  const result = { ...ctx };
+
+  // Root-level arrays with string fields
+  result.assumptionLog = stringifyFields(result.assumptionLog, ["field", "assumed", "risk"]);
+  result.followUpQuestionsRequired = stringifyFields(result.followUpQuestionsRequired, ["pillar", "question", "impact"]);
+  result.readinessBlockers = Array.isArray(result.readinessBlockers)
+    ? result.readinessBlockers.map((v) => typeof v === "string" ? v : JSON.stringify(v))
+    : result.readinessBlockers;
+  result.crossPillarConflicts = Array.isArray(result.crossPillarConflicts)
+    ? result.crossPillarConflicts.map((v) => typeof v === "string" ? v : JSON.stringify(v))
+    : result.crossPillarConflicts;
+
+  // Nested section arrays
+  const resp = typeof result.responsible === "object" && result.responsible ? { ...(result.responsible as Record<string, unknown>) } : null;
+  if (resp) {
+    resp.stageGateRequirements = stringifyFields(resp.stageGateRequirements, ["gate", "owner", "criteria"]);
+    resp.remediationRoadmap = stringifyFields(resp.remediationRoadmap, ["priority", "action", "owner"]);
+    resp.conditionalApprovalConditions = Array.isArray(resp.conditionalApprovalConditions)
+      ? resp.conditionalApprovalConditions.map((v) => typeof v === "string" ? v : JSON.stringify(v))
+      : resp.conditionalApprovalConditions;
+    resp.transparencyObligations = Array.isArray(resp.transparencyObligations)
+      ? resp.transparencyObligations.map((v) => typeof v === "string" ? v : JSON.stringify(v))
+      : resp.transparencyObligations;
+    result.responsible = resp;
+  }
+
+  const data = typeof result.dataReadiness === "object" && result.dataReadiness ? { ...(result.dataReadiness as Record<string, unknown>) } : null;
+  if (data) {
+    data.incidentEscalationMatrix = stringifyFields(data.incidentEscalationMatrix, ["severity", "escalateTo"]);
+    result.dataReadiness = data;
+  }
+
+  return result;
 }
